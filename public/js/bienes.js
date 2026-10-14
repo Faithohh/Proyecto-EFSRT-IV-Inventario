@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", function () {
     (function () {
         var panelBien = document.getElementById("mpBien") || document;
         var bienvenida = document.getElementById("mpBienvenida");
-
         var tblBody = document.getElementById("tbody_bien") || document.querySelector("#tblBien tbody");
         var txtBuscar = document.getElementById("txtBuscarBien");
         var cboFiltroSala = document.getElementById("cboFiltroSala");
@@ -16,66 +15,85 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
 
-        // --- FUNCIÓN DE FECHA IDENTICA A GRUPO.JS (UTC-5 AM/PM) ---
+        function getCsrfToken() {
+            return document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
+                   document.querySelector('input[name="_token"]')?.value || "";
+        }
+
         function formatearFecha(f) {
             if (!f) return "";
-
             var fechaStr = String(f).trim();
             var regex = /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[ T](\d{1,2}):(\d{1,2}))?/;
             var match = fechaStr.match(regex);
+            var d;
 
             if (match) {
-                var anio = parseInt(match[1], 10);
-                var mes = parseInt(match[2], 10) - 1;
-                var dia = parseInt(match[3], 10);
-                var horas = match[4] ? parseInt(match[4], 10) : 0;
-                var minutos = match[5] ? parseInt(match[5], 10) : 0;
-
-                var d = new Date(anio, mes, dia, horas, minutos);
-                d.setHours(d.getHours() - 5);
-
-                var dDia = String(d.getDate()).padStart(2, '0');
-                var dMes = String(d.getMonth() + 1).padStart(2, '0');
-                var dAnio = d.getFullYear();
-                var dHoras24 = d.getHours();
-                var dMin = String(d.getMinutes()).padStart(2, '0');
-
-                var ampm = dHoras24 >= 12 ? 'PM' : 'AM';
-                var dHoras12 = dHoras24 % 12;
-                dHoras12 = dHoras12 ? dHoras12 : 12;
-
-                return dDia + '/' + dMes + '/' + dAnio + ' ' + String(dHoras12).padStart(2, '0') + ':' + dMin + ' ' + ampm;
+                d = new Date(match[1], match[2] - 1, match[3], match[4] || 0, match[5] || 0);
+            } else {
+                d = new Date(f);
+                if (isNaN(d.getTime())) return f;
             }
 
-            var fallbackDate = new Date(f);
-            if (isNaN(fallbackDate.getTime())) return f;
+            d.setHours(d.getHours() - 5);
 
-            fallbackDate.setHours(fallbackDate.getHours() - 5);
+            var dia = String(d.getDate()).padStart(2, '0');
+            var mes = String(d.getMonth() + 1).padStart(2, '0');
+            var anio = d.getFullYear();
+            var h24 = d.getHours();
+            var min = String(d.getMinutes()).padStart(2, '0');
+            var ampm = h24 >= 12 ? 'PM' : 'AM';
+            var h12 = String(h24 % 12 || 12).padStart(2, '0');
 
-            var fbDia = String(fallbackDate.getDate()).padStart(2, '0');
-            var fbMes = String(fallbackDate.getMonth() + 1).padStart(2, '0');
-            var fbAnio = fallbackDate.getFullYear();
-            var fbHoras24 = fallbackDate.getHours();
-            var fbMin = String(fallbackDate.getMinutes()).padStart(2, '0');
+            return `${dia}/${mes}/${anio} ${h12}:${min} ${ampm}`;
+        }
 
-            var fbAmpm = fbHoras24 >= 12 ? 'PM' : 'AM';
-            var fbHoras12 = fbHoras24 % 12;
-            fbHoras12 = fbHoras12 ? fbHoras12 : 12;
-
-            return fbDia + '/' + fbMes + '/' + fbAnio + ' ' + String(fbHoras12).padStart(2, '0') + ':' + fbMin + ' ' + fbAmpm;
+        function llenarSelect(selectEl, lista, valKey, textKey, defaultText) {
+            if (!selectEl || !Array.isArray(lista)) return;
+            var html = `<option value="">-- ${defaultText} --</option>`;
+            html += lista.map(item => `<option value="${esc(item[valKey])}">${esc(item[textKey])}</option>`).join('');
+            selectEl.innerHTML = html;
         }
 
         function setEstadoFormularioBien(deshabilitado) {
             var form = document.getElementById("formBien");
             if (form) {
-                var elementos = form.querySelectorAll("input, select, textarea");
-                elementos.forEach(function (el) { el.disabled = deshabilitado; });
+                form.querySelectorAll("input, select, textarea").forEach(el => el.disabled = deshabilitado);
             }
-
             var btnGuardar = document.getElementById("btnGuardarBien");
-            if (btnGuardar) {
-                btnGuardar.style.display = deshabilitado ? "none" : "";
+            if (btnGuardar) btnGuardar.style.display = deshabilitado ? "none" : "";
+        }
+
+        function cargarCamposFormulario(data) {
+            data = data || {};
+            var mapaCampos = {
+                "txtIdBienOriginal": data.idBien || "",
+                "txtCbi": data.cbi || "",
+                "txtDescripcionBien": data.descripcion || "",
+                "txtSerieMedida": data.serieMedida || "",
+                "txtOtrasEspecificaciones": data.otrasEspecificaciones || "",
+                "cboSala": data.idSala || "",
+                "cboGrupo": data.idGrupo || "",
+                "cboTipo": data.idTipo || "",
+                "cboMarca": data.idMarca || "",
+                "cboModelo": data.idModelo || "",
+                "cboEstado": data.idEstado || ""
+            };
+
+            Object.keys(mapaCampos).forEach(id => {
+                var el = document.getElementById(id);
+                if (el) el.value = mapaCampos[id];
+            });
+        }
+
+        function obtenerSeleccionado() {
+            if (!bienSeleccionado && tblBody) {
+                var trSel = tblBody.querySelector("tr.sel, tr.selected, tr.table-active");
+                if (trSel) {
+                    var id = trSel.getAttribute("data-id");
+                    bienSeleccionado = bienCache.find(g => String(g.idBien) === String(id));
+                }
             }
+            return bienSeleccionado;
         }
 
         function pintarBien(lista) {
@@ -84,102 +102,54 @@ document.addEventListener("DOMContentLoaded", function () {
                 tblBody.innerHTML = '<tr><td colspan="13" class="text-center">No hay registros disponibles</td></tr>';
                 return;
             }
-            tblBody.innerHTML = lista.map(function (item) {
-                return '<tr data-id="' + esc(item.idBien) + '">' +
-                    '<td>' + esc(item.cbi || '') + '</td>' +
-                    '<td>' + esc(item.descripcion || '') + '</td>' +
-                    '<td>' + esc(item.tipo || '') + '</td>' +
-                    '<td>' + esc(item.marca || '') + '</td>' +
-                    '<td>' + esc(item.modelo || '') + '</td>' +
-                    '<td>' + esc(item.estado || '') + '</td>' +
-                    '<td>' + esc(item.grupo || '') + '</td>' +
-                    '<td>' + esc(item.serieMedida || '') + '</td>' +
-                    '<td>' + esc(item.otrasEspecificaciones || '') + '</td>' +
-                    '<td>' + esc(formatearFecha(item.fechaCreacion) || '') + '</td>' +
-                    '<td>' + esc(formatearFecha(item.fechaModificacion) || '') + '</td>' +
-                    '<td>' + esc(item.idUsuarioCrea || '') + '</td>' +
-                    '<td>' + esc(item.idUsuarioModifica || '') + '</td>' +
-                    '</tr>';
-            }).join("");
+            tblBody.innerHTML = lista.map(item => `
+                <tr data-id="${esc(item.idBien)}">
+                    <td>${esc(item.cbi)}</td>
+                    <td>${esc(item.descripcion)}</td>
+                    <td>${esc(item.tipo)}</td>
+                    <td>${esc(item.marca)}</td>
+                    <td>${esc(item.modelo)}</td>
+                    <td>${esc(item.estado)}</td>
+                    <td>${esc(item.grupo)}</td>
+                    <td>${esc(item.serieMedida)}</td>
+                    <td>${esc(item.otrasEspecificaciones)}</td>
+                    <td>${esc(formatearFecha(item.fechaCreacion))}</td>
+                    <td>${esc(formatearFecha(item.fechaModificacion))}</td>
+                    <td>${esc(item.idUsuarioCrea)}</td>
+                    <td>${esc(item.idUsuarioModifica)}</td>
+                </tr>
+            `).join("");
         }
 
-        // --- CARGAR SALAS PARA EL FILTRO SUPERIOR ---
         async function cargarSalasFiltro() {
             if (!cboFiltroSala) return;
             try {
                 var r = await fetch("/bienes/salas", { headers: { Accept: "application/json" } });
                 var j = await r.json();
-                if (j.ok && Array.isArray(j.data)) {
-                    cboFiltroSala.innerHTML = '<option value="">-- TODAS LAS SALAS --</option>';
-                    j.data.forEach(function (s) {
-                        cboFiltroSala.innerHTML += '<option value="' + esc(s.idSala) + '">' + esc(s.descripcion) + '</option>';
-                    });
-                }
+                if (j.ok) llenarSelect(cboFiltroSala, j.data, "idSala", "descripcion", "TODAS LAS SALAS");
             } catch (e) {
                 console.error("Error al cargar salas en filtro:", e);
             }
         }
 
-        // --- CARGAR LOS 6 COMBOS DEL MODAL DESDE /bienes/combos ---
         async function cargarCombosModal() {
             try {
-                // Llenar Sala del modal
-                var rSala = await fetch("/bienes/salas", { headers: { Accept: "application/json" } });
+                var [rSala, rCombos] = await Promise.all([
+                    fetch("/bienes/salas", { headers: { Accept: "application/json" } }),
+                    fetch("/bienes/combos", { headers: { Accept: "application/json" } })
+                ]);
+
                 var jSala = await rSala.json();
-                var cboSala = document.getElementById("cboSala");
-                if (cboSala && jSala.ok && Array.isArray(jSala.data)) {
-                    cboSala.innerHTML = '<option value="">-- SELECCIONE SALA --</option>';
-                    jSala.data.forEach(function (s) {
-                        cboSala.innerHTML += '<option value="' + esc(s.idSala) + '">' + esc(s.descripcion) + '</option>';
-                    });
-                }
+                if (jSala.ok) llenarSelect(document.getElementById("cboSala"), jSala.data, "idSala", "descripcion", "SELECCIONE SALA");
 
-                // Llenar Grupos, Tipos, Marcas, Modelos, Estados
-                var rCombos = await fetch("/bienes/combos", { headers: { Accept: "application/json" } });
                 var jCombos = await rCombos.json();
-
                 if (jCombos.ok && jCombos.data) {
                     var d = jCombos.data;
-
-                    var cboGrupo = document.getElementById("cboGrupo");
-                    if (cboGrupo && Array.isArray(d.grupos)) {
-                        cboGrupo.innerHTML = '<option value="">-- SELECCIONE GRUPO --</option>';
-                        d.grupos.forEach(function (g) {
-                            cboGrupo.innerHTML += '<option value="' + esc(g.idGrupo) + '">' + esc(g.nombre) + '</option>';
-                        });
-                    }
-
-                    var cboTipo = document.getElementById("cboTipo");
-                    if (cboTipo && Array.isArray(d.tipos)) {
-                        cboTipo.innerHTML = '<option value="">-- SELECCIONE TIPO --</option>';
-                        d.tipos.forEach(function (t) {
-                            cboTipo.innerHTML += '<option value="' + esc(t.idTipo) + '">' + esc(t.nombre) + '</option>';
-                        });
-                    }
-
-                    var cboMarca = document.getElementById("cboMarca");
-                    if (cboMarca && Array.isArray(d.marcas)) {
-                        cboMarca.innerHTML = '<option value="">-- SELECCIONE MARCA --</option>';
-                        d.marcas.forEach(function (m) {
-                            cboMarca.innerHTML += '<option value="' + esc(m.idMarca) + '">' + esc(m.nombre) + '</option>';
-                        });
-                    }
-
-                    var cboModelo = document.getElementById("cboModelo");
-                    if (cboModelo && Array.isArray(d.modelos)) {
-                        cboModelo.innerHTML = '<option value="">-- SELECCIONE MODELO --</option>';
-                        d.modelos.forEach(function (mo) {
-                            cboModelo.innerHTML += '<option value="' + esc(mo.idModelo) + '">' + esc(mo.nombre) + '</option>';
-                        });
-                    }
-
-                    var cboEstado = document.getElementById("cboEstado");
-                    if (cboEstado && Array.isArray(d.estados)) {
-                        cboEstado.innerHTML = '<option value="">-- SELECCIONE ESTADO --</option>';
-                        d.estados.forEach(function (e) {
-                            cboEstado.innerHTML += '<option value="' + esc(e.idEstado) + '">' + esc(e.nombre) + '</option>';
-                        });
-                    }
+                    llenarSelect(document.getElementById("cboGrupo"), d.grupos, "idGrupo", "nombre", "SELECCIONE GRUPO");
+                    llenarSelect(document.getElementById("cboTipo"), d.tipos, "idTipo", "nombre", "SELECCIONE TIPO");
+                    llenarSelect(document.getElementById("cboMarca"), d.marcas, "idMarca", "nombre", "SELECCIONE MARCA");
+                    llenarSelect(document.getElementById("cboModelo"), d.modelos, "idModelo", "nombre", "SELECCIONE MODELO");
+                    llenarSelect(document.getElementById("cboEstado"), d.estados, "idEstado", "nombre", "SELECCIONE ESTADO");
                 }
             } catch (e) {
                 console.error("Error al cargar combos del modal:", e);
@@ -203,7 +173,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 aplicarFiltros();
             } catch (e) {
                 console.error("Error al cargar bienes:", e);
-                tblBody.innerHTML = '<tr><td colspan="13" class="text-center text-danger">' + esc(e.message || "Error al cargar datos") + '</td></tr>';
+                tblBody.innerHTML = `<tr><td colspan="13" class="text-center text-danger">${esc(e.message || "Error al cargar datos")}</td></tr>`;
             }
         }
 
@@ -211,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
             var q = txtBuscar ? txtBuscar.value.trim().toLowerCase() : "";
             var idSalaSel = cboFiltroSala ? cboFiltroSala.value : "";
 
-            var filtrados = bienCache.filter(function (item) {
+            var filtrados = bienCache.filter(item => {
                 var texto = Object.values(item).join(" ").toLowerCase();
                 var coincideTexto = !q || texto.includes(q);
                 var coincideSala = !idSalaSel || String(item.idSala) === String(idSalaSel);
@@ -221,124 +191,35 @@ document.addEventListener("DOMContentLoaded", function () {
             pintarBien(filtrados);
         }
 
-        if (tblBody) {
-            tblBody.addEventListener("click", function (e) {
-                var tr = e.target.closest("tr[data-id]");
-                if (!tr) return;
+        
+        function mostrarModal(titulo, esSoloLectura) {
+            var title = document.getElementById("modalBienTitle");
+            if (title) title.textContent = titulo;
 
-                tblBody.querySelectorAll("tr").forEach(function (x) { x.classList.remove("table-active", "selected", "sel"); });
-                tr.classList.add("table-active", "selected", "sel");
+            setEstadoFormularioBien(esSoloLectura);
 
-                var id = tr.getAttribute("data-id");
-                bienSeleccionado = bienCache.find(function (g) { return String(g.idBien) === String(id); });
-            });
+            var modalEl = document.getElementById("modalBien");
+            if (modalEl) {
+                (bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl)).show();
+            }
         }
-
-        if (txtBuscar) txtBuscar.addEventListener("keyup", aplicarFiltros);
-        if (cboFiltroSala) cboFiltroSala.addEventListener("change", aplicarFiltros);
 
         async function abrirModalNuevo() {
-            var form = document.getElementById("formBien");
-            if (form) form.reset();
-
+            document.getElementById("formBien")?.reset();
             await cargarCombosModal();
-
-            var inputId = document.getElementById("txtIdBienOriginal");
-            if (inputId) inputId.value = "";
-
-            var title = document.getElementById("modalBienTitle");
-            if (title) title.textContent = "Nuevo Bien";
-
-            setEstadoFormularioBien(false);
-
-            var modalEl = document.getElementById("modalBien");
-            if (modalEl) {
-                var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                modal.show();
-            }
+            cargarCamposFormulario({});
+            mostrarModal("Nuevo Bien", false);
         }
 
-        async function abrirModalEditar() {
-            if (!bienSeleccionado) {
-                var trSel = tblBody ? tblBody.querySelector("tr.sel, tr.selected, tr.table-active") : null;
-                if (trSel) {
-                    var id = trSel.getAttribute("data-id");
-                    bienSeleccionado = bienCache.find(function (g) { return String(g.idBien) === String(id); });
-                }
-            }
-
-            if (!bienSeleccionado) {
-                alert("Por favor, seleccione un registro de la tabla para editar.");
+        async function abrirModalFormulario(titulo, esSoloLectura) {
+            var item = obtenerSeleccionado();
+            if (!item) {
+                alert("Por favor, seleccione un registro de la tabla.");
                 return;
             }
-
             await cargarCombosModal();
-
-            document.getElementById("txtIdBienOriginal").value = bienSeleccionado.idBien || "";
-            document.getElementById("txtCbi").value = bienSeleccionado.cbi || "";
-            document.getElementById("txtDescripcionBien").value = bienSeleccionado.descripcion || "";
-            document.getElementById("txtSerieMedida").value = bienSeleccionado.serieMedida || "";
-            document.getElementById("txtOtrasEspecificaciones").value = bienSeleccionado.otrasEspecificaciones || "";
-
-            // Seleccionar los valores guardados en los combos
-            if (document.getElementById("cboSala")) document.getElementById("cboSala").value = bienSeleccionado.idSala || "";
-            if (document.getElementById("cboGrupo")) document.getElementById("cboGrupo").value = bienSeleccionado.idGrupo || "";
-            if (document.getElementById("cboTipo")) document.getElementById("cboTipo").value = bienSeleccionado.idTipo || "";
-            if (document.getElementById("cboMarca")) document.getElementById("cboMarca").value = bienSeleccionado.idMarca || "";
-            if (document.getElementById("cboModelo")) document.getElementById("cboModelo").value = bienSeleccionado.idModelo || "";
-            if (document.getElementById("cboEstado")) document.getElementById("cboEstado").value = bienSeleccionado.idEstado || "";
-
-            var title = document.getElementById("modalBienTitle");
-            if (title) title.textContent = "Editar Bien";
-
-            setEstadoFormularioBien(false);
-
-            var modalEl = document.getElementById("modalBien");
-            if (modalEl) {
-                var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                modal.show();
-            }
-        }
-
-        async function verDetalle() {
-            if (!bienSeleccionado) {
-                var trSel = tblBody ? tblBody.querySelector("tr.sel, tr.selected, tr.table-active") : null;
-                if (trSel) {
-                    var id = trSel.getAttribute("data-id");
-                    bienSeleccionado = bienCache.find(function (g) { return String(g.idBien) === String(id); });
-                }
-            }
-
-            if (!bienSeleccionado) {
-                alert("Por favor, seleccione un registro para consultar.");
-                return;
-            }
-
-            await cargarCombosModal();
-
-            document.getElementById("txtIdBienOriginal").value = bienSeleccionado.idBien || "";
-            document.getElementById("txtCbi").value = bienSeleccionado.cbi || "";
-            document.getElementById("txtDescripcionBien").value = bienSeleccionado.descripcion || "";
-            document.getElementById("txtSerieMedida").value = bienSeleccionado.serieMedida || "";
-            document.getElementById("txtOtrasEspecificaciones").value = bienSeleccionado.otrasEspecificaciones || "";
-
-            if (document.getElementById("cboSala")) document.getElementById("cboSala").value = bienSeleccionado.idSala || "";
-            if (document.getElementById("cboGrupo")) document.getElementById("cboGrupo").value = bienSeleccionado.idGrupo || "";
-            if (document.getElementById("cboTipo")) document.getElementById("cboTipo").value = bienSeleccionado.idTipo || "";
-            if (document.getElementById("cboMarca")) document.getElementById("cboMarca").value = bienSeleccionado.idMarca || "";
-            if (document.getElementById("cboModelo")) document.getElementById("cboModelo").value = bienSeleccionado.idModelo || "";
-            if (document.getElementById("cboEstado")) document.getElementById("cboEstado").value = bienSeleccionado.idEstado || "";
-
-            var title = document.getElementById("modalBienTitle");
-            if (title) title.textContent = "Consulta de Bien";
-
-            setEstadoFormularioBien(true);
-
-            var modalEl = document.getElementById("modalBien");
-            if (modalEl) {
-                var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                modal.show();
-            }
+            cargarCamposFormulario(item);
+            mostrarModal(titulo, esSoloLectura);
         }
 
         async function guardarBien() {
@@ -349,15 +230,12 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             try {
-                var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
-                            document.querySelector('input[name="_token"]')?.value;
-
                 var response = await fetch("/bienes/guardar", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         Accept: "application/json",
-                        "X-CSRF-TOKEN": token
+                        "X-CSRF-TOKEN": getCsrfToken()
                     },
                     body: JSON.stringify({
                         idOriginal: document.getElementById("txtIdBienOriginal")?.value,
@@ -377,10 +255,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 var data = await response.json();
                 if (data.ok) {
                     var modalEl = document.getElementById("modalBien");
-                    if (modalEl) {
-                        var modal = bootstrap.Modal.getInstance(modalEl);
-                        if (modal) modal.hide();
-                    }
+                    if (modalEl) bootstrap.Modal.getInstance(modalEl)?.hide();
                     await listarBien();
                 } else {
                     alert(data.msg || "Error al guardar el bien.");
@@ -391,15 +266,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         function confirmarEliminar() {
-            if (!bienSeleccionado) {
-                var trSel = tblBody ? tblBody.querySelector("tr.sel, tr.selected, tr.table-active") : null;
-                if (trSel) {
-                    var id = trSel.getAttribute("data-id");
-                    bienSeleccionado = bienCache.find(function (g) { return String(g.idBien) === String(id); });
-                }
-            }
-
-            if (!bienSeleccionado) {
+            var item = obtenerSeleccionado();
+            if (!item) {
                 alert("Por favor, seleccione un registro de la tabla para eliminar.");
                 return;
             }
@@ -410,34 +278,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (!modalEl) return;
 
-            var nombre = bienSeleccionado.descripcion || bienSeleccionado.idBien;
-            if (msgEl) msgEl.textContent = '¿Está seguro de eliminar el bien "' + nombre + '"?';
-
+            if (msgEl) msgEl.textContent = `¿Está seguro de eliminar el bien "${item.descripcion || item.idBien}"?`;
             var bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
 
             if (btnEliminar) {
                 btnEliminar.onclick = async function () {
                     bsModal.hide();
-                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
-                                document.querySelector('input[name="_token"]')?.value;
-
                     try {
                         var res = await fetch("/bienes/eliminar", {
                             method: "POST",
                             headers: {
-                                "X-CSRF-TOKEN": token,
+                                "X-CSRF-TOKEN": getCsrfToken(),
                                 "Content-Type": "application/json",
                                 Accept: "application/json"
                             },
-                            body: JSON.stringify({ idBien: bienSeleccionado.idBien })
+                            body: JSON.stringify({ idBien: item.idBien })
                         });
 
                         var data = await res.json();
-                        if (data.ok) {
-                            await listarBien();
-                        } else {
-                            alert(data.msg || "Error al eliminar el bien.");
-                        }
+                        if (data.ok) await listarBien();
+                        else alert(data.msg || "Error al eliminar el bien.");
                     } catch (err) {
                         alert("Error de conexión con el servidor.");
                     }
@@ -453,57 +313,48 @@ document.addEventListener("DOMContentLoaded", function () {
                 return; 
             }
             var csv = "cbi,descripcion,Tipo,Marca,Modelo,Estado,Grupo,serieMedida,otrasEspecificaciones,fechaCreacion,fechaModificacion,idUsuarioCrea,idUsuarioModifica\n";
-            bienCache.forEach(function (item) {
-                var cbi = (item.cbi || "").replace(/"/g, '""');
-                var des = (item.descripcion || "").replace(/"/g, '""');
-                var tip = (item.tipo || "").replace(/"/g, '""');
-                var mar = (item.marca || "").replace(/"/g, '""');
-                var mod = (item.modelo || "").replace(/"/g, '""');
-                var est = (item.estado || "").replace(/"/g, '""');
-                var gru = (item.grupo || "").replace(/"/g, '""');
-                var ser = (item.serieMedida || "").replace(/"/g, '""');
-                var esp = (item.otrasEspecificaciones || "").replace(/"/g, '""');
-                var fCrea = (formatearFecha(item.fechaCreacion) || "").replace(/"/g, '""');
-                var fMod = (formatearFecha(item.fechaModificacion) || "").replace(/"/g, '""');
-                var uCrea = (item.idUsuarioCrea || "").replace(/"/g, '""');
-                var uMod = (item.idUsuarioModifica || "").replace(/"/g, '""');
-
-                csv += '"' + cbi + '","' + des + '","' + tip + '","' + mar + '","' + mod + '","' + est + '","' + gru + '","' + ser + '","' + esp + '","' + fCrea + '","' + fMod + '","' + uCrea + '","' + uMod + '"\n';
+            bienCache.forEach(item => {
+                var cols = [
+                    item.cbi, item.descripcion, item.tipo, item.marca, item.modelo,
+                    item.estado, item.grupo, item.serieMedida, item.otrasEspecificaciones,
+                    formatearFecha(item.fechaCreacion), formatearFecha(item.fechaModificacion),
+                    item.idUsuarioCrea, item.idUsuarioModifica
+                ];
+                csv += cols.map(c => `"${String(c || "").replace(/"/g, '""')}"`).join(",") + "\n";
             });
 
             var blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
             var link = document.createElement("a");
-            var url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", "bienes_" + new Date().toISOString().slice(0, 10) + ".csv");
-            link.style.visibility = "hidden";
-            document.body.appendChild(link);
+            link.href = URL.createObjectURL(blob);
+            link.download = `bienes_${new Date().toISOString().slice(0, 10)}.csv`;
             link.click();
-            document.body.removeChild(link);
         }
 
-        var btnGuardarModal = document.getElementById("btnGuardarBien");
-        if (btnGuardarModal) {
-            btnGuardarModal.addEventListener("click", function (e) {
-                e.preventDefault();
-                guardarBien();
+        if (tblBody) {
+            tblBody.addEventListener("click", function (e) {
+                var tr = e.target.closest("tr[data-id]");
+                if (!tr) return;
+                tblBody.querySelectorAll("tr").forEach(x => x.classList.remove("table-active", "selected", "sel"));
+                tr.classList.add("table-active", "selected", "sel");
+                var id = tr.getAttribute("data-id");
+                bienSeleccionado = bienCache.find(g => String(g.idBien) === String(id));
             });
         }
 
-        var formEl = document.getElementById("formBien");
-        formEl?.addEventListener("submit", function (e) {
-            e.preventDefault();
-            guardarBien();
-        });
+        if (txtBuscar) txtBuscar.addEventListener("keyup", aplicarFiltros);
+        if (cboFiltroSala) cboFiltroSala.addEventListener("change", aplicarFiltros);
 
-        panelBien.querySelectorAll(".tb-btn").forEach(function (b) {
+        document.getElementById("btnGuardarBien")?.addEventListener("click", e => { e.preventDefault(); guardarBien(); });
+        document.getElementById("formBien")?.addEventListener("submit", e => { e.preventDefault(); guardarBien(); });
+
+        panelBien.querySelectorAll(".tb-btn").forEach(b => {
             b.addEventListener("click", function () {
                 var acc = b.dataset.acc;
                 if (acc === "nuevo") abrirModalNuevo();
-                else if (acc === "editar") abrirModalEditar();
+                else if (acc === "editar") abrirModalFormulario("Editar Bien", false);
                 else if (acc === "eliminar") confirmarEliminar();
                 else if (acc === "recargar") listarBien();
-                else if (acc === "imprimir" || acc === "consultar" || acc === "detalle") verDetalle();
+                else if (["imprimir", "consultar", "detalle"].includes(acc)) abrirModalFormulario("Consulta de Bien", true);
                 else if (acc === "excel") exportarExcel();
                 else if (acc === "salir" && bienvenida) {
                     if (panelBien !== document) panelBien.hidden = true;
@@ -512,11 +363,9 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
 
-        window.addEventListener("modulo:abrir", function (e) {
+        window.addEventListener("modulo:abrir", e => {
             var mod = (e.detail || "").toLowerCase();
-            if (mod === "bienes" || mod === "bien") {
-                listarBien();
-            }
+            if (mod === "bienes" || mod === "bien") listarBien();
         });
 
         cargarSalasFiltro();

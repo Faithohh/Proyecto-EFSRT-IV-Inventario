@@ -84,9 +84,9 @@
                 </div>
             </div>
             <div class="mp-item">
-                <a class="mp-link" href="/principal"><svg viewBox="0 0 24 24">
+                <button type="button" class="mp-link" data-modulo="reportes"><svg viewBox="0 0 24 24">
                         <path d="M4 20V10M10 20V4M16 20v-8M22 20H2" />
-                    </svg>Reportes</a>
+                    </svg>Reportes</button>
             </div>
             <div class="mp-item">
                 <button type="button" class="mp-link" data-menu="m-ventana"><svg viewBox="0 0 24 24">
@@ -133,10 +133,10 @@
             @include('modulos.tipo')
             @include('modulos.bienes')
             @include('modulos.toma_inventario')
+            @include('modulos.reportes')
         </main>
     </div>
 
-    <!-- Modal de Confirmación Eliminar (Reutilizable para todos los módulos) -->
     <div class="modal fade" id="modalConfirmarEliminar" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -155,20 +155,21 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('js/tema.js') }}?v={{ time() }}"></script>
-    <script src="{{ asset('js/principal.js') }}?v={{ time() }}"></script>
-    <script src="{{ asset('js/usuarios.js') }}?v={{ time() }}"></script>
-    <script src="{{ asset('js/personal.js') }}?v={{ time() }}"></script>
-    <script src="{{ asset('js/ProgramaEstudio.js') }}?v={{ time() }}"></script>
-    <script src="{{ asset('js/grupo.js') }}?v={{ time() }}"></script>
-    <script src="{{ asset('js/estado.js') }}?v={{ time() }}"></script>
-    <script src="{{ asset('js/marca.js') }}?v={{ time() }}"></script>
-    <script src="{{ asset('js/modelo.js') }}?v={{ time() }}"></script>
-    <script src="{{ asset('js/sala.js') }}?v={{ time() }}"></script>
-    <script src="{{ asset('js/tipo.js') }}?v={{ time() }}"></script>
-    <script src="{{ asset('js/bienes.js') }}?v={{ time() }}"></script>
-    <script src="{{ asset('js/toma_inventario.js') }}?v={{ time() }}"></script>
-</body>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> 
+    <script src="{{ asset('js/tema.js') }}?v={{ time() }}"></script> 
+    <script src="{{ asset('js/principal.js') }}?v={{ time() }}"></script> 
+    <script src="{{ asset('js/usuarios.js') }}?v={{ time() }}"></script> 
+    <script src="{{ asset('js/personal.js') }}?v={{ time() }}"></script> 
+    <script src="{{ asset('js/ProgramaEstudio.js') }}?v={{ time() }}"></script> 
+    <script src="{{ asset('js/grupo.js') }}?v={{ time() }}"></script> 
+    <script src="{{ asset('js/estado.js') }}?v={{ time() }}"></script> 
+    <script src="{{ asset('js/marca.js') }}?v={{ time() }}"></script> 
+    <script src="{{ asset('js/modelo.js') }}?v={{ time() }}"></script> 
+    <script src="{{ asset('js/sala.js') }}?v={{ time() }}"></script> 
+    <script src="{{ asset('js/tipo.js') }}?v={{ time() }}"></script> 
+    <script src="{{ asset('js/bienes.js') }}?v={{ time() }}"></script> 
+    <script src="{{ asset('js/toma_inventario.js') }}?v={{ time() }}"></script> 
+    <script src="{{ asset('js/reportes.js') }}?v={{ time() }}"></script> 
+</body> 
+ 
 </html>

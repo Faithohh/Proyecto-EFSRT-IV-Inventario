@@ -1,11 +1,8 @@
-// Variable global para almacenar el ID del inventario en edición (null = Nuevo)
 let idInventarioEditando = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Carga inicial
     cargarInventarios();
 
-    // Evento de apertura por módulo
     window.addEventListener("modulo:abrir", function (e) {
         var mod = (e.detail || "").toLowerCase();
         if (mod.includes("inventario") || mod.includes("toma")) {
@@ -15,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 1. Buscador en tiempo real
     const txtBuscar = document.getElementById('txtBuscarInventario');
     if (txtBuscar) {
         txtBuscar.addEventListener('input', function () {
@@ -30,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 2. Selección de fila
     const tabla = document.getElementById('tblInventarios');
     if (tabla) {
         const tbody = tabla.querySelector('tbody');
@@ -45,14 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 3. Evento para modal
     const modalInventario = document.getElementById('modalInventario');
     if (modalInventario) {
         modalInventario.addEventListener('hidden.bs.modal', () => {
             limpiarBackdrops();
             idInventarioEditando = null;
 
-            // Habilitar campos nuevamente y reactivar botón guardar
             modalInventario.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
             const btnGuardar = document.getElementById('btnGuardarInventario');
             if (btnGuardar) btnGuardar.style.display = 'inline-block';
@@ -62,7 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. Botones de herramientas del panel (Nuevo, Editar, Detalle/Imprimir, Recargar, Salir)
     const panelInventario = document.getElementById('mpTomaInventario');
     if (panelInventario) {
         panelInventario.querySelectorAll('.tb-btn').forEach(btn => {
@@ -74,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const form = document.getElementById('formInventario') || modalInventario?.querySelector('form');
                     if (form) form.reset();
 
-                    // Asegurar que los campos estén habilitados
                     if (modalInventario) {
                         modalInventario.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
                         const btnGuardar = document.getElementById('btnGuardarInventario');
@@ -91,8 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         alert('Por favor, seleccione un registro de la tabla para editar.');
                         return;
                     }
-                    const id = filaSel.dataset.id;
-                    prepararEdicion(id);
+                    prepararEdicion(filaSel.dataset.id);
 
                 } else if (acc === 'detalle' || acc === 'ver' || acc === 'imprimir') {
                     const filaSel = document.querySelector('#tblInventarios tbody tr.sel');
@@ -100,8 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         alert('Por favor, seleccione un registro de la tabla para visualizar.');
                         return;
                     }
-                    const id = filaSel.dataset.id;
-                    verDetalleInventario(id);
+                    verDetalleInventario(filaSel.dataset.id);
 
                 } else if (acc === 'recargar') {
                     cargarInventarios();
@@ -115,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 5. Botón Guardar dentro del Modal (POST o PUT)
     const btnGuardar = document.getElementById('btnGuardarInventario');
     if (btnGuardar) {
         btnGuardar.addEventListener('click', function (e) {
@@ -164,9 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (resData.success || resData.status) {
                     alert(idInventarioEditando ? '¡Inventario actualizado con éxito!' : '¡Inventario registrado con éxito!');
 
-                    const modalEl = document.getElementById('modalInventario');
-                    if (modalEl && typeof bootstrap !== 'undefined') {
-                        const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                    if (modalInventario && typeof bootstrap !== 'undefined') {
+                        const modalInstance = bootstrap.Modal.getInstance(modalInventario) || new bootstrap.Modal(modalInventario);
                         modalInstance.hide();
                     }
 
@@ -192,34 +179,35 @@ function abrirModal() {
     }
 }
 
-function prepararEdicion(id) {
+function rellenarFormulario(d) {
+    if (document.getElementById('txtSerie')) document.getElementById('txtSerie').value = d.anio || '';
+    if (document.getElementById('txtNumero')) document.getElementById('txtNumero').value = d.numero || '';
+    if (document.getElementById('cboEstadoInventario')) document.getElementById('cboEstadoInventario').value = d.estado || 'ABIERTO';
+    if (document.getElementById('cboSalaInventario')) document.getElementById('cboSalaInventario').value = d.sala_id || '';
+    if (document.getElementById('cboCoordinador')) document.getElementById('cboCoordinador').value = d.coordinador_id || '';
+    if (document.getElementById('cboAsistente1')) document.getElementById('cboAsistente1').value = d.asistente1_id || '';
+    if (document.getElementById('cboAsistente2')) document.getElementById('cboAsistente2').value = d.asistente2_id || '';
+    if (document.getElementById('txtFechaEntrega')) document.getElementById('txtFechaEntrega').value = d.fecha_entrega || '';
+    if (document.getElementById('txtObservacionInventario')) document.getElementById('txtObservacionInventario').value = d.observacion || '';
+}
+
+function cargarDatosYMostrar(id, esSoloLectura) {
     cargarComboboxesInventario().then(() => {
         fetch(`/inventario/mostrar/${id}`)
             .then(res => res.json())
             .then(resData => {
                 if (resData.status && resData.data) {
                     const d = resData.data;
-                    idInventarioEditando = d.id;
+                    idInventarioEditando = esSoloLectura ? null : d.id;
 
-                    // Habilitar campos por si venía de un modo detalle
                     const modalEl = document.getElementById('modalInventario');
                     if (modalEl) {
-                        modalEl.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
+                        modalEl.querySelectorAll('input, select, textarea').forEach(el => el.disabled = esSoloLectura);
                         const btnGuardar = document.getElementById('btnGuardarInventario');
-                        if (btnGuardar) btnGuardar.style.display = 'inline-block';
+                        if (btnGuardar) btnGuardar.style.display = esSoloLectura ? 'none' : 'inline-block';
                     }
 
-                    // Mapeo a los inputs del Modal
-                    if (document.getElementById('txtSerie')) document.getElementById('txtSerie').value = d.anio;
-                    if (document.getElementById('txtNumero')) document.getElementById('txtNumero').value = d.numero;
-                    if (document.getElementById('cboEstadoInventario')) document.getElementById('cboEstadoInventario').value = d.estado;
-                    if (document.getElementById('cboSalaInventario')) document.getElementById('cboSalaInventario').value = d.sala_id;
-                    if (document.getElementById('cboCoordinador')) document.getElementById('cboCoordinador').value = d.coordinador_id;
-                    if (document.getElementById('cboAsistente1')) document.getElementById('cboAsistente1').value = d.asistente1_id;
-                    if (document.getElementById('cboAsistente2')) document.getElementById('cboAsistente2').value = d.asistente2_id || '';
-                    if (document.getElementById('txtFechaEntrega')) document.getElementById('txtFechaEntrega').value = d.fecha_entrega;
-                    if (document.getElementById('txtObservacionInventario')) document.getElementById('txtObservacionInventario').value = d.observacion || '';
-
+                    rellenarFormulario(d);
                     abrirModal();
                 } else {
                     alert('No se pudieron obtener los datos del registro.');
@@ -232,42 +220,12 @@ function prepararEdicion(id) {
     });
 }
 
+function prepararEdicion(id) {
+    cargarDatosYMostrar(id, false);
+}
+
 function verDetalleInventario(id) {
-    cargarComboboxesInventario().then(() => {
-        fetch(`/inventario/mostrar/${id}`)
-            .then(res => res.json())
-            .then(resData => {
-                if (resData.status && resData.data) {
-                    const d = resData.data;
-
-                    if (document.getElementById('txtSerie')) document.getElementById('txtSerie').value = d.anio;
-                    if (document.getElementById('txtNumero')) document.getElementById('txtNumero').value = d.numero;
-                    if (document.getElementById('cboEstadoInventario')) document.getElementById('cboEstadoInventario').value = d.estado;
-                    if (document.getElementById('cboSalaInventario')) document.getElementById('cboSalaInventario').value = d.sala_id;
-                    if (document.getElementById('cboCoordinador')) document.getElementById('cboCoordinador').value = d.coordinador_id;
-                    if (document.getElementById('cboAsistente1')) document.getElementById('cboAsistente1').value = d.asistente1_id;
-                    if (document.getElementById('cboAsistente2')) document.getElementById('cboAsistente2').value = d.asistente2_id || '';
-                    if (document.getElementById('txtFechaEntrega')) document.getElementById('txtFechaEntrega').value = d.fecha_entrega;
-                    if (document.getElementById('txtObservacionInventario')) document.getElementById('txtObservacionInventario').value = d.observacion || '';
-
-                    // Deshabilitar campos y ocultar botón guardar
-                    const modalEl = document.getElementById('modalInventario');
-                    if (modalEl) {
-                        modalEl.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
-                        const btnGuardar = document.getElementById('btnGuardarInventario');
-                        if (btnGuardar) btnGuardar.style.display = 'none';
-                    }
-
-                    abrirModal();
-                } else {
-                    alert('No se pudieron obtener los detalles del registro.');
-                }
-            })
-            .catch(err => {
-                console.error('Error al ver detalle:', err);
-                alert('Error al conectar con el servidor.');
-            });
-    });
+    cargarDatosYMostrar(id, true);
 }
 
 function limpiarBackdrops() {
@@ -278,48 +236,46 @@ function limpiarBackdrops() {
 }
 
 function cargarInventarios() {
-    const tabla = document.getElementById('tblInventarios');
-    const tbody = tabla ? tabla.querySelector('tbody') : null;
+    const tbody = document.querySelector('#tblInventarios tbody');
+    if (!tbody) return;
 
-    if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="9" class="text-center">Cargando...</td></tr>';
-    }
+    tbody.innerHTML = '<tr><td colspan="9" class="text-center">Cargando...</td></tr>';
 
     fetch('/inventario/listar')
         .then(res => res.json())
         .then(resData => {
-            if (!tbody) return;
-
             const items = resData.data || [];
-            let html = '';
 
             if (items.length === 0) {
-                html = '<tr><td colspan="9" class="text-center text-muted">No hay registros de inventario.</td></tr>';
-            } else {
-                items.forEach(item => {
-                    html += `
-                        <tr data-id="${item.idInventario}">
-                            <td>${item.INVENTARIO || ''}</td>
-                            <td>${item.SALA || ''}</td>
-                            <td>${item.COORDINADOR || ''}</td>
-                            <td>${item.ASISTENTE_T1 || ''}</td>
-                            <td>${item.ASISTENTE_T2 || ''}</td>
-                            <td>${item.FECHA_ENTREGA || ''}</td>
-                            <td>${item.OBSERVACION || ''}</td>
-                            <td>${item.CANTIDAD_DE_BIENES ?? 0}</td>
-                            <td>${item.ESTADO || ''}</td>
-                        </tr>
-                    `;
-                });
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No hay registros de inventario.</td></tr>';
+                return;
             }
 
-            tbody.innerHTML = html;
+            const fragment = document.createDocumentFragment();
+
+            items.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.dataset.id = item.idInventario;
+                tr.innerHTML = `
+                    <td>${item.INVENTARIO || ''}</td>
+                    <td>${item.SALA || ''}</td>
+                    <td>${item.COORDINADOR || ''}</td>
+                    <td>${item.ASISTENTE_T1 || ''}</td>
+                    <td>${item.ASISTENTE_T2 || ''}</td>
+                    <td>${item.FECHA_ENTREGA || ''}</td>
+                    <td>${item.OBSERVACION || ''}</td>
+                    <td>${item.CANTIDAD_DE_BIENES ?? 0}</td>
+                    <td>${item.ESTADO || ''}</td>
+                `;
+                fragment.appendChild(tr);
+            });
+
+            tbody.innerHTML = '';
+            tbody.appendChild(fragment);
         })
         .catch(err => {
             console.error('Error al listar inventarios:', err);
-            if (tbody) {
-                tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error al cargar datos.</td></tr>';
-            }
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error al cargar datos.</td></tr>';
         });
 }
 
@@ -331,11 +287,16 @@ function cargarComboboxesInventario() {
         { url: '/personal/listar', elementId: 'cboAsistente2' }
     ];
 
+    const peticiones = new Map();
+
     return Promise.all(catalogos.map(cat => {
-        return fetch(cat.url)
-            .then(res => res.json())
+        if (!peticiones.has(cat.url)) {
+            peticiones.set(cat.url, fetch(cat.url).then(res => res.json()));
+        }
+
+        return peticiones.get(cat.url)
             .then(resData => {
-                let items = resData.data || (Array.isArray(resData) ? resData : []);
+                const items = resData.data || (Array.isArray(resData) ? resData : []);
                 const select = document.getElementById(cat.elementId);
                 if (!select) return;
 

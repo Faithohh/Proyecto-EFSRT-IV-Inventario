@@ -14,6 +14,8 @@ use App\Http\Controllers\TipoController;
 use App\Http\Controllers\ProgramaEstudioController;
 use App\Http\Controllers\BienController;
 use App\Http\Controllers\InventarioController;
+use App\Http\Controllers\ReporteController;
+
 
 Route::get('/inventario/exportar-excel/{id}', [InventarioController::class, 'exportarExcel']);
 
@@ -22,14 +24,24 @@ Route::put('/inventario/actualizar/{id}', [InventarioController::class, 'actuali
 Route::get('/inventario/listar', [InventarioController::class, 'listar']);
 Route::post('/inventario/guardar', [InventarioController::class, 'guardar']);
 
+
+// Rutas de Módulo Reportes
+Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+Route::get('/reportes/inventarios', [ReporteController::class, 'listarInventarios'])->name('reportes.inventarios');
+Route::get('/reportes/informe/{idInventario}', [ReporteController::class, 'generarInforme'])->name('reportes.informe');
+
+
 Route::redirect('/', '/login');
+
 
 Route::get('/login', [Login::class, 'index'])->name('login');
 Route::post('/login/acceso', [Login::class, 'validarAcceso'])->name('login.acceso');
 Route::post('/login/sesion', [Login::class, 'crearSesion'])->name('login.sesion');
 
+
 Route::get('/principal', function () {
     $titulo = str_replace('2025', '2026', Session::get('tituloSesion', 'SIIN'));
+
     return view('principal', [
         'titulo'   => $titulo,
         'usuario'  => Session::get('idUsuario', ''),
@@ -37,6 +49,7 @@ Route::get('/principal', function () {
         'programa' => Session::get('idProgramaEstudio', ''),
     ]);
 })->name('principal');
+
 
 // Rutas de Módulo Usuarios
 Route::get('/usuarios', function () {
@@ -49,6 +62,7 @@ Route::get('/usuarios/buscar/{idUsuario}', [UsuarioController::class, 'buscar'])
 Route::post('/usuarios/guardar', [UsuarioController::class, 'guardar'])->name('usuarios.guardar');
 Route::post('/usuarios/eliminar', [UsuarioController::class, 'eliminar'])->name('usuarios.eliminar');
 
+
 // Rutas de Módulo Personal
 Route::get('/personal', function () {
     return view('modulos.personal');
@@ -58,6 +72,7 @@ Route::get('/personal/listar', [PersonalController::class, 'listar'])->name('per
 Route::get('/personal/buscar/{idPersonal}', [PersonalController::class, 'buscar'])->name('personal.buscar');
 Route::post('/personal/guardar', [PersonalController::class, 'guardar'])->name('personal.guardar');
 Route::delete('/personal/eliminar/{idPersonal}', [PersonalController::class, 'eliminar'])->name('personal.eliminar');
+
 
 // Rutas de Módulo Grupo
 Route::get('/grupo', function () {
@@ -69,6 +84,7 @@ Route::get('/grupo/buscar/{idGrupo}', [GrupoController::class, 'buscar'])->name(
 Route::post('/grupo/guardar', [GrupoController::class, 'guardar'])->name('grupo.guardar');
 Route::post('/grupo/eliminar', [GrupoController::class, 'eliminar'])->name('grupo.eliminar');
 
+
 // Rutas de Módulo Estado
 Route::get('/estado', function () {
     return view('modulos.estado');
@@ -78,6 +94,7 @@ Route::get('/estado/listar', [EstadoController::class, 'listar'])->name('estado.
 Route::get('/estado/buscar/{idEstado}', [EstadoController::class, 'buscar'])->name('estado.buscar');
 Route::post('/estado/guardar', [EstadoController::class, 'guardar'])->name('estado.guardar');
 Route::post('/estado/eliminar', [EstadoController::class, 'eliminar'])->name('estado.eliminar');
+
 
 // Rutas de Módulo Marca
 Route::get('/marca', function () {
@@ -89,6 +106,7 @@ Route::get('/marca/buscar/{idMarca}', [MarcaController::class, 'buscar'])->name(
 Route::post('/marca/guardar', [MarcaController::class, 'guardar'])->name('marca.guardar');
 Route::post('/marca/eliminar', [MarcaController::class, 'eliminar'])->name('marca.eliminar');
 
+
 // Endpoints del Módulo Modelo
 Route::get('/modelo', function () {
     return view('modulos.modelo');
@@ -98,6 +116,7 @@ Route::get('/modelo/listar', [ModeloController::class, 'listar'])->name('modelo.
 Route::get('/modelo/buscar/{idModelo}', [ModeloController::class, 'buscar'])->name('modelo.buscar');
 Route::post('/modelo/guardar', [ModeloController::class, 'guardar'])->name('modelo.guardar');
 Route::post('/modelo/eliminar', [ModeloController::class, 'eliminar'])->name('modelo.eliminar');
+
 
 // Rutas de Módulo Sala
 Route::get('/sala', function () {
@@ -109,6 +128,7 @@ Route::get('/sala/buscar/{idSala}', [SalaController::class, 'buscar'])->name('sa
 Route::post('/sala/guardar', [SalaController::class, 'guardar'])->name('sala.guardar');
 Route::post('/sala/eliminar', [SalaController::class, 'eliminar'])->name('sala.eliminar');
 
+
 // Rutas de Módulo Tipo
 Route::get('/tipo', function () {
     return view('modulos.tipo');
@@ -118,6 +138,7 @@ Route::get('/tipo/listar', [TipoController::class, 'listar'])->name('tipo.listar
 Route::get('/tipo/buscar/{idTipo}', [TipoController::class, 'buscar'])->name('tipo.buscar');
 Route::post('/tipo/guardar', [TipoController::class, 'guardar'])->name('tipo.guardar');
 Route::post('/tipo/eliminar', [TipoController::class, 'eliminar'])->name('tipo.eliminar');
+
 
 // Rutas de Módulo Programa de Estudio
 Route::get('/programa-estudio', function () {
@@ -129,6 +150,7 @@ Route::get('/programa-estudio/usuarios', [ProgramaEstudioController::class, 'lis
 Route::get('/programa-estudio/buscar/{idProgramaEstudio}', [ProgramaEstudioController::class, 'buscar'])->name('programa.buscar');
 Route::post('/programa-estudio/guardar', [ProgramaEstudioController::class, 'guardar'])->name('programa.guardar');
 Route::delete('/programa-estudio/eliminar/{idProgramaEstudio}', [ProgramaEstudioController::class, 'eliminar'])->name('programa.eliminar');
+
 
 // Rutas de Módulo Bienes
 Route::get('/bienes', function () {
