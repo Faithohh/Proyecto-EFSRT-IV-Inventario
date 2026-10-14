@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 23-09-2026 a las 23:56:11
+-- Tiempo de generación: 18-09-2026 a las 23:48:42
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -1297,8 +1297,7 @@ INSERT INTO `bien` (`idBien`, `idSala`, `idGrupo`, `cbi`, `idTipo`, `descripcion
 (73, 2, 28, 'L2-24', 1, 'CPU DE COMPUTO - MAQUINA 24', 1, 17, 'SERIE-L2-28', 1, 'EQUIPO DE COMPUTO PARA LABORATORIO 2', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
 (74, 2, 29, 'L2-25', 1, 'CPU DE COMPUTO - MAQUINA 25', 1, 17, 'SERIE-L2-29', 1, 'EQUIPO DE COMPUTO PARA LABORATORIO 2', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
 (81, 2, 6, '000002', 2, 'ninguna descripcion 2', 16, 19, '00000123', 4, 'ninguna otra especificaon 2', 0, 'FAI', '2026-09-17 22:28:23', 'DESKTOP-DKN38QG', 'FAI', '2026-09-17 22:30:47', 'DESKTOP-DKN38QG'),
-(82, 3, 4, '000011123', 21, 'rapidoasdasd', 31, 16, '0000142434523412', 4, 'nadaaseqaweqw', 1, 'FAI', '2026-09-17 22:32:42', 'DESKTOP-DKN38QG', 'FAI', '2026-09-17 22:32:53', 'DESKTOP-DKN38QG'),
-(83, 4, 6, '123123', 4, '12312', 53, 17, '123', 4, '1231', 1, 'FAI', '2026-09-23 21:44:12', 'DESKTOP-07IOB2G', NULL, NULL, NULL);
+(82, 3, 4, '000011123', 21, 'rapidoasdasd', 31, 16, '0000142434523412', 4, 'nadaaseqaweqw', 1, 'FAI', '2026-09-17 22:32:42', 'DESKTOP-DKN38QG', 'FAI', '2026-09-17 22:32:53', 'DESKTOP-DKN38QG');
 
 -- --------------------------------------------------------
 
@@ -1878,7 +1877,8 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('XOJ5WlJy8ngt4c6DFcK7xubcK18U7G6EieoPYcax', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.138.0 Chrome/148.0.7778.280 Electron/42.10.0 Safari/537.36', 'YTo3OntzOjY6Il90b2tlbiI7czo0MDoiQzAyU3dIYW9vUzg1N1dZWm9ybUhtZW9GRGdTR1V4bXphaEVwejFPUSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzU6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9tb2RlbG8vbGlzdGFyIjtzOjU6InJvdXRlIjtzOjEzOiJtb2RlbG8ubGlzdGFyIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJpZFVzdWFyaW8iO3M6MzoiRkFJIjtzOjE3OiJpZFByb2dyYW1hRXN0dWRpbyI7czoxOiIyIjtzOjExOiJ0aXBvVXN1YXJpbyI7czoxMzoiQURNSU5JU1RSQURPUiI7czoxMjoidGl0dWxvU2VzaW9uIjtzOjExMjoiWyBTSUlOLTIwMjYtMSBdIC0gWyBERVNBUlJPTExPIERFIFNJU1RFTUFTIERFIElORk9STUFDScOTTiBdIC0gWyBGQUkgXSAtIFsgTFVDQVMgTUFUSElBUyBGQUlUSCBPUk1Fw5FPIEhFUlJFUkEgXSI7fQ==', 1790200228);
+('2YKQm0mWaCt2jQXrm5eovXx9nRzONm1Q1TFz0ypW', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.137.0 Chrome/148.0.7778.280 Electron/42.10.0 Safari/537.36', 'YTo3OntzOjY6Il90b2tlbiI7czo0MDoiUjJ0S1VvYXhZSWxUQ3RGcUdRNTJ1SDMzZ3h3QWlyM0NDTU5WVDlkdSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDI6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9pbnZlbnRhcmlvL21vc3RyYXIvNSI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJpZFVzdWFyaW8iO3M6MzoiRkFJIjtzOjE3OiJpZFByb2dyYW1hRXN0dWRpbyI7czoxOiI1IjtzOjExOiJ0aXBvVXN1YXJpbyI7czoxMzoiQURNSU5JU1RSQURPUiI7czoxMjoidGl0dWxvU2VzaW9uIjtzOjkzOiJbIFNJSU4tMjAyNi0xIF0gLSBbIE1FQ0FOSUNBIEFVVE9NT1RSSVogXSAtIFsgRkFJIF0gLSBbIExVQ0FTIE1BVEhJQVMgRkFJVEggT1JNRcORTyBIRVJSRVJBIF0iO30=', 1789767809),
+('sxGe4UzNKwQGGx8ZjJGIETSAOITJcSSGRe9BMUaw', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', 'YTo3OntzOjY6Il90b2tlbiI7czo0MDoiMzBOOGZMckZ5MGJteXZ1TkhXWnFtTVBEVG1ZRFFsc2tDUmFSaHo4QSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzU6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9iaWVuZXMvbGlzdGFyIjtzOjU6InJvdXRlIjtzOjEzOiJiaWVuZXMubGlzdGFyIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJpZFVzdWFyaW8iO3M6MzoiRkFJIjtzOjE3OiJpZFByb2dyYW1hRXN0dWRpbyI7czoxOiIyIjtzOjExOiJ0aXBvVXN1YXJpbyI7czoxMzoiQURNSU5JU1RSQURPUiI7czoxMjoidGl0dWxvU2VzaW9uIjtzOjExMjoiWyBTSUlOLTIwMjYtMSBdIC0gWyBERVNBUlJPTExPIERFIFNJU1RFTUFTIERFIElORk9STUFDScOTTiBdIC0gWyBGQUkgXSAtIFsgTFVDQVMgTUFUSElBUyBGQUlUSCBPUk1Fw5FPIEhFUlJFUkEgXSI7fQ==', 1789768049);
 
 -- --------------------------------------------------------
 
@@ -2295,7 +2295,7 @@ ALTER TABLE `usuario_programaestudio`
 -- AUTO_INCREMENT de la tabla `bien`
 --
 ALTER TABLE `bien`
-  MODIFY `idBien` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
+  MODIFY `idBien` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
 
 --
 -- AUTO_INCREMENT de la tabla `failed_jobs`
