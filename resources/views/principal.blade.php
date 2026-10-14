@@ -48,7 +48,9 @@
                         <div class="mp-sub" id="s-archivo">
                             <button type="button" class="mp-opt" data-modulo="usuarios">Usuarios</button>
                             <button type="button" class="mp-opt" data-modulo="personal">Personal</button>
-                            <button type="button" class="mp-opt">Programa de Estudio</button>
+                            {{-- <button type="button" class="mp-opt" data-modulo="grupo">Grupos</button> --}}
+                            {{-- <button type="button" class="mp-opt" data-modulo="estados">Estados</button> --}}
+                            <button type="button" class="mp-opt" data-modulo="ProgramaEstudio">Programa de Estudio</button>
                         </div>
                     </div>
                     <div class="mp-sep"></div>
@@ -67,17 +69,17 @@
                     <div class="mp-has">
                         <button type="button" class="mp-opt" data-sub="s-tablas"><span>Tablas Generales</span><span class="mp-arrow">›</span></button>
                         <div class="mp-sub" id="s-tablas">
-                            <button type="button" class="mp-opt">Grupo</button>
-                            <button type="button" class="mp-opt">Estado</button>
-                            <button type="button" class="mp-opt">Marca</button>
-                            <button type="button" class="mp-opt">Modelo</button>
-                            <button type="button" class="mp-opt">Sala</button>
-                            <button type="button" class="mp-opt">Tipo</button>
+                            <button type="button" class="mp-opt" data-modulo="grupo">Grupo</button>
+                            <button type="button" class="mp-opt" data-modulo="estado">Estado</button>
+                            <button type="button" class="mp-opt" data-modulo="marca">Marca</button>
+                            <button type="button" class="mp-opt" data-modulo="modelo">Modelo</button>
+                            <button type="button" class="mp-opt" data-modulo="sala">Sala</button>
+                            <button type="button" class="mp-opt" data-modulo="tipo">Tipo</button>
                         </div>
                     </div>
                     <div class="mp-sep"></div>
-                    <button type="button" class="mp-opt">Bienes</button>
-                    <button type="button" class="mp-opt">Toma de Inventario</button>
+                    <button type="button" class="mp-opt" data-modulo="bien">Bienes</button>
+                    <button type="button" class="mp-opt" data-modulo="toma_inventario">Toma de Inventario</button>
                     <button type="button" class="mp-opt">Reporte bien</button>
                 </div>
             </div>
@@ -122,7 +124,34 @@
             </section>
             @include('modulos.usuarios')
             @include('modulos.personal')
+            @include('modulos.ProgramaEstudio')
+            @include('modulos.grupo')
+            @include('modulos.estado')
+            @include('modulos.marca')
+            @include('modulos.modelo')
+            @include('modulos.sala')
+            @include('modulos.tipo')
+            @include('modulos.bienes')
+            @include('modulos.toma_inventario')
         </main>
+    </div>
+
+    <div class="modal fade" id="modalConfirmarEliminar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="msgConfirmarEliminar" class="mb-0">¿Está seguro de eliminar este registro?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmarEliminarAccion">Eliminar</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -130,6 +159,15 @@
     <script src="{{ asset('js/principal.js') }}?v={{ time() }}"></script>
     <script src="{{ asset('js/usuarios.js') }}?v={{ time() }}"></script>
     <script src="{{ asset('js/personal.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/ProgramaEstudio.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/grupo.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/estado.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/marca.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/modelo.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/sala.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/tipo.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/bienes.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/toma_inventario.js') }}?v={{ time() }}"></script>
 </body>
 
 </html>

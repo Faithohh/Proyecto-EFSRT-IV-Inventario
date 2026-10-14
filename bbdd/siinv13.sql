@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-09-2026 a las 23:18:57
+-- Tiempo de generación: 23-09-2026 a las 23:56:11
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -1295,7 +1295,10 @@ INSERT INTO `bien` (`idBien`, `idSala`, `idGrupo`, `cbi`, `idTipo`, `descripcion
 (71, 2, 26, 'L2-22', 1, 'CPU DE COMPUTO - MAQUINA 22', 1, 17, 'SERIE-L2-26', 1, 'EQUIPO DE COMPUTO PARA LABORATORIO 2', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
 (72, 2, 27, 'L2-23', 1, 'CPU DE COMPUTO - MAQUINA 23', 1, 17, 'SERIE-L2-27', 1, 'EQUIPO DE COMPUTO PARA LABORATORIO 2', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
 (73, 2, 28, 'L2-24', 1, 'CPU DE COMPUTO - MAQUINA 24', 1, 17, 'SERIE-L2-28', 1, 'EQUIPO DE COMPUTO PARA LABORATORIO 2', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
-(74, 2, 29, 'L2-25', 1, 'CPU DE COMPUTO - MAQUINA 25', 1, 17, 'SERIE-L2-29', 1, 'EQUIPO DE COMPUTO PARA LABORATORIO 2', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL);
+(74, 2, 29, 'L2-25', 1, 'CPU DE COMPUTO - MAQUINA 25', 1, 17, 'SERIE-L2-29', 1, 'EQUIPO DE COMPUTO PARA LABORATORIO 2', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
+(81, 2, 6, '000002', 2, 'ninguna descripcion 2', 16, 19, '00000123', 4, 'ninguna otra especificaon 2', 0, 'FAI', '2026-09-17 22:28:23', 'DESKTOP-DKN38QG', 'FAI', '2026-09-17 22:30:47', 'DESKTOP-DKN38QG'),
+(82, 3, 4, '000011123', 21, 'rapidoasdasd', 31, 16, '0000142434523412', 4, 'nadaaseqaweqw', 1, 'FAI', '2026-09-17 22:32:42', 'DESKTOP-DKN38QG', 'FAI', '2026-09-17 22:32:53', 'DESKTOP-DKN38QG'),
+(83, 4, 6, '123123', 4, '12312', 53, 17, '123', 4, '1231', 1, 'FAI', '2026-09-23 21:44:12', 'DESKTOP-07IOB2G', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1391,11 +1394,11 @@ CREATE TABLE `grupo` (
 --
 
 INSERT INTO `grupo` (`idGrupo`, `idProgramaEstudio`, `nombre`, `st_registro`, `idUsuarioCrea`, `fechaCreacion`, `pcTerminalCrea`, `idUsuarioModifica`, `fechaModificacion`, `pcTerminalModifica`) VALUES
-(1, 2, 'EQUIPOS DE CÓMPUTO', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
+(1, 2, 'EQUIPOS DE CÓMPUTO', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', 'AZUñIGA', '2026-09-16 00:56:41', NULL),
 (2, 2, 'MOBILIARIO', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
 (3, 5, 'HERRAMIENTAS ELÉCTRICAS', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
 (4, 5, 'HERRAMIENTAS MANUALES', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
-(5, 2, 'MAQUINA 01', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
+(5, 2, 'MAQUINA 01', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', 'FAI', '2026-09-16 04:10:06', NULL),
 (6, 2, 'MAQUINA 02', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
 (7, 2, 'MAQUINA 03', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
 (8, 2, 'MAQUINA 04', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
@@ -1419,7 +1422,9 @@ INSERT INTO `grupo` (`idGrupo`, `idProgramaEstudio`, `nombre`, `st_registro`, `i
 (26, 2, 'MAQUINA 22', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
 (27, 2, 'MAQUINA 23', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
 (28, 2, 'MAQUINA 24', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
-(29, 2, 'MAQUINA 25', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL);
+(29, 2, 'MAQUINA 25', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
+(35, 2, 'sadddd', 1, 'AZUñIGA', '2026-09-15 23:14:57', NULL, 'AZUñIGA', '2026-09-15 23:16:06', NULL),
+(39, 2, 'a', 1, 'AZUñIGA', '2026-09-16 00:25:35', NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1620,7 +1625,10 @@ INSERT INTO `marca` (`idMarca`, `idProgramaEstudio`, `nombre`, `st_registro`, `i
 (46, 5, 'HYUNDAI', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
 (47, 5, 'KIA', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
 (48, 5, 'CHEVROLET', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
-(49, 5, 'FORD', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL);
+(49, 5, 'FORD', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
+(51, 2, 'RAZERR', 1, 'AZUñIGA', '2026-09-15 23:43:55', NULL, 'AZUñIGA', '2026-09-15 23:44:07', NULL),
+(52, 2, 'a', 1, 'AZUñIGA', '2026-09-16 00:16:36', NULL, NULL, NULL, NULL),
+(53, 2, 'aaa', 1, 'AZUñIGA', '2026-09-16 00:29:01', NULL, 'AZUñIGA', '2026-09-16 00:29:09', NULL);
 
 -- --------------------------------------------------------
 
@@ -1698,7 +1706,8 @@ INSERT INTO `modelo` (`idModelo`, `idProgramaEstudio`, `nombre`, `st_registro`, 
 (27, NULL, 'MOUSE OPTICO INALAMBRICO', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
 (28, NULL, 'MOUSE LASER', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
 (29, NULL, 'MOUSE GAMER', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
-(30, NULL, 'MOUSE ERGONOMICO', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL);
+(30, NULL, 'MOUSE ERGONOMICO', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
+(31, 2, 'Optiplex 2323x', NULL, 'AZUñIGA', '2026-09-15 23:57:55', NULL, 'AZUñIGA', '2026-09-15 23:58:03', NULL);
 
 -- --------------------------------------------------------
 
@@ -1720,8 +1729,8 @@ CREATE TABLE `password_reset_tokens` (
 
 CREATE TABLE `personal` (
   `idPersonal` int(11) NOT NULL,
-  `apellidos` varchar(30) DEFAULT NULL,
-  `nombres` varchar(30) DEFAULT NULL,
+  `apellidos` varchar(100) DEFAULT NULL,
+  `nombres` varchar(100) DEFAULT NULL,
   `dni` char(8) DEFAULT NULL,
   `celular` varchar(30) DEFAULT NULL,
   `email` varchar(60) DEFAULT NULL,
@@ -1741,8 +1750,10 @@ CREATE TABLE `personal` (
 
 INSERT INTO `personal` (`idPersonal`, `apellidos`, `nombres`, `dni`, `celular`, `email`, `direccion`, `st_registro`, `idUsuarioCrea`, `fechaCreacion`, `pcTerminalCrea`, `idUsuarioModifica`, `fechaModificacion`, `pcTerminalModifica`) VALUES
 (1, 'ZUÑIGA ROJAS', 'ANTONIO', '45632178', '987654321', 'antonio@gmail.com', 'AV. SOL 123 VES', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
-(2, 'TEO', 'GARCIA', '11111111', '111111111', 'teo@gmail.com', 'AV. SOL 321 VES', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
-(3, 'LEO', 'MALDONADO', '22222222', '222222222', 'leo@gmail.com', 'AV. SOL 321 VES', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL);
+(2, NULL, 'TEO GARCIA TEO', '11111111', '111111111', 'teo@gmail.com', 'AV. SOL 321 VES', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
+(3, 'LEO', 'MALDONADO', '22222222', '222222222', 'leo@gmail.com', 'AV. SOL 321 VES', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
+(6, NULL, 'Lucas Mathias Faith Ormeño Herrera', '61270453', '21312321321', 'ormenofaith12@gmail.com', NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL),
+(7, NULL, 'Alejandro Canales Valles', '71694260', '991402297', 'vallesalejandro123@gmail.com', NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1799,12 +1810,16 @@ CREATE TABLE `programaestudio` (
 
 INSERT INTO `programaestudio` (`idProgramaEstudio`, `idInstitucion`, `nombre`, `idCoordinadorArea`, `idAsistenteAreaT1`, `idAsistenteAreaT2`, `abreviatura`, `observacion`, `st_programaEstudio`, `st_registro`, `idUsuarioCrea`, `fechaCreacion`, `pcTerminalCrea`, `idUsuarioModifica`, `fechaModificacion`, `pcTerminalModifica`) VALUES
 (1, 1, 'ADMINISTRACIÓN DE EMPRESAS', NULL, NULL, NULL, NULL, '', 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
-(2, 1, 'DESARROLLO DE SISTEMAS DE INFORMACIÓN', NULL, 2, NULL, NULL, '', 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
+(2, 1, 'DESARROLLO DE SISTEMAS DE INFORMACIÓN', 1, 2, 6, NULL, NULL, 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
 (3, 1, 'CONTABILIDAD', NULL, NULL, NULL, NULL, '', 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
 (4, 1, 'ELECTRICIDAD INDUSTRIAL', NULL, NULL, NULL, NULL, '', 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
 (5, 1, 'MECANICA AUTOMOTRIZ', NULL, 3, NULL, NULL, '', 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
 (6, 1, 'MECANICA DE PRODUCCIÓN', NULL, NULL, NULL, NULL, '', 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
-(7, 1, 'SECRETARIADO EJECUTIVO', NULL, NULL, NULL, NULL, '', 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL);
+(7, 1, 'SECRETARIADO EJECUTIVO', NULL, NULL, NULL, NULL, '', 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
+(8, 1, 'matematica', NULL, NULL, NULL, NULL, NULL, 'ACTIVO', 0, NULL, NULL, NULL, NULL, NULL, NULL),
+(9, 1, 'matematica', NULL, NULL, NULL, NULL, 'a', 'ACTIVO', 0, NULL, NULL, NULL, NULL, NULL, NULL),
+(10, 1, 'matematica', NULL, NULL, NULL, NULL, 'a', 'ACTIVO', 0, NULL, NULL, NULL, NULL, NULL, NULL),
+(11, 1, 'a', 1, 3, 3, NULL, 'a', 'ACTIVO', 0, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1840,7 +1855,8 @@ INSERT INTO `sala` (`idSala`, `idProgramaEstudio`, `nombre`, `observacion`, `st_
 (7, 2, 'LABORATORIO L6', 'Laboratorio de redes avanzadas', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
 (8, 5, 'TALLER M1', 'Taller de motores', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
 (9, 5, 'TALLER M2', 'Taller de transmisión', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
-(10, 5, 'TALLER M3', 'Taller eléctrico automotriz', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL);
+(10, 5, 'TALLER M3', 'Taller eléctrico automotriz', 1, 'AZUÑIGA', '2026-09-10 10:42:18', 'SERVER', NULL, NULL, NULL),
+(15, 2, 'a', 'a', 1, 'AZUñIGA', '2026-09-16 00:31:42', NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1862,7 +1878,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('mSa8ZWdSrAjmZI2EOrhHI3LClWZycDb9YUezmmOF', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', 'YTo3OntzOjY6Il90b2tlbiI7czo0MDoiOTdyekVXTHUzMU54RENOZ3V0Y0xmSk9IQnNwS1AzTm5ZTzFlclR1ayI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC91c3Vhcmlvcy9saXN0YXIiO3M6NToicm91dGUiO3M6MTU6InVzdWFyaW9zLmxpc3RhciI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6OToiaWRVc3VhcmlvIjtzOjM6IlRFTyI7czoxNzoiaWRQcm9ncmFtYUVzdHVkaW8iO3M6MToiMiI7czoxMToidGlwb1VzdWFyaW8iO3M6OToiQVNJU1RFTlRFIjtzOjEyOiJ0aXR1bG9TZXNpb24iO3M6ODc6IlsgU0lJTi0yMDI1LTEgXSAtIFsgREVTQVJST0xMTyBERSBTSVNURU1BUyBERSBJTkZPUk1BQ0nDk04gXSAtIFsgVEVPIF0gLSBbIFRFTyBHQVJDSUEgXSI7fQ==', 1789334266);
+('XOJ5WlJy8ngt4c6DFcK7xubcK18U7G6EieoPYcax', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.138.0 Chrome/148.0.7778.280 Electron/42.10.0 Safari/537.36', 'YTo3OntzOjY6Il90b2tlbiI7czo0MDoiQzAyU3dIYW9vUzg1N1dZWm9ybUhtZW9GRGdTR1V4bXphaEVwejFPUSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzU6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9tb2RlbG8vbGlzdGFyIjtzOjU6InJvdXRlIjtzOjEzOiJtb2RlbG8ubGlzdGFyIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJpZFVzdWFyaW8iO3M6MzoiRkFJIjtzOjE3OiJpZFByb2dyYW1hRXN0dWRpbyI7czoxOiIyIjtzOjExOiJ0aXBvVXN1YXJpbyI7czoxMzoiQURNSU5JU1RSQURPUiI7czoxMjoidGl0dWxvU2VzaW9uIjtzOjExMjoiWyBTSUlOLTIwMjYtMSBdIC0gWyBERVNBUlJPTExPIERFIFNJU1RFTUFTIERFIElORk9STUFDScOTTiBdIC0gWyBGQUkgXSAtIFsgTFVDQVMgTUFUSElBUyBGQUlUSCBPUk1Fw5FPIEhFUlJFUkEgXSI7fQ==', 1790200228);
 
 -- --------------------------------------------------------
 
@@ -1888,7 +1904,7 @@ CREATE TABLE `tipo` (
 --
 
 INSERT INTO `tipo` (`idTipo`, `idProgramaEstudio`, `nombre`, `st_registro`, `idUsuarioCrea`, `fechaCreacion`, `pcTerminalCrea`, `idUsuarioModifica`, `fechaModificacion`, `pcTerminalModifica`) VALUES
-(1, 2, 'CASE', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
+(1, 2, 'CASE', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', 'AZUñIGA', '2026-09-16 00:56:18', NULL),
 (2, 2, 'EQUIPO DE SONIDO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
 (3, 2, 'ESCRITORIO DE MADERA', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
 (4, 2, 'ESTABILIZADOR', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
@@ -1912,6 +1928,38 @@ INSERT INTO `tipo` (`idTipo`, `idProgramaEstudio`, `nombre`, `st_registro`, `idU
 (22, 5, 'MAQUINA DE SOLDAR', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
 (23, 5, 'TALADRO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
 (24, 5, 'PRENSA HIDRAULICA', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `toma_inventarios`
+--
+
+CREATE TABLE `toma_inventarios` (
+  `id` int(11) NOT NULL,
+  `anio` varchar(4) NOT NULL,
+  `numero` int(11) NOT NULL DEFAULT 1,
+  `sala_id` int(11) NOT NULL,
+  `coordinador_id` int(11) NOT NULL,
+  `asistente1_id` int(11) NOT NULL,
+  `asistente2_id` int(11) DEFAULT NULL,
+  `fecha_entrega` date DEFAULT NULL,
+  `observacion` text DEFAULT NULL,
+  `estado` varchar(20) NOT NULL DEFAULT 'ABIERTO',
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `toma_inventarios`
+--
+
+INSERT INTO `toma_inventarios` (`id`, `anio`, `numero`, `sala_id`, `coordinador_id`, `asistente1_id`, `asistente2_id`, `fecha_entrega`, `observacion`, `estado`, `created_at`, `updated_at`) VALUES
+(1, '2026', 1, 1, 1, 1, NULL, '2026-09-18', 'REGISTRO DE PRUEBA', 'ABIERTO', '2026-09-18 21:01:34', '2026-09-18 21:01:34'),
+(2, '123', 1, 4, 3, 7, 2, '2026-09-02', 'asd', 'ABIERTO', '2026-09-19 02:17:35', '2026-09-19 02:17:35'),
+(3, '2023', 1, 4, 7, 7, 7, '2026-09-09', 'ninguna observacion', 'ABIERTO', '2026-09-19 02:18:09', '2026-09-19 02:18:09'),
+(4, '2000', 1, 1, 2, 1, 3, '2026-09-08', 'asdasd', 'ABIERTO', '2026-09-19 02:30:21', '2026-09-19 02:30:21'),
+(5, '2001', 1, 9, 3, 6, 7, '2026-09-17', 'asdasd', 'ABIERTO', '2026-09-19 02:30:51', '2026-09-19 02:35:36');
 
 -- --------------------------------------------------------
 
@@ -1957,6 +2005,8 @@ CREATE TABLE `usuario` (
 
 INSERT INTO `usuario` (`idUsuario`, `contraseña`, `idPersonal`, `tipoUsuario`, `activo`, `st_registro`, `idUsuarioCrea`, `fechaCreacion`, `pcTerminalCrea`, `idUsuarioModifica`, `fechaModificacion`, `pcTerminalModifica`) VALUES
 ('AZUÑIGA', 'AZUÑIGA', 1, 'ADMINISTRADOR', 1, 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
+('ELMELIUX', '123', 7, 'ADMINISTRADOR', 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
+('FAI', 'FAI', 6, 'ADMINISTRADOR', 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
 ('LEO', 'LEO', 3, 'ASISTENTE', 1, 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
 ('TEO', 'TEO', 2, 'ASISTENTE', 1, 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL);
 
@@ -2016,7 +2066,29 @@ INSERT INTO `usuario_programaestudio` (`idUsuarioProgramaEstudio`, `idProgramaEs
 (18, 4, 'LEO', 0, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
 (19, 5, 'LEO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
 (20, 6, 'LEO', 0, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
-(21, 7, 'LEO', 0, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL);
+(21, 7, 'LEO', 0, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
+(36, 1, 'FAI', 0, NULL, '2026-09-15 22:50:11', NULL, NULL, NULL, NULL),
+(37, 2, 'FAI', 0, NULL, '2026-09-15 22:50:11', NULL, NULL, NULL, NULL),
+(38, 3, 'FAI', 0, NULL, '2026-09-15 22:50:11', NULL, NULL, NULL, NULL),
+(39, 4, 'FAI', 0, NULL, '2026-09-15 22:50:11', NULL, NULL, NULL, NULL),
+(40, 5, 'FAI', 0, NULL, '2026-09-15 22:50:11', NULL, NULL, NULL, NULL),
+(41, 6, 'FAI', 0, NULL, '2026-09-15 22:50:11', NULL, NULL, NULL, NULL),
+(42, 7, 'FAI', 0, NULL, '2026-09-15 22:50:11', NULL, NULL, NULL, NULL),
+(43, 8, 'FAI', 0, NULL, '2026-09-15 22:50:11', NULL, NULL, NULL, NULL),
+(44, 9, 'FAI', 0, NULL, '2026-09-15 22:50:11', NULL, NULL, NULL, NULL),
+(45, 10, 'FAI', 0, NULL, '2026-09-15 22:50:11', NULL, NULL, NULL, NULL),
+(46, 11, 'FAI', 0, NULL, '2026-09-15 22:50:11', NULL, NULL, NULL, NULL),
+(51, 1, 'ELMELIUX', 0, NULL, '2026-09-17 16:09:35', NULL, NULL, NULL, NULL),
+(52, 2, 'ELMELIUX', 0, NULL, '2026-09-17 16:09:35', NULL, NULL, NULL, NULL),
+(53, 3, 'ELMELIUX', 0, NULL, '2026-09-17 16:09:35', NULL, NULL, NULL, NULL),
+(54, 4, 'ELMELIUX', 0, NULL, '2026-09-17 16:09:35', NULL, NULL, NULL, NULL),
+(55, 5, 'ELMELIUX', 0, NULL, '2026-09-17 16:09:35', NULL, NULL, NULL, NULL),
+(56, 6, 'ELMELIUX', 0, NULL, '2026-09-17 16:09:35', NULL, NULL, NULL, NULL),
+(57, 7, 'ELMELIUX', 0, NULL, '2026-09-17 16:09:35', NULL, NULL, NULL, NULL),
+(58, 8, 'ELMELIUX', 0, NULL, '2026-09-17 16:09:35', NULL, NULL, NULL, NULL),
+(59, 9, 'ELMELIUX', 0, NULL, '2026-09-17 16:09:35', NULL, NULL, NULL, NULL),
+(60, 10, 'ELMELIUX', 0, NULL, '2026-09-17 16:09:35', NULL, NULL, NULL, NULL),
+(61, 11, 'ELMELIUX', 0, NULL, '2026-09-17 16:09:35', NULL, NULL, NULL, NULL);
 
 --
 -- Índices para tablas volcadas
@@ -2188,6 +2260,12 @@ ALTER TABLE `tipo`
   ADD KEY `idProgramaEstudio` (`idProgramaEstudio`);
 
 --
+-- Indices de la tabla `toma_inventarios`
+--
+ALTER TABLE `toma_inventarios`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `users`
 --
 ALTER TABLE `users`
@@ -2217,7 +2295,7 @@ ALTER TABLE `usuario_programaestudio`
 -- AUTO_INCREMENT de la tabla `bien`
 --
 ALTER TABLE `bien`
-  MODIFY `idBien` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
+  MODIFY `idBien` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
 
 --
 -- AUTO_INCREMENT de la tabla `failed_jobs`
@@ -2229,7 +2307,7 @@ ALTER TABLE `failed_jobs`
 -- AUTO_INCREMENT de la tabla `grupo`
 --
 ALTER TABLE `grupo`
-  MODIFY `idGrupo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `idGrupo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT de la tabla `institucion`
@@ -2259,7 +2337,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT de la tabla `marca`
 --
 ALTER TABLE `marca`
-  MODIFY `idMarca` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `idMarca` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT de la tabla `migrations`
@@ -2271,13 +2349,13 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT de la tabla `modelo`
 --
 ALTER TABLE `modelo`
-  MODIFY `idModelo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `idModelo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT de la tabla `personal`
 --
 ALTER TABLE `personal`
-  MODIFY `idPersonal` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `idPersonal` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `personals`
@@ -2295,19 +2373,25 @@ ALTER TABLE `posts`
 -- AUTO_INCREMENT de la tabla `programaestudio`
 --
 ALTER TABLE `programaestudio`
-  MODIFY `idProgramaEstudio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `idProgramaEstudio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `sala`
 --
 ALTER TABLE `sala`
-  MODIFY `idSala` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `idSala` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT de la tabla `tipo`
 --
 ALTER TABLE `tipo`
-  MODIFY `idTipo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `idTipo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
+-- AUTO_INCREMENT de la tabla `toma_inventarios`
+--
+ALTER TABLE `toma_inventarios`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `users`
@@ -2319,7 +2403,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de la tabla `usuario_programaestudio`
 --
 ALTER TABLE `usuario_programaestudio`
-  MODIFY `idUsuarioProgramaEstudio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `idUsuarioProgramaEstudio` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- Restricciones para tablas volcadas

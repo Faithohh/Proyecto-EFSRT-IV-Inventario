@@ -1,4 +1,14 @@
 <section class="mp-panel" id="mpPersonal" hidden>
+    <!-- CABECERA DEL MÓDULO -->
+    <div class="mp-panel-header d-flex align-items-center mb-3">
+        <svg viewBox="0 0 24 24" width="24" height="24" class="me-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <polyline points="16 11 18 13 22 9"></polyline>
+        </svg>
+        <h4 class="m-0 font-weight-bold">Gestión de Personal</h4>
+    </div>
+
     <!-- Barra de Herramientas -->
     <div class="tb-bar" role="toolbar" aria-label="Acciones de personal">
         <button type="button" class="tb-btn" data-acc="nuevo" id="btn_nuevo_personal" title="Nuevo">
@@ -8,7 +18,7 @@
             <svg viewBox="0 0 24 24"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17v3z"/><path d="M13.5 6.5l3 3"/></svg>
         </button>
         <button type="button" class="tb-btn" data-acc="eliminar" id="btn_eliminar_personal" title="Eliminar">
-            <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
         <button type="button" class="tb-btn" data-acc="recargar" id="btn_recargar_personal" title="Recargar">
             <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v4h-4"/></svg>
@@ -30,7 +40,7 @@
         <input type="text" id="txtBuscarPersonal" autocomplete="off" placeholder="Escriba para filtrar...">
     </div>
 
-    <!-- Tabla con las columnas solicitadas -->
+    <!-- Tabla de Personal -->
     <div class="tb-table-wrap">
         <table class="tb-table" id="tabla_personal">
             <thead>
@@ -49,7 +59,7 @@
     </div>
 </section>
 
-<!-- Modal Formulario Personal -->
+<!-- Modal Formulario (Registrar / Editar Personal - Alineado Arriba) -->
 <div class="modal fade" id="personal_modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -60,7 +70,7 @@
             <div class="modal-body">
                 <form id="form_personal">
                     @csrf
-                    <input type="hidden" id="personal_id" name="id">
+                    <input type="hidden" id="personal_id" name="idPersonal">
                     
                     <div class="row mb-3">
                         <div class="col-md-6">
@@ -98,6 +108,51 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="submit" form="form_personal" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Detalle del Personal (Posicionado Arriba) -->
+<div class="modal fade" id="modalDetallePersonal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalle del Personal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered mb-0">
+                    <tbody>
+                        <tr><th>DNI</th><td class="det-dni"></td></tr>
+                        <tr><th>Nombre Completo</th><td class="det-nombres"></td></tr>
+                        <tr><th>Celular</th><td class="det-celular"></td></tr>
+                        <tr><th>Email</th><td class="det-email"></td></tr>
+                        <tr><th>Estado</th><td class="det-estado"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Eliminar Personal (Centrado al Medio) -->
+<div class="modal fade" id="modalEliminarPersonal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de eliminar al personal <strong id="txtPersonalEliminar"></strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarEliminarPersonal">Eliminar</button>
             </div>
         </div>
     </div>

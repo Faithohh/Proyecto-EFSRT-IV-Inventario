@@ -2,64 +2,66 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tipo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
+use App\Models\Tipo;
+use Exception;
 
 class TipoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function listar()
     {
-        //
+        try {
+            $data = Tipo::listar();
+            return response()->json(['ok' => true, 'data' => $data]);
+        } catch (Exception $e) {
+            return response()->json(['ok' => false, 'msg' => $e->getMessage()], 500);
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function buscar($nombre)
     {
-        //
+        try {
+            $data = Tipo::buscar($nombre);
+            if (!$data) {
+                return response()->json(['ok' => false, 'msg' => 'Tipo no encontrado']);
+            }
+            return response()->json(['ok' => true, 'data' => $data]);
+        } catch (Exception $e) {
+            return response()->json(['ok' => false, 'msg' => $e->getMessage()], 500);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function guardar(Request $request)
     {
-        //
+        try {
+            $idOriginal = $request->input('idOriginal');
+            $nombre     = $request->input('nombre');
+            $idUsuario  = Session::get('idUsuario', 'SISTEMA');
+
+            if (empty($idOriginal)) {
+                Tipo::crear($nombre, $idUsuario);
+                $msg = 'Tipo registrado correctamente';
+            } else {
+                Tipo::actualizar($idOriginal, $nombre, $idUsuario);
+                $msg = 'Tipo actualizado correctamente';
+            }
+
+            return response()->json(['ok' => true, 'msg' => $msg]);
+        } catch (Exception $e) {
+            return response()->json(['ok' => false, 'msg' => $e->getMessage()]);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Tipo $tipo)
+    public function eliminar(Request $request)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Tipo $tipo)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Tipo $tipo)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Tipo $tipo)
-    {
-        //
+        try {
+            $nombre = $request->input('nombre');
+            DB::table('tipo')->where('NOMBRE', $nombre)->delete();
+            return response()->json(['ok' => true, 'msg' => 'Tipo eliminado correctamente']);
+        } catch (Exception $e) {
+            return response()->json(['ok' => false, 'msg' => 'Error al eliminar el tipo: ' . $e->getMessage()]);
+        }
     }
 }

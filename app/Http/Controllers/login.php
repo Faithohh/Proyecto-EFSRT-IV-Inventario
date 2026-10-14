@@ -25,6 +25,25 @@ class login extends Controller
                 ]);
             }
 
+            $datosUsuario = DB::selectOne("
+                SELECT u.`idUsuario`, u.`tipoUsuario`, u.`activo`, u.`st_registro`, p.`st_registro` AS `personal_activo`
+                FROM `USUARIO` u
+                LEFT JOIN `personal` p ON u.`idPersonal` = p.`idPersonal`
+                WHERE u.`idUsuario` = ? LIMIT 1
+            ", [$usuario]);
+
+            if ($datosUsuario) {
+                $usuarioActivo = (int)($datosUsuario->activo ?? 1);
+                $stRegistroUser = (int)($datosUsuario->st_registro ?? 1);
+                $stRegistroPersonal = isset($datosUsuario->personal_activo) ? (int)$datosUsuario->personal_activo : 1;
+
+                if ($usuarioActivo === 0 || $stRegistroUser === 0 || $stRegistroPersonal === 0) {
+                    return response()->json([
+                        'valid' => 'Su cuenta se encuentra desactivada. Contacte al administrador.'
+                    ]);
+                }
+            }
+
             $pdo = DB::getPdo();
 
             $stmt = $pdo->prepare("CALL sp_login_acceso_Q01(:user, :pass, @p_valid)");
@@ -36,42 +55,38 @@ class login extends Controller
             $res = DB::select("SELECT @p_valid AS valid");
             $valid = $res[0]->valid ?? null;
 
-            $dbgUser = DB::selectOne("SELECT COUNT(*) AS c FROM `USUARIO` WHERE `idUsuario` = ?", [$usuario]);
-            $dbgRow = DB::selectOne("SELECT `idUsuario`, `activo`, `st_registro` FROM `USUARIO` WHERE `idUsuario` = ? LIMIT 1", [$usuario]);
             if ($valid !== '1') {
                 return response()->json([
-                    'valid' => $valid ?? 'Error de credenciales',
-                    'debug' => [
-                        'recibido' => $usuario,
-                        'existe' => (int) ($dbgUser->c ?? 0),
-                        'activo' => $dbgRow->activo ?? null,
-                        'st_registro' => $dbgRow->st_registro ?? null,
-                    ],
+                    'valid' => 'Usuario o contraseña incorrectos.'
                 ]);
             }
 
-            if ($valid === '1') {
+            $tipoUsuario = strtoupper(trim($datosUsuario->tipoUsuario ?? ''));
+            $programasRaw = [];
+
+            if ($tipoUsuario === 'ADMINISTRADOR' || $tipoUsuario === 'ADMIN') {
+                $programasRaw = DB::select("SELECT `idProgramaEstudio`, `nombre` AS `programaEstudio` FROM `programaestudio` WHERE `st_registro` = 1");
+                $programasRaw = array_map(function ($item) {
+                    return (array) $item;
+                }, $programasRaw);
+            } else {
                 $stmtProg = $pdo->prepare("CALL sp_login_usuarioProgramaEstudio_Q01(:user)");
                 $stmtProg->bindParam(':user', $usuario);
                 $stmtProg->execute();
                 $programasRaw = $stmtProg->fetchAll(\PDO::FETCH_ASSOC);
                 $stmtProg->closeCursor();
-
-                $programas = array_map(function ($prog) {
-                    return [
-                        'idProgramaEstudio' => $prog['idProgramaEstudio'] ?? null,
-                        'programaEstudio'   => $prog['programaEstudio'] ?? ''
-                    ];
-                }, $programasRaw);
-
-                return response()->json([
-                    'valid' => '1',
-                    'programas' => $programas
-                ]);
             }
 
+            $programas = array_map(function ($prog) {
+                return [
+                    'idProgramaEstudio' => $prog['idProgramaEstudio'] ?? null,
+                    'programaEstudio'   => $prog['programaEstudio'] ?? ''
+                ];
+            }, $programasRaw);
+
             return response()->json([
-                'valid' => $valid ?? 'Error de credenciales'
+                'valid' => '1',
+                'programas' => $programas
             ]);
 
         } catch (\Exception $e) {
@@ -95,12 +110,29 @@ class login extends Controller
                 $stmt->execute();
                 $stmt->closeCursor();
 
-                $res = DB::select("SELECT @p_tipoUsuario AS tipoUsuario, @p_tituloSesion AS tituloSesion");
+                $res = DB::select("SELECT @p_tipoUsuario AS tipoUsuario");
+
+                $prog = DB::selectOne("SELECT `nombre` FROM `programaestudio` WHERE `idProgramaEstudio` = ? LIMIT 1", [$idProgramaEstudio]);
+                $nombrePrograma = $prog->nombre ?? '';
+
+                $persona = DB::selectOne("
+                    SELECT p.`apellidos`, p.`nombres` 
+                    FROM `USUARIO` u
+                    LEFT JOIN `personal` p ON u.`idPersonal` = p.`idPersonal`
+                    WHERE u.`idUsuario` = ? LIMIT 1
+                ", [$usuario]);
+
+                $nombreCompleto = trim(($persona->apellidos ?? '') . ' ' . ($persona->nombres ?? ''));
+                if (empty($nombreCompleto)) {
+                    $nombreCompleto = $usuario;
+                }
+
+                $tituloSesion = "[ SIIN-2026-1 ] - [ " . mb_strtoupper($nombrePrograma) . " ] - [ " . $usuario . " ] - [ " . mb_strtoupper($nombreCompleto) . " ]";
 
                 Session::put('idUsuario', $usuario);
                 Session::put('idProgramaEstudio', $idProgramaEstudio);
                 Session::put('tipoUsuario', $res[0]->tipoUsuario ?? '');
-                Session::put('tituloSesion', $res[0]->tituloSesion ?? '');
+                Session::put('tituloSesion', $tituloSesion);
 
                 return response()->json([
                     'success' => true,

@@ -2,64 +2,69 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Sala;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
+use App\Models\Sala;
+use Exception;
 
 class SalaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function listar()
     {
-        //
+        try {
+            $data = Sala::listar();
+            return response()->json(['ok' => true, 'data' => $data]);
+        } catch (Exception $e) {
+            return response()->json(['ok' => false, 'msg' => $e->getMessage()], 500);
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function buscar($idSala)
     {
-        //
+        try {
+            $data = Sala::buscar($idSala);
+            if (!$data) {
+                return response()->json(['ok' => false, 'msg' => 'Sala no encontrada']);
+            }
+            return response()->json(['ok' => true, 'data' => $data]);
+        } catch (Exception $e) {
+            return response()->json(['ok' => false, 'msg' => $e->getMessage()], 500);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function guardar(Request $request)
     {
-        //
+        try {
+            $idOriginal        = $request->input('idOriginal');
+            $nombre            = $request->input('nombre');
+            $observacion       = $request->input('observacion');
+            $idProgramaEstudio = $request->input('idProgramaEstudio') ?: Session::get('idProgramaEstudio');
+            $stRegistro        = $request->input('st_registro');
+            $idUsuario         = Session::get('idUsuario', 'SISTEMA');
+
+            if (empty($idOriginal)) {
+                Sala::crear($nombre, $observacion, $idProgramaEstudio, $stRegistro, $idUsuario);
+                $msg = 'Sala registrada correctamente';
+            } else {
+                Sala::actualizar($idOriginal, $nombre, $observacion, $idProgramaEstudio, $stRegistro, $idUsuario);
+                $msg = 'Sala actualizada correctamente';
+            }
+
+            return response()->json(['ok' => true, 'msg' => $msg]);
+        } catch (Exception $e) {
+            return response()->json(['ok' => false, 'msg' => $e->getMessage()]);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Sala $sala)
+    public function eliminar(Request $request)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Sala $sala)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Sala $sala)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Sala $sala)
-    {
-        //
+        try {
+            $idSala = $request->input('idSala');
+            DB::table('sala')->where('idSala', $idSala)->delete();
+            return response()->json(['ok' => true, 'msg' => 'Sala eliminada correctamente']);
+        } catch (Exception $e) {
+            return response()->json(['ok' => false, 'msg' => 'Error al eliminar la sala: ' . $e->getMessage()]);
+        }
     }
 }

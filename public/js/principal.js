@@ -33,11 +33,22 @@ document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener("keydown", function(e) { if (e.key === "Escape") closeAll(null); });
 
     function abrirModulo(nombre) {
-        var id = "mp" + nombre.charAt(0).toUpperCase() + nombre.slice(1);
+        // Formatear snake_case a CamelCase (ej: toma_inventario -> TomaInventario)
+        var nombreFormateado = nombre.replace(/[-_](.)/g, function(_, c) { return c.toUpperCase(); });
+        var id = "mp" + nombreFormateado.charAt(0).toUpperCase() + nombreFormateado.slice(1);
+
         document.querySelectorAll(".mp-panel").forEach(function(p) { p.hidden = true; });
-        document.getElementById("mpBienvenida").hidden = true;
-        var panel = document.getElementById(id);
-        if (panel) panel.hidden = false;
+        
+        var bienvenida = document.getElementById("mpBienvenida");
+        if (bienvenida) bienvenida.hidden = true;
+
+        var panel = document.getElementById(id) || document.getElementById("mp-" + nombre) || document.getElementById("mp_" + nombre);
+        
+        if (panel) {
+            panel.hidden = false;
+        }
+
+        closeAll(null);
         window.dispatchEvent(new CustomEvent("modulo:abrir", { detail: nombre }));
     }
 

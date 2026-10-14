@@ -7,9 +7,9 @@ document.addEventListener("DOMContentLoaded", function () {
         var tblBody = document.querySelector("#tblUsuarios tbody");
         var txtBuscar = document.getElementById("txtBuscarUsuarios");
         var usuariosCache = [];
+        var usuarioSeleccionado = null;
 
         var modalUsuario = new bootstrap.Modal(document.getElementById("modalUsuario"));
-        var modalEliminar = new bootstrap.Modal(document.getElementById("modalEliminar"));
 
         function esc(v) {
             return String(v || "").replace(/[&<">]/g, function (c) {
@@ -75,6 +75,8 @@ document.addEventListener("DOMContentLoaded", function () {
         async function mostrarUsuarios() {
             if (!panelUsu) return;
             tblBody.innerHTML = '<tr><td colspan="3" class="text-center">Cargando...</td></tr>';
+            usuarioSeleccionado = null;
+
             try {
                 var r = await fetch("/usuarios/listar", { headers: { Accept: "application/json" } });
                 var j = await r.json();
@@ -90,8 +92,11 @@ document.addEventListener("DOMContentLoaded", function () {
         tblBody.addEventListener("click", function (e) {
             var tr = e.target.closest("tr[data-id]");
             if (!tr) return;
-            tblBody.querySelectorAll("tr.sel").forEach(function (x) { x.classList.remove("sel"); });
-            tr.classList.add("sel");
+            tblBody.querySelectorAll("tr").forEach(function (x) { x.classList.remove("table-active", "selected", "sel"); });
+            tr.classList.add("table-active", "selected", "sel");
+
+            var id = tr.getAttribute("data-id");
+            usuarioSeleccionado = usuariosCache.find(function (u) { return String(u.idUsuario) === String(id); });
         });
 
         if (txtBuscar) {
@@ -126,11 +131,20 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         async function editarUsuario() {
-            var s = tblBody.querySelector("tr.sel");
-            if (!s) { alert("Seleccione un usuario de la lista para editar."); return; }
+            if (!usuarioSeleccionado) {
+                var s = tblBody.querySelector("tr.sel, tr.selected, tr.table-active");
+                if (s) {
+                    var id = s.getAttribute("data-id");
+                    usuarioSeleccionado = usuariosCache.find(function (u) { return String(u.idUsuario) === String(id); });
+                }
+            }
+
+            if (!usuarioSeleccionado) { 
+                alert("Seleccione un usuario de la lista para editar."); 
+                return; 
+            }
             
             setEstadoFormulario(false);
-            var idUsuario = s.getAttribute("data-id");
             var modalTitle = document.getElementById("modalUsuarioTitle");
             if (modalTitle) modalTitle.textContent = "Editar Usuario";
             
@@ -138,45 +152,120 @@ document.addEventListener("DOMContentLoaded", function () {
             if (form) form.reset();
             
             await cargarPersonal();
-            var usuario = usuariosCache.find(function (u) { return String(u.idUsuario) === String(idUsuario); });
-            if (usuario) {
-                var txtOrig = document.getElementById("txtIdUsuarioOriginal");
-                var txtId = document.getElementById("txtIdUsuario");
-                var cboTipo = document.getElementById("cboTipoUsuario");
-                var cboPers = document.getElementById("cboPersonal");
 
-                if (txtOrig) txtOrig.value = usuario.idUsuario;
-                if (txtId) {
-                    txtId.value = usuario.idUsuario;
-                    txtId.readOnly = true;
+            var u = usuarioSeleccionado;
+
+            try {
+                var r = await fetch("/usuarios/buscar/" + encodeURIComponent(usuarioSeleccionado.idUsuario), { 
+                    headers: { Accept: "application/json" } 
+                });
+                var j = await r.json();
+                if (j.ok && j.data) {
+                    u = j.data;
                 }
-                if (cboTipo) cboTipo.value = usuario.tipoUsuario || "";
-                if (cboPers) cboPers.value = usuario.idPersonal || usuario.idpersonal || "";
+            } catch (e) {
+                console.warn("No se pudo obtener el detalle extenso, usando datos en caché.", e);
             }
+            
+            var txtOrig = document.getElementById("txtIdUsuarioOriginal");
+            var txtId = document.getElementById("txtIdUsuario");
+            var txtPass = document.getElementById("txtContrasena");
+            var cboTipo = document.getElementById("cboTipoUsuario");
+            var cboPers = document.getElementById("cboPersonal");
+
+            if (txtOrig) txtOrig.value = u.idUsuario || "";
+            if (txtId) {
+                txtId.value = u.idUsuario || "";
+                txtId.readOnly = true;
+            }
+            
+            // Asignar contraseña al campo de texto
+            if (txtPass) {
+                txtPass.value = u.contrasena || u.contraseña || u.clave || u.password || "";
+            }
+
+            if (cboTipo) cboTipo.value = u.tipoUsuario || "";
+            if (cboPers) cboPers.value = u.idPersonal || u.idpersonal || "";
+
             modalUsuario.show();
         }
 
-        function eliminarUsuario() {
-            var s = tblBody.querySelector("tr.sel");
-            if (!s) { alert("Seleccione un usuario de la lista para eliminar."); return; }
+        function confirmarEliminar() {
+            if (!usuarioSeleccionado) {
+                var s = tblBody.querySelector("tr.sel, tr.selected, tr.table-active");
+                if (s) {
+                    var id = s.getAttribute("data-id");
+                    usuarioSeleccionado = usuariosCache.find(function (u) { return String(u.idUsuario) === String(id); });
+                }
+            }
+
+            if (!usuarioSeleccionado) {
+                alert("Por favor, seleccione un usuario de la tabla para eliminar.");
+                return;
+            }
+
+            var nombre = usuarioSeleccionado.idUsuario || "este usuario";
             
-            var idUsuario = s.getAttribute("data-id");
-            var elDel = document.getElementById("txtUsuarioEliminar");
-            if (elDel) elDel.textContent = idUsuario;
-            
-            modalEliminar.show();
+            var msgEl = document.getElementById("msgConfirmarEliminar");
+            if (msgEl) {
+                msgEl.textContent = "¿Está seguro de eliminar al usuario " + nombre + "?";
+            }
+
+            var modalEl = document.getElementById("modalConfirmarEliminar");
+            var btnEliminarAccion = document.getElementById("btnConfirmarEliminarAccion");
+
+            if (!modalEl) return;
+
+            var bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+
+            btnEliminarAccion.onclick = async function () {
+                bsModal.hide();
+
+                var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || document.querySelector('input[name="_token"]')?.value;
+
+                try {
+                    var response = await fetch("/usuarios/eliminar", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN": token
+                        },
+                        body: JSON.stringify({ idUsuario: usuarioSeleccionado.idUsuario })
+                    });
+                    
+                    var data = await response.json();
+
+                    if (data.ok || data.success) {
+                        await mostrarUsuarios();
+                    } else {
+                        alert(data.msg || data.message || "Error al eliminar el usuario.");
+                    }
+                } catch (e) {
+                    console.error("Error al eliminar:", e);
+                    alert("Error de conexión con el servidor.");
+                }
+            };
+
+            bsModal.show();
         }
 
         async function verDetalle() {
-            var s = tblBody.querySelector("tr.sel");
-            if (!s) { 
+            if (!usuarioSeleccionado) {
+                var s = tblBody.querySelector("tr.sel, tr.selected, tr.table-active");
+                if (s) {
+                    var id = s.getAttribute("data-id");
+                    usuarioSeleccionado = usuariosCache.find(function (u) { return String(u.idUsuario) === String(id); });
+                }
+            }
+
+            if (!usuarioSeleccionado) { 
                 alert("Seleccione un usuario de la lista para consultar su información."); 
                 return; 
             }
             
             try {
-                var idUsuario = s.getAttribute("data-id");
-                var r = await fetch("/usuarios/buscar/" + encodeURIComponent(idUsuario), { 
+                var r = await fetch("/usuarios/buscar/" + encodeURIComponent(usuarioSeleccionado.idUsuario), { 
                     headers: { Accept: "application/json" } 
                 });
                 var j = await r.json();
@@ -192,7 +281,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 var elTipo = document.getElementById("cboTipoUsuario");
 
                 if (elId) elId.value = u.idUsuario || "";
-                if (elPass) elPass.value = u.contrasena || u.clave || u.password || "";
+                if (elPass) elPass.value = u.contrasena || u.contraseña || u.clave || u.password || "";
                 if (elPersonal) elPersonal.value = u.idPersonal || u.idpersonal || "";
                 if (elTipo) elTipo.value = u.tipoUsuario || "";
 
@@ -223,7 +312,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
                 
                 try {
-                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content");
+                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || document.querySelector('input[name="_token"]')?.value;
                     var response = await fetch("/usuarios/guardar", {
                         method: "POST",
                         headers: {
@@ -241,54 +330,15 @@ document.addEventListener("DOMContentLoaded", function () {
                     });
                     
                     var data = await response.json();
-                    if (data.ok) {
+                    if (data.ok || data.success) {
                         modalUsuario.hide();
-                        alert(data.msg);
                         await mostrarUsuarios();
                     } else {
-                        alert(data.msg || "Error al guardar");
+                        alert(data.msg || data.message || "Error al guardar");
                     }
                 } catch (e) {
                     modalUsuario.hide();
                     alert("Error de conexión: " + e.message);
-                }
-            });
-        }
-
-        var btnEliminar = document.getElementById("btnConfirmarEliminar");
-        if (btnEliminar) {
-            btnEliminar.addEventListener("click", async function () {
-                var idUsuario = document.getElementById("txtUsuarioEliminar").textContent.trim();
-                
-                if (!idUsuario) {
-                    alert("No se seleccionó ningún usuario para eliminar.");
-                    return;
-                }
-
-                try {
-                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content");
-                    var response = await fetch("/usuarios/eliminar", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Accept: "application/json",
-                            "X-CSRF-TOKEN": token
-                        },
-                        body: JSON.stringify({ idUsuario: idUsuario })
-                    });
-                    
-                    var data = await response.json();
-                    modalEliminar.hide();
-
-                    if (data.ok) {
-                        alert(data.msg || "Usuario eliminado correctamente");
-                        await mostrarUsuarios();
-                    } else {
-                        alert(data.msg || "Error al eliminar el usuario");
-                    }
-                } catch (e) {
-                    modalEliminar.hide();
-                    alert("Error de conexión con el servidor.");
                 }
             });
         }
@@ -316,9 +366,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 var acc = b.dataset.acc;
                 if (acc === "nuevo") nuevoUsuario();
                 else if (acc === "editar") editarUsuario();
-                else if (acc === "eliminar") eliminarUsuario();
+                else if (acc === "eliminar") confirmarEliminar();
                 else if (acc === "recargar") mostrarUsuarios();
-                else if (acc === "imprimir" || acc === "consultar") verDetalle();
+                else if (acc === "imprimir" || acc === "consultar" || acc === "detalle") verDetalle();
                 else if (acc === "excel") exportarExcel();
                 else if (acc === "salir") {
                     panelUsu.hidden = true;
@@ -330,5 +380,7 @@ document.addEventListener("DOMContentLoaded", function () {
         window.addEventListener("modulo:abrir", function (e) {
             if (e.detail === "usuarios") mostrarUsuarios();
         });
+
+        mostrarUsuarios();
     })();
 });

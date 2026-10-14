@@ -7,59 +7,65 @@ use Illuminate\Http\Request;
 
 class EstadoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function listar()
     {
-        //
+        try {
+            $data = Estado::listar();
+            return response()->json(['ok' => true, 'data' => $data]);
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'msg' => $e->getMessage()], 500);
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function buscar($idEstado)
     {
-        //
+        try {
+            $estado = Estado::buscar($idEstado);
+            if (!$estado) {
+                return response()->json(['ok' => false, 'msg' => 'Estado no encontrado'], 404);
+            }
+            return response()->json(['ok' => true, 'data' => $estado]);
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'msg' => $e->getMessage()], 500);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function guardar(Request $request)
     {
-        //
+        try {
+            $nombre     = $request->input('nombre');
+            $idOriginal = $request->input('idOriginal');
+
+            if (empty($nombre)) {
+                return response()->json(['ok' => false, 'msg' => 'El nombre del estado es obligatorio'], 422);
+            }
+
+            if (empty($idOriginal)) {
+                Estado::crear($nombre);
+                $msg = 'Estado creado correctamente';
+            } else {
+                Estado::actualizar($idOriginal, $nombre);
+                $msg = 'Estado actualizado correctamente';
+            }
+
+            return response()->json(['ok' => true, 'msg' => $msg]);
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'msg' => 'Error al guardar: ' . $e->getMessage()], 500);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Estado $estado)
+    public function eliminar(Request $request)
     {
-        //
-    }
+        try {
+            $idEstado = $request->input('idEstado');
+            if (empty($idEstado)) {
+                return response()->json(['ok' => false, 'msg' => 'ID de estado no proporcionado'], 400);
+            }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Estado $estado)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Estado $estado)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Estado $estado)
-    {
-        //
+            Estado::eliminar($idEstado);
+            return response()->json(['ok' => true, 'msg' => 'Estado eliminado correctamente']);
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'msg' => 'Error al eliminar el estado: ' . $e->getMessage()], 500);
+        }
     }
 }

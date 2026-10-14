@@ -7,59 +7,65 @@ use Illuminate\Http\Request;
 
 class ModeloController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function listar()
     {
-        //
+        try {
+            $data = Modelo::listar();
+            return response()->json(['ok' => true, 'data' => $data]);
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'msg' => $e->getMessage()], 500);
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function buscar($idModelo)
     {
-        //
+        try {
+            $modelo = Modelo::buscar($idModelo);
+            if (!$modelo) {
+                return response()->json(['ok' => false, 'msg' => 'Modelo no encontrado'], 404);
+            }
+            return response()->json(['ok' => true, 'data' => $modelo]);
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'msg' => $e->getMessage()], 500);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function guardar(Request $request)
     {
-        //
+        try {
+            $nombre     = $request->input('nombre');
+            $idOriginal = $request->input('idOriginal');
+
+            if (empty($nombre)) {
+                return response()->json(['ok' => false, 'msg' => 'El nombre del modelo es obligatorio'], 422);
+            }
+
+            if (empty($idOriginal)) {
+                Modelo::crear($nombre);
+                $msg = 'Modelo registrado correctamente';
+            } else {
+                Modelo::actualizar($idOriginal, $nombre);
+                $msg = 'Modelo actualizado correctamente';
+            }
+
+            return response()->json(['ok' => true, 'msg' => $msg]);
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'msg' => 'Error al guardar: ' . $e->getMessage()], 500);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Modelo $modelo)
+    public function eliminar(Request $request)
     {
-        //
-    }
+        try {
+            $idModelo = $request->input('idModelo');
+            if (empty($idModelo)) {
+                return response()->json(['ok' => false, 'msg' => 'ID de modelo no proporcionado'], 400);
+            }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Modelo $modelo)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Modelo $modelo)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Modelo $modelo)
-    {
-        //
+            Modelo::eliminar($idModelo);
+            return response()->json(['ok' => true, 'msg' => 'Modelo eliminado correctamente']);
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'msg' => 'Error al eliminar el modelo: ' . $e->getMessage()], 500);
+        }
     }
 }

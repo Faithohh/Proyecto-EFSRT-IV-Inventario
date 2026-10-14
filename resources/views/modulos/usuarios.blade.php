@@ -1,4 +1,16 @@
 <section class="mp-panel" id="mpUsuarios" hidden>
+    <!-- CABECERA DEL MÓDULO (Icono Usuarios) -->
+    <div class="mp-panel-header d-flex align-items-center mb-3">
+        <svg viewBox="0 0 24 24" width="24" height="24" class="me-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        <h4 class="m-0 font-weight-bold">Gestión de Usuarios</h4>
+    </div>
+
+    <!-- BARRA DE HERRAMIENTAS -->
     <div class="tb-bar" role="toolbar" aria-label="Acciones de usuarios">
         <button type="button" class="tb-btn" data-acc="nuevo" title="Nuevo"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
         <button type="button" class="tb-btn" data-acc="editar" title="Editar"><svg viewBox="0 0 24 24"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17v3z"/><path d="M13.5 6.5l3 3"/></svg></button>
@@ -8,21 +20,31 @@
         <button type="button" class="tb-btn tb-xls" data-acc="excel" title="Excel"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 9.5l6 5M15 9.5l-6 5"/></svg><span>X</span></button>
         <button type="button" class="tb-btn" data-acc="salir" title="Salir"><svg viewBox="0 0 24 24"><path d="M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10"/></svg></button>
     </div>
+
+    <!-- BUSCADOR -->
     <div class="tb-search">
         <label for="txtBuscarUsuarios">BUSCAR:</label>
         <input type="text" id="txtBuscarUsuarios" autocomplete="off" placeholder="Escriba para filtrar...">
     </div>
+
+    <!-- TABLA DE USUARIOS -->
     <div class="tb-table-wrap">
         <table class="tb-table" id="tblUsuarios">
             <thead>
-                <tr><th>ID</th><th>Personal Asociado</th><th>Tipo de Usuario</th></tr>
+                <tr>
+                    <th>ID</th>
+                    <th>Personal Asociado</th>
+                    <th>Tipo de Usuario</th>
+                </tr>
             </thead>
-            <tbody><tr><td colspan="3" class="text-center">Cargando...</td></tr></tbody>
+            <tbody>
+                <tr><td colspan="3" class="text-center">Cargando...</td></tr>
+            </tbody>
         </table>
     </div>
 </section>
 
-<!-- Modal Registrar / Editar Usuario -->
+<!-- Modal Registrar / Editar Usuario (Posicionado Arriba) -->
 <div class="modal fade" id="modalUsuario" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -35,17 +57,18 @@
                     <input type="hidden" id="txtIdUsuarioOriginal" value="">
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label for="txtIdUsuario" class="form-label">ID Usuario</label>
-                            <input type="text" class="form-control" id="txtIdUsuario" maxlength="15" required>
+                            <label for="txtIdUsuario" class="form-label fw-bold">ID Usuario</label>
+                            <input type="text" class="form-control" id="txtIdUsuario" maxlength="15" required placeholder="Ingrese ID de usuario">
                         </div>
                         <div class="col-md-6">
-                            <label for="txtContrasena" class="form-label">Contraseña</label>
-                            <input type="text" class="form-control" id="txtContrasena" maxlength="15" required>
+                            <label for="txtContrasena" class="form-label fw-bold">Contraseña</label>
+                            <!-- Se cambia type="password" por type="text" para que sea visible -->
+                            <input type="text" class="form-control" id="txtContrasena" maxlength="15" required placeholder="Ingrese contraseña">
                         </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label for="cboTipoUsuario" class="form-label">Tipo de Usuario</label>
+                            <label for="cboTipoUsuario" class="form-label fw-bold">Tipo de Usuario</label>
                             <select class="form-select" id="cboTipoUsuario" required>
                                 <option value="">Seleccione...</option>
                                 <option value="ADMINISTRADOR">ADMINISTRADOR</option>
@@ -55,7 +78,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label for="cboPersonal" class="form-label">Personal Asociado</label>
+                            <label for="cboPersonal" class="form-label fw-bold">Personal Asociado</label>
                             <select class="form-select" id="cboPersonal" required>
                                 <option value="">Cargando...</option>
                             </select>
@@ -71,7 +94,7 @@
     </div>
 </div>
 
-<!-- Modal Detalle del Usuario -->
+<!-- Modal Detalle del Usuario (Posicionado Arriba) -->
 <div class="modal fade" id="modalDetalleUsuario" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -80,7 +103,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
-                <table class="table table-bordered">
+                <table class="table table-bordered mb-0">
                     <tbody>
                         <tr><th>ID Usuario</th><td class="det-idUsuario"></td></tr>
                         <tr><th>Contraseña</th><td class="det-contrasena"></td></tr>
@@ -97,20 +120,20 @@
     </div>
 </div>
 
-<!-- Modal Eliminar Usuario -->
+<!-- Modal Eliminar Usuario (Centrado al Medio) -->
 <div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title">Confirmar Eliminación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
                 <p>¿Está seguro de eliminar al usuario <strong id="txtUsuarioEliminar"></strong>?</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">Sí, Eliminar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">Eliminar</button>
             </div>
         </div>
     </div>
