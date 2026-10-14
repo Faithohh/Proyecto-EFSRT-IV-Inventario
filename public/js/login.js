@@ -1,16 +1,15 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Selección de elementos del DOM
-    const txtUsuario = document.getElementById('txt_usuario');
-    const txtContrasena = document.getElementById('txt_contraseña');
-    const cbxProgramaEstudio = document.getElementById('cbx_programaEstudio');
-    const gbxProgramaEstudio = document.getElementById('gbx_programaEstudio');
-    const btnIngresar = document.getElementById('btn_ingresar');
-    const btnCancelar = document.getElementById('btn_cancelar');
+document.addEventListener("DOMContentLoaded", () => {
+    const txtUsuario = document.getElementById("txt_usuario");
+    const txtContrasena = document.getElementById("txt_contraseña");
+    const cbxProgramaEstudio = document.getElementById("cbx_programaEstudio");
+    const gbxProgramaEstudio = document.getElementById("gbx_programaEstudio");
+    const btnIngresar = document.getElementById("btn_ingresar");
+    const btnCancelar = document.getElementById("btn_cancelar");
 
-    // Token CSRF obligatorio en Laravel para peticiones POST
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    const csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        ?.getAttribute("content");
 
-    // Validación de campos obligatorios
     function validarDatosCompletos() {
         const usuario = txtUsuario.value.trim();
         const contrasena = txtContrasena.value.trim();
@@ -28,113 +27,117 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
-    // Validar usuario y cargar ComboBox / Select mediante AJAX
     async function validarUsuario() {
         try {
-            const response = await fetch('/login/acceso', {
-                method: 'POST',
+            const response = await fetch("/login/acceso", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
                 },
                 body: JSON.stringify({
-                    usuario: txtUsuario.value,
-                    contrasena: txtContrasena.value
-                })
+                    usuario: txtUsuario.value.trim(),
+                    contrasena: txtContrasena.value.trim(),
+                }),
             });
 
             const data = await response.json();
 
             if (data.valid === "1") {
-                // Limpiar selector previo
-                cbxProgramaEstudio.innerHTML = '';
+                cbxProgramaEstudio.innerHTML = "";
 
-                // Llenar el desplegable con la lista de programas de estudio
                 if (data.programas && data.programas.length > 0) {
-                    data.programas.forEach(prog => {
-                        const option = document.createElement('option');
+                    data.programas.forEach((prog) => {
+                        const option = document.createElement("option");
                         option.value = prog.idProgramaEstudio;
                         option.textContent = prog.programaEstudio;
                         cbxProgramaEstudio.appendChild(option);
                     });
 
-                    // Mostrar el contenedor del desplegable y habilitar botón
-                    gbxProgramaEstudio.style.display = 'block';
+                    if (gbxProgramaEstudio)
+                        gbxProgramaEstudio.style.display = "block";
                     btnIngresar.disabled = false;
                     cbxProgramaEstudio.focus();
                 } else {
-                    alert("No tiene acceso a programa(s) de estudio\nConsulte con el Administrador de Sistemas");
+                    alert(
+                        "No tiene acceso a programa(s) de estudio\nConsulte con el Administrador de Sistemas",
+                    );
                 }
                 return true;
             } else {
-                alert(data.valid || "Error de credenciales");
-                txtUsuario.value = '';
-                txtContrasena.value = '';
+                alert(
+                    "Alerta\n\nDatos Inválidos\n-----------------------------------\n" +
+                        (data.valid || "Error de credenciales"),
+                );
+                txtUsuario.value = "";
+                txtContrasena.value = "";
+                resetearFormulario();
                 txtUsuario.focus();
                 return false;
             }
         } catch (error) {
-            console.error('Error en la petición:', error);
-            alert('Ocurrió un error al procesar la solicitud.');
+            console.error("Error en la petición:", error);
+            alert("Ocurrió un error al procesar la solicitud con el servidor.");
             return false;
         }
     }
 
-    // Iniciar sesión con el programa de estudio seleccionado
     async function iniciarSesion() {
         if (!validarDatosCompletos()) return;
 
         if (cbxProgramaEstudio.options.length > 0 && cbxProgramaEstudio.value) {
             try {
-                const response = await fetch('/login/sesion', {
-                    method: 'POST',
+                const response = await fetch("/login/sesion", {
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN": csrfToken,
                     },
                     body: JSON.stringify({
-                        idUsuario: txtUsuario.value,
-                        idProgramaEstudio: cbxProgramaEstudio.value
-                    })
+                        idUsuario: txtUsuario.value.trim(),
+                        idProgramaEstudio: cbxProgramaEstudio.value,
+                    }),
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    // Redireccionar a la vista principal
-                    window.location.href = data.redirectUrl || '/principal';
+                    window.location.href = data.redirectUrl || "/principal";
                 } else {
-                    alert(data.message || 'No se pudo iniciar sesión.');
+                    alert(data.message || "No se pudo iniciar sesión.");
                 }
             } catch (error) {
-                console.error('Error en la sesión:', error);
+                console.error("Error en la sesión:", error);
+                alert("Error al conectar para iniciar sesión.");
             }
         } else {
-            alert("No tiene acceso a programa(s) de estudio\nConsulte con el Administrador de Sistemas");
+            alert(
+                "No tiene acceso a programa(s) de estudio\nConsulte con el Administrador de Sistemas",
+            );
         }
     }
 
-    // Eventos de Botones
-    btnIngresar.addEventListener('click', (e) => {
+    btnIngresar.addEventListener("click", (e) => {
         e.preventDefault();
         iniciarSesion();
     });
 
-    btnCancelar?.addEventListener('click', (e) => {
+    btnCancelar?.addEventListener("click", (e) => {
         e.preventDefault();
-        window.location.href = '/';
+        window.location.href = "/login";
     });
 
-    // Manejo de eventos de teclado (Enter = KeyCode 13)
-    txtUsuario.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
+    txtUsuario.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
             e.preventDefault();
             txtContrasena.focus();
         }
     });
 
-    txtContrasena.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
+    txtContrasena.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
             e.preventDefault();
             if (validarDatosCompletos()) {
                 validarUsuario();
@@ -142,34 +145,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    cbxProgramaEstudio.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
+    cbxProgramaEstudio.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
             e.preventDefault();
             btnIngresar.focus();
         }
     });
 
-    // Resetear formulario al cambiar usuario o contraseña
     const resetearFormulario = () => {
         btnIngresar.disabled = true;
-        gbxProgramaEstudio.style.display = 'none';
-        cbxProgramaEstudio.innerHTML = '';
+        if (gbxProgramaEstudio) gbxProgramaEstudio.style.display = "none";
+        cbxProgramaEstudio.innerHTML = "";
     };
 
-    txtUsuario.addEventListener('input', () => {
+    txtUsuario.addEventListener("input", () => {
         resetearFormulario();
-        txtContrasena.value = '';
+        txtContrasena.value = "";
     });
 
-    txtContrasena.addEventListener('input', resetearFormulario);
+    txtContrasena.addEventListener("input", resetearFormulario);
 
-    cbxProgramaEstudio.addEventListener('change', () => {
+    cbxProgramaEstudio.addEventListener("change", () => {
         btnIngresar.disabled = false;
     });
 
-    // Estilos de enfoque (Lógica equivalentes a BackColor = LightYellow)
-    [txtUsuario, txtContrasena].forEach(input => {
-        input.addEventListener('focus', () => input.style.backgroundColor = '#FFFFE0');
-        input.addEventListener('blur', () => input.style.backgroundColor = '');
+    [txtUsuario, txtContrasena].forEach((input) => {
+        if (input) {
+            input.addEventListener("focus", () => input.classList.add("lit"));
+            input.addEventListener("blur", () => input.classList.remove("lit"));
+        }
     });
 });

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 10-09-2026 a las 18:52:36
+-- Tiempo de generación: 13-09-2026 a las 23:18:57
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -1799,10 +1799,10 @@ CREATE TABLE `programaestudio` (
 
 INSERT INTO `programaestudio` (`idProgramaEstudio`, `idInstitucion`, `nombre`, `idCoordinadorArea`, `idAsistenteAreaT1`, `idAsistenteAreaT2`, `abreviatura`, `observacion`, `st_programaEstudio`, `st_registro`, `idUsuarioCrea`, `fechaCreacion`, `pcTerminalCrea`, `idUsuarioModifica`, `fechaModificacion`, `pcTerminalModifica`) VALUES
 (1, 1, 'ADMINISTRACIÓN DE EMPRESAS', NULL, NULL, NULL, NULL, '', 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
-(2, 1, 'DESARROLLO DE SISTEMAS DE INFORMACIÓN', NULL, NULL, NULL, NULL, '', 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
+(2, 1, 'DESARROLLO DE SISTEMAS DE INFORMACIÓN', NULL, 2, NULL, NULL, '', 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
 (3, 1, 'CONTABILIDAD', NULL, NULL, NULL, NULL, '', 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
 (4, 1, 'ELECTRICIDAD INDUSTRIAL', NULL, NULL, NULL, NULL, '', 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
-(5, 1, 'MECANICA AUTOMOTRIZ', NULL, NULL, NULL, NULL, '', 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
+(5, 1, 'MECANICA AUTOMOTRIZ', NULL, 3, NULL, NULL, '', 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
 (6, 1, 'MECANICA DE PRODUCCIÓN', NULL, NULL, NULL, NULL, '', 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
 (7, 1, 'SECRETARIADO EJECUTIVO', NULL, NULL, NULL, NULL, '', 'ACTIVO', 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL);
 
@@ -1862,7 +1862,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('8LaqElmcfYJxDqWQAmPfWondVqIFezoQa2l4bcsD', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiNXF1ZEQ3RVNjclVlejBROXRzUmNscGhzcUpQSThVSExHTkExY3pmciI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1789059057);
+('mSa8ZWdSrAjmZI2EOrhHI3LClWZycDb9YUezmmOF', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36', 'YTo3OntzOjY6Il90b2tlbiI7czo0MDoiOTdyekVXTHUzMU54RENOZ3V0Y0xmSk9IQnNwS1AzTm5ZTzFlclR1ayI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC91c3Vhcmlvcy9saXN0YXIiO3M6NToicm91dGUiO3M6MTU6InVzdWFyaW9zLmxpc3RhciI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6OToiaWRVc3VhcmlvIjtzOjM6IlRFTyI7czoxNzoiaWRQcm9ncmFtYUVzdHVkaW8iO3M6MToiMiI7czoxMToidGlwb1VzdWFyaW8iO3M6OToiQVNJU1RFTlRFIjtzOjEyOiJ0aXR1bG9TZXNpb24iO3M6ODc6IlsgU0lJTi0yMDI1LTEgXSAtIFsgREVTQVJST0xMTyBERSBTSVNURU1BUyBERSBJTkZPUk1BQ0nDk04gXSAtIFsgVEVPIF0gLSBbIFRFTyBHQVJDSUEgXSI7fQ==', 1789334266);
 
 -- --------------------------------------------------------
 
@@ -1957,8 +1957,8 @@ CREATE TABLE `usuario` (
 
 INSERT INTO `usuario` (`idUsuario`, `contraseña`, `idPersonal`, `tipoUsuario`, `activo`, `st_registro`, `idUsuarioCrea`, `fechaCreacion`, `pcTerminalCrea`, `idUsuarioModifica`, `fechaModificacion`, `pcTerminalModifica`) VALUES
 ('AZUÑIGA', 'AZUÑIGA', 1, 'ADMINISTRADOR', 1, 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
-('LEO', 'LEO', 3, 'ASISTENTE', 5, 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
-('TEO', 'TEO', 2, 'ASISTENTE', 2, 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL);
+('LEO', 'LEO', 3, 'ASISTENTE', 1, 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL),
+('TEO', 'TEO', 2, 'ASISTENTE', 1, 1, 'AZUÑIGA', '2026-09-10 10:42:17', 'SERVER', NULL, NULL, NULL);
 
 --
 -- Disparadores `usuario`
