@@ -1,83 +1,148 @@
-document.addEventListener('DOMContentLoaded', function () {
 
-    cargarInventarios();
+document.addEventListener("DOMContentLoaded", function () {
+    let cargandoInventarios = false;
 
-    function cargarInventarios() {
+    async function cargarInventarios() {
+        const combo = document.getElementById("cbInventario");
 
-        fetch('/reportes/inventarios')
-            .then(response => response.json())
-            .then(data => {
-
-                if (!data.ok) {
-                    mostrarError(data.msg || 'No se pudieron cargar los inventarios.');
-                    return;
-                }
-
-                const combo = document.getElementById('cbInventario');
-
-                combo.innerHTML = `
-                    <option value="">Seleccione un inventario</option>
-                `;
-
-                data.data.forEach(function (inventario) {
-
-                    const option = document.createElement('option');
-
-                    option.value = inventario.idInventario;
-
-                    option.textContent =
-                        inventario.INVENTARIO +
-                        ' - ' +
-                        inventario.SALA;
-
-                    combo.appendChild(option);
-                });
-
-            })
-            .catch(error => {
-
-                console.error(error);
-
-                mostrarError('No se pudieron cargar los inventarios.');
-
-            });
-    }
-
-    document.getElementById('btnCargarDatos').addEventListener('click', function () {
-
-        const idInventario = document.getElementById('cbInventario').value;
-
-        if (!idInventario) {
-
-            mostrarAdvertencia(
-                'Seleccione un inventario',
-                'Debe seleccionar un inventario antes de continuar.'
-            );
-
+        if (!combo || cargandoInventarios) {
             return;
         }
 
-        cargarInforme(idInventario);
+        cargandoInventarios = true;
+
+        const seleccionAnterior = combo.value;
+
+        try {
+            combo.innerHTML = `
+                <option value="">Cargando inventarios...</option>
+            `;
+
+            const response = await fetch("/reportes/inventarios", {
+                cache: "no-store"
+            });
+
+            if (!response.ok) {
+                throw new Error("Error al consultar los inventarios.");
+            }
+
+            const data = await response.json();
+
+            if (!data.ok) {
+                combo.innerHTML = `
+                    <option value="">No se pudieron cargar los inventarios</option>
+                `;
+
+                mostrarError(
+                    data.msg || "No se pudieron cargar los inventarios."
+                );
+
+                return;
+            }
+
+            const inventarios = data.data || [];
+
+            combo.innerHTML = `
+                <option value="">Seleccione un inventario cerrado</option>
+            `;
+
+            if (inventarios.length === 0) {
+                combo.innerHTML = `
+                    <option value="">No hay inventarios cerrados disponibles</option>
+                `;
+
+                return;
+            }
+
+            inventarios.forEach(function (inventario) {
+                const option = document.createElement("option");
+
+                option.value = inventario.idInventario;
+
+                option.textContent =
+                    inventario.INVENTARIO + " - " + inventario.SALA;
+
+                combo.appendChild(option);
+            });
+
+            if (
+                seleccionAnterior &&
+                inventarios.some(
+                    inventario =>
+                        String(inventario.idInventario) === seleccionAnterior
+                )
+            ) {
+                combo.value = seleccionAnterior;
+            }
+        } catch (error) {
+            console.error(error);
+
+            combo.innerHTML = `
+                <option value="">Error al cargar inventarios</option>
+            `;
+
+            mostrarError("No se pudieron cargar los inventarios.");
+        } finally {
+            cargandoInventarios = false;
+        }
+    }
+
+    cargarInventarios();
+
+    const comboInventario = document.getElementById("cbInventario");
+
+    if (comboInventario) {
+        comboInventario.addEventListener("focus", cargarInventarios);
+    }
+
+    document.addEventListener("visibilitychange", function () {
+        if (!document.hidden) {
+            cargarInventarios();
+        }
     });
 
-    function cargarInforme(idInventario) {
+    window.addEventListener("focus", cargarInventarios);
 
-        document.getElementById('contenedorReporte').innerHTML = `
+    const btnCargarDatos = document.getElementById("btnCargarDatos");
+
+    if (btnCargarDatos) {
+        btnCargarDatos.addEventListener("click", function () {
+            const combo = document.getElementById("cbInventario");
+
+            if (!combo || !combo.value) {
+                mostrarAdvertencia(
+                    "Seleccione un inventario",
+                    "Debe seleccionar un inventario antes de continuar."
+                );
+
+                return;
+            }
+
+            cargarInforme(combo.value);
+        });
+    }
+
+    function cargarInforme(idInventario) {
+        document.getElementById("contenedorReporte").innerHTML = `
             <div class="reporte-cargando">
                 <div class="spinner-border" role="status"></div>
                 <p>Cargando informe...</p>
             </div>
         `;
 
-        fetch('/reportes/informe/' + idInventario)
-            .then(response => response.json())
-            .then(data => {
+        fetch("/reportes/informe/" + encodeURIComponent(idInventario))
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("No se pudo cargar el informe.");
+                }
 
+                return response.json();
+            })
+            .then((data) => {
                 if (!data.ok) {
-
-                    document.getElementById('contenedorReporte').innerHTML = `
+                    document.getElementById("contenedorReporte").innerHTML = `
                         <div class="alert alert-danger">
-                            ${escapeHtml(data.msg || 'No se pudo cargar el informe.')}
+                            ${escapeHtml(data.msg || "No se pudo cargar el informe.")}
                         </div>
                     `;
 
@@ -85,23 +150,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 mostrarInforme(data.data);
-
             })
-            .catch(error => {
-
+            .catch((error) => {
                 console.error(error);
 
-                document.getElementById('contenedorReporte').innerHTML = `
+                document.getElementById("contenedorReporte").innerHTML = `
                     <div class="alert alert-danger">
                         No se pudo cargar el informe.
                     </div>
                 `;
-
             });
     }
 
     function mostrarInforme(data) {
-
         const inventario = data.inventario;
         const bienes = data.bienes || [];
 
@@ -109,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const totalBienes = bienes.length;
 
-        let html = '';
+        let html = "";
 
         html += `
             <style>
@@ -462,13 +523,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 <div class="reporte-encabezado">
 
-                    <img 
-                        src="/img/logo.png"
-                        alt="Logo del Instituto"
-                        class="reporte-logo"
-                        onerror="this.style.display='none';"
-                    >
-
                     <div class="reporte-institucion">
 
                         <h5>
@@ -498,7 +552,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </h2>
 
                     <p>
-                        Inventario N.º <strong>${escapeHtml(inventario.INVENTARIO || '-')}</strong>
+                        Inventario N.º <strong>${escapeHtml(inventario.INVENTARIO || "-")}</strong>
                     </p>
 
                 </div>
@@ -513,7 +567,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         <div class="reporte-info-item">
                             <strong>Sala:</strong>
-                            ${escapeHtml(inventario.SALA || '-')}
+                            ${escapeHtml(inventario.SALA || "-")}
                         </div>
 
                         <div class="reporte-info-item">
@@ -523,22 +577,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         <div class="reporte-info-item">
                             <strong>Coordinador:</strong>
-                            ${escapeHtml(inventario.COORDINADOR || '-')}
+                            ${escapeHtml(inventario.COORDINADOR || "-")}
                         </div>
 
                         <div class="reporte-info-item">
                             <strong>Asistente T1:</strong>
-                            ${escapeHtml(inventario.ASISTENTE_T1 || '-')}
+                            ${escapeHtml(inventario.ASISTENTE_T1 || "-")}
                         </div>
 
                         <div class="reporte-info-item">
                             <strong>Asistente T2:</strong>
-                            ${escapeHtml(inventario.ASISTENTE_T2 || '-')}
+                            ${escapeHtml(inventario.ASISTENTE_T2 || "-")}
                         </div>
 
                         <div class="reporte-info-item">
                             <strong>Estado:</strong>
-                            ${escapeHtml(inventario.ESTADO || '-')}
+                            ${escapeHtml(inventario.ESTADO || "-")}
                         </div>
 
                     </div>
@@ -567,7 +621,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <strong>Observaciones:</strong>
 
                     <span>
-                        ${escapeHtml(inventario.OBSERVACION || '-')}
+                        ${escapeHtml(inventario.OBSERVACION || "-")}
                     </span>
 
                 </div>
@@ -582,13 +636,11 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
         `;
 
-        document.getElementById('contenedorReporte').innerHTML = html;
+        document.getElementById("contenedorReporte").innerHTML = html;
     }
 
     function generarTablaBienes(bienes) {
-
         if (!bienes || bienes.length === 0) {
-
             return `
                 <div class="reporte-sin-datos">
                     No existen bienes registrados para este inventario.
@@ -596,16 +648,14 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
         }
 
-        let html = '';
+        let html = "";
 
         let grupoActual = null;
 
         bienes.forEach(function (bien) {
-
-            const grupo = bien.GRUPO || 'SIN GRUPO';
+            const grupo = bien.GRUPO || "SIN GRUPO";
 
             if (grupo !== grupoActual) {
-
                 if (grupoActual !== null) {
                     html += `
                         </tbody>
@@ -650,37 +700,37 @@ document.addEventListener('DOMContentLoaded', function () {
                 <tr>
 
                     <td>
-                        ${escapeHtml(bien.INV_DRELM || '-')}
+                        ${escapeHtml(bien.INV_DRELM || "-")}
                     </td>
 
                     <td>
-                        ${escapeHtml(bien.CBI || '-')}
+                        ${escapeHtml(bien.CBI || "-")}
                     </td>
 
                     <td>
-                        ${escapeHtml(bien.DESCRIPCION || '-')}
+                        ${escapeHtml(bien.DESCRIPCION || "-")}
                     </td>
 
                     <td>
-                        ${escapeHtml(bien.MARCA || '-')}
+                        ${escapeHtml(bien.MARCA || "-")}
                     </td>
 
                     <td>
-                        ${escapeHtml(bien.MODELO || '-')}
+                        ${escapeHtml(bien.MODELO || "-")}
                     </td>
 
                     <td>
-                        ${escapeHtml(bien.SERIE_MEDIDA || '-')}
+                        ${escapeHtml(bien.SERIE_MEDIDA || "-")}
                     </td>
 
                     <td>
                         <span class="reporte-estado">
-                            ${escapeHtml(bien.ESTADO || '-')}
+                            ${escapeHtml(bien.ESTADO || "-")}
                         </span>
                     </td>
 
                     <td>
-                        ${escapeHtml(bien.OTRAS_ESPECIFICACIONES || '-')}
+                        ${escapeHtml(bien.OTRAS_ESPECIFICACIONES || "-")}
                     </td>
 
                 </tr>
@@ -698,74 +748,60 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function obtenerFechaActual() {
-
         const fecha = new Date();
 
-        const dia = String(fecha.getDate()).padStart(2, '0');
+        const dia = String(fecha.getDate()).padStart(2, "0");
 
-        const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+        const mes = String(fecha.getMonth() + 1).padStart(2, "0");
 
         const anio = fecha.getFullYear();
 
-        return dia + '/' + mes + '/' + anio;
+        return dia + "/" + mes + "/" + anio;
     }
 
     function formatearFecha(fecha) {
-
         if (!fecha) {
-            return '-';
+            return "-";
         }
 
-        const partes = fecha.substring(0, 10).split('-');
+        const partes = fecha.substring(0, 10).split("-");
 
         if (partes.length !== 3) {
             return fecha;
         }
 
-        return partes[2] + '/' + partes[1] + '/' + partes[0];
+        return partes[2] + "/" + partes[1] + "/" + partes[0];
     }
 
     function escapeHtml(texto) {
+        const div = document.createElement("div");
 
-        const div = document.createElement('div');
-
-        div.textContent = texto;
+        div.textContent = String(texto);
 
         return div.innerHTML;
     }
 
     function mostrarError(mensaje) {
-
-        if (typeof Swal !== 'undefined') {
-
+        if (typeof Swal !== "undefined") {
             Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: mensaje
+                icon: "error",
+                title: "Error",
+                text: mensaje,
             });
-
         } else {
-
             alert(mensaje);
-
         }
     }
 
     function mostrarAdvertencia(titulo, mensaje) {
-
-        if (typeof Swal !== 'undefined') {
-
+        if (typeof Swal !== "undefined") {
             Swal.fire({
-                icon: 'warning',
+                icon: "warning",
                 title: titulo,
-                text: mensaje
+                text: mensaje,
             });
-
         } else {
-
-            alert(titulo + '\n\n' + mensaje);
-
+            alert(titulo + "\n\n" + mensaje);
         }
     }
-
 });

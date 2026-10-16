@@ -9,6 +9,17 @@
     --ac: #5eead4;
 }
 
+html[data-theme="light"] {
+    --bg: #eef1f7;
+    --panel: #ffffff;
+    --card: #ffffff;
+    --line: #dbe1ee;
+    --txt: #131a2c;
+    --mut: #5b6578;
+    --dim: #8c94a8;
+    --ac: #0ea5a4;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -304,34 +315,6 @@ body.mp {
     background: var(--card);
 }
 
-.mp-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13.5px;
-}
-
-.mp-table th,
-.mp-table td {
-    padding: 11px 14px;
-    text-align: left;
-    border-bottom: 1px solid var(--line);
-}
-
-.mp-table thead th {
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    color: var(--mut);
-    background: rgba(94, 234, 212, 0.06);
-}
-
-.mp-table tbody tr:last-child td {
-    border-bottom: 0;
-}
-
-.mp-table tbody tr:hover td {
-    background: rgba(94, 234, 212, 0.05);
-}
-
 .mp-empty {
     text-align: center;
     color: var(--mut);
@@ -367,17 +350,6 @@ body.mp {
 
 .mp-cards strong {
     font-size: 17px;
-}
-
-html[data-theme="light"] {
-    --bg: #eef1f7;
-    --panel: #fff;
-    --card: #fff;
-    --line: #dbe1ee;
-    --txt: #131a2c;
-    --mut: #5b6578;
-    --dim: #8c94a8;
-    --ac: #0ea5a4;
 }
 
 .mp-user .tema-btn {
@@ -610,51 +582,54 @@ html[data-theme="light"] .mp-cards div {
 .tb-table-wrap {
     border: 1px solid var(--line);
     border-radius: 12px;
-    overflow: hidden;
+    overflow-x: auto;
     background: var(--card);
 }
 
-.tb-table {
-    margin: 0;
+/* =========================================================
+   ADAPTACIÓN EXCLUSIVA DE TABLAS (MODO CLARO / OSCURO)
+   ========================================================= */
+.tb-table,
+.table {
+    margin: 0 !important;
     width: 100%;
     border-collapse: collapse;
-    background: var(--card);
-    color: var(--txt);
+    background-color: var(--card) !important;
+    color: var(--txt) !important;
 }
 
 .tb-table th,
-.tb-table td {
-    background-color: var(--card);
-    color: var(--txt);
-    border-color: var(--line);
-    border-bottom: 1px solid var(--line);
-    box-shadow: none;
+.tb-table td,
+.table th,
+.table td {
+    background-color: var(--card) !important;
+    color: var(--txt) !important;
+    border-color: var(--line) !important;
+    border-bottom: 1px solid var(--line) !important;
+    box-shadow: none !important;
     padding: 10px 14px;
 }
 
-.tb-table thead th {
-    background-color: var(--panel);
-    color: var(--mut);
-    font-size: 11.5px;
+.tb-table thead th,
+.table thead th {
+    background-color: var(--panel) !important;
+    color: var(--mut) !important;
+    font-size: 11.5px !important;
     letter-spacing: 0.12em;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--line) !important;
     padding: 11px 14px;
 }
 
-.tb-table tbody tr:nth-of-type(odd) td {
-    background-color: rgba(139, 148, 173, 0.1);
-    color: var(--txt);
+.tb-table tbody tr:nth-of-type(odd) td,
+.table tbody tr:nth-of-type(odd) td {
+    background-color: rgba(139, 148, 173, 0.08) !important;
+    color: var(--txt) !important;
 }
 
-.tb-table tbody tr:hover td {
-    background-color: rgba(94, 234, 212, 0.08);
-    color: var(--txt);
-}
-
-.tb-table tbody td {
-    padding: 10px 14px;
-    font-size: 13.5px;
-    border-color: var(--line);
+.tb-table tbody tr:hover td,
+.table tbody tr:hover td {
+    background-color: rgba(94, 234, 212, 0.08) !important;
+    color: var(--txt) !important;
 }
 
 .tb-table tbody tr {
@@ -669,12 +644,59 @@ html[data-theme="light"] .tb-search input:focus {
     box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.15);
 }
 
-html[data-theme="light"] .tb-table tbody tr:nth-of-type(odd) td {
-    background-color: rgba(19, 26, 44, 0.045);
+html[data-theme="light"] .tb-table thead th,
+html[data-theme="light"] .table thead th {
+    background-color: #e2e8f0 !important;
+    color: #1e293b !important;
+    border-bottom-color: #cbd5e1 !important;
 }
 
-html[data-theme="light"] .tb-table tbody tr:hover td {
-    background-color: rgba(14, 165, 164, 0.08);
+html[data-theme="light"] .tb-table tbody tr:nth-of-type(odd) td,
+html[data-theme="light"] .table tbody tr:nth-of-type(odd) td {
+    background-color: rgba(19, 26, 44, 0.035) !important;
+}
+
+html[data-theme="light"] .tb-table tbody tr:hover td,
+html[data-theme="light"] .table tbody tr:hover td {
+    background-color: rgba(14, 165, 164, 0.08) !important;
+}
+
+/* =========================================================
+   ADAPTACIÓN DINÁMICA DE BARRAS DE SCROLL (CLARO / OSCURO)
+   ========================================================= */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) var(--card);
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--card) !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--line) !important;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--dim) !important;
+}
+
+html[data-theme="light"] ::-webkit-scrollbar-track {
+    background: #e2e8f0 !important;
+}
+
+html[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1 !important;
+}
+
+html[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8 !important;
 }
 
 @media (max-width: 860px) {
@@ -822,3 +844,675 @@ html[data-theme="light"] .modal-body .form-control:focus,
 html[data-theme="light"] .modal-body .form-select:focus {
     box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.15) !important;
 }
+
+/* ================================
+   MÓDULO DE REPORTES
+================================ */
+
+#mpReportes {
+    color: var(--txt);
+}
+
+#mpReportes .tb-search {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 20px;
+}
+
+#mpReportes .tb-search label {
+    color: var(--txt);
+    font-weight: 600;
+}
+
+#mpReportes #cbInventario {
+    background-color: var(--card);
+    color: var(--txt);
+    border: 1px solid var(--line);
+}
+
+#mpReportes #cbInventario option {
+    background-color: var(--card);
+    color: var(--txt);
+}
+
+#mpReportes #cbInventario:focus {
+    border-color: var(--ac);
+    box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--ac) 20%, transparent);
+}
+
+#mpReportes #contenedorReporte {
+    color: var(--txt);
+}
+
+#mpReportes .reporte-documento {
+    background: var(--panel);
+    color: var(--txt);
+    padding: 35px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.10);
+    font-family: Arial, Helvetica, sans-serif;
+    max-width: 1400px;
+    margin: 20px auto;
+    transition: background 0.2s, color 0.2s;
+}
+
+#mpReportes .reporte-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid #1f4e79;
+}
+
+#mpReportes .reporte-logo {
+    width: 85px;
+    height: 85px;
+    object-fit: contain;
+}
+
+#mpReportes .reporte-institucion {
+    flex: 1;
+}
+
+#mpReportes .reporte-institucion h5 {
+    margin: 0 0 5px 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--txt);
+}
+
+#mpReportes .reporte-institucion h6 {
+    margin: 0;
+    font-size: 13px;
+    color: var(--mut);
+    font-weight: 500;
+}
+
+#mpReportes .reporte-titulo {
+    text-align: center;
+    margin: 25px 0;
+}
+
+#mpReportes .reporte-titulo h2 {
+    margin: 0;
+    font-size: 23px;
+    font-weight: 700;
+    color: var(--ac);
+    letter-spacing: 0.5px;
+}
+
+#mpReportes .reporte-titulo p {
+    margin: 7px 0 0 0;
+    font-size: 14px;
+    color: var(--mut);
+}
+
+#mpReportes .reporte-titulo p strong {
+    color: var(--txt);
+}
+
+#mpReportes .reporte-fecha {
+    text-align: right;
+    min-width: 170px;
+    font-size: 12px;
+    color: var(--mut);
+}
+
+#mpReportes .reporte-fecha strong {
+    display: block;
+    color: var(--txt);
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+#mpReportes .reporte-seccion-titulo {
+    background: #1f4e79;
+    color: #ffffff;
+    padding: 9px 13px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 5px 5px 0 0;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+#mpReportes .reporte-info {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-top: none;
+    border-radius: 0 0 5px 5px;
+    padding: 16px;
+    margin-bottom: 25px;
+}
+
+#mpReportes .reporte-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 13px 30px;
+}
+
+#mpReportes .reporte-info-item {
+    font-size: 13px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid var(--line);
+    color: var(--txt);
+}
+
+#mpReportes .reporte-info-item strong {
+    display: inline-block;
+    min-width: 125px;
+    color: var(--mut);
+}
+
+#mpReportes .reporte-grupo {
+    margin-top: 20px;
+}
+
+#mpReportes .reporte-grupo-titulo {
+    background: color-mix(in srgb, #1f4e79 15%, var(--card));
+    color: var(--txt);
+    border: 1px solid var(--line);
+    border-left: 5px solid #1f4e79;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+#mpReportes .reporte-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0;
+    font-size: 11px;
+    background: var(--card);
+    color: var(--txt);
+}
+
+#mpReportes .reporte-tabla th {
+    background: color-mix(in srgb, #1f4e79 15%, var(--panel));
+    color: var(--txt);
+    border: 1px solid var(--line);
+    padding: 9px 6px;
+    text-align: center;
+    font-weight: 700;
+    vertical-align: middle;
+}
+
+#mpReportes .reporte-tabla td {
+    background: transparent;
+    border: 1px solid var(--line);
+    padding: 8px 6px;
+    vertical-align: middle;
+    color: var(--txt);
+}
+
+#mpReportes .reporte-tabla tbody tr:nth-child(even) {
+    background: color-mix(in srgb, var(--panel) 75%, var(--card));
+}
+
+#mpReportes .reporte-tabla tbody tr:hover {
+    background: color-mix(in srgb, var(--ac) 12%, var(--card));
+}
+
+#mpReportes .reporte-tabla th:nth-child(1),
+#mpReportes .reporte-tabla td:nth-child(1) {
+    width: 9%;
+    text-align: center;
+}
+
+#mpReportes .reporte-tabla th:nth-child(2),
+#mpReportes .reporte-tabla td:nth-child(2) {
+    width: 7%;
+    text-align: center;
+}
+
+#mpReportes .reporte-tabla th:nth-child(3),
+#mpReportes .reporte-tabla td:nth-child(3) {
+    width: 20%;
+}
+
+#mpReportes .reporte-tabla th:nth-child(4),
+#mpReportes .reporte-tabla td:nth-child(4) {
+    width: 10%;
+}
+
+#mpReportes .reporte-tabla th:nth-child(5),
+#mpReportes .reporte-tabla td:nth-child(5) {
+    width: 11%;
+}
+
+#mpReportes .reporte-tabla th:nth-child(6),
+#mpReportes .reporte-tabla td:nth-child(6) {
+    width: 15%;
+}
+
+#mpReportes .reporte-tabla th:nth-child(7),
+#mpReportes .reporte-tabla td:nth-child(7) {
+    width: 10%;
+    text-align: center;
+}
+
+#mpReportes .reporte-tabla th:nth-child(8),
+#mpReportes .reporte-tabla td:nth-child(8) {
+    width: 18%;
+}
+
+#mpReportes .reporte-estado {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--ac) 12%, var(--card));
+    color: var(--txt);
+    border: 1px solid var(--line);
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+#mpReportes .reporte-total {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 22px;
+}
+
+#mpReportes .reporte-total-box {
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 11px 18px;
+    min-width: 220px;
+    background: var(--card);
+    color: var(--txt);
+    text-align: right;
+    font-size: 13px;
+}
+
+#mpReportes .reporte-total-box strong {
+    color: var(--ac);
+    font-size: 15px;
+}
+
+#mpReportes .reporte-observacion {
+    margin-top: 20px;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 14px;
+    font-size: 13px;
+    background: var(--card);
+    color: var(--txt);
+}
+
+#mpReportes .reporte-observacion strong {
+    color: var(--ac);
+}
+
+#mpReportes .reporte-pie {
+    margin-top: 30px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    text-align: center;
+    color: var(--mut);
+    font-size: 10px;
+}
+
+#mpReportes .reporte-sin-datos {
+    padding: 30px;
+    text-align: center;
+    color: var(--mut);
+    border: 1px solid var(--line);
+    background: var(--card);
+}
+
+#mpReportes .reporte-cargando {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--mut);
+}
+
+#mpReportes .reporte-cargando .spinner-border {
+    width: 35px;
+    height: 35px;
+    color: var(--ac);
+}
+
+#mpReportes .reporte-cargando p {
+    margin-top: 12px;
+    margin-bottom: 0;
+}
+
+#mpReportes .alert-danger {
+    color: var(--txt);
+    background: var(--card);
+    border-color: var(--line);
+}
+
+@media (max-width: 900px) {
+
+    #mpReportes .reporte-documento {
+        padding: 20px;
+    }
+
+    #mpReportes .reporte-encabezado {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    #mpReportes .reporte-fecha {
+        text-align: center;
+    }
+
+    #mpReportes .reporte-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #mpReportes .table-responsive {
+        overflow-x: auto;
+    }
+
+}
+
+/* IMPRESIÓN DEL INFORME */
+
+@media print {
+
+    #mpReportes .reporte-documento {
+        background: #ffffff !important;
+        color: #1f2937 !important;
+        box-shadow: none;
+        margin: 0;
+        max-width: none;
+        border: none;
+        border-radius: 0;
+        padding: 15px;
+    }
+
+    #mpReportes .reporte-encabezado {
+        border-bottom-color: #1f4e79 !important;
+    }
+
+    #mpReportes .reporte-institucion h5,
+    #mpReportes .reporte-fecha strong,
+    #mpReportes .reporte-info-item,
+    #mpReportes .reporte-info-item strong,
+    #mpReportes .reporte-tabla td,
+    #mpReportes .reporte-tabla th,
+    #mpReportes .reporte-observacion,
+    #mpReportes .reporte-total-box,
+    #mpReportes .reporte-titulo p strong {
+        color: #1f2937 !important;
+    }
+
+    #mpReportes .reporte-info,
+    #mpReportes .reporte-tabla,
+    #mpReportes .reporte-tabla th,
+    #mpReportes .reporte-tabla td,
+    #mpReportes .reporte-total-box,
+    #mpReportes .reporte-observacion,
+    #mpReportes .reporte-sin-datos {
+        background: #ffffff !important;
+        border-color: #d7dde3 !important;
+    }
+
+    #mpReportes .reporte-titulo h2,
+    #mpReportes .reporte-total-box strong,
+    #mpReportes .reporte-observacion strong {
+        color: #1f4e79 !important;
+    }
+
+    #mpReportes .reporte-titulo p,
+    #mpReportes .reporte-institucion h6,
+    #mpReportes .reporte-fecha,
+    #mpReportes .reporte-pie,
+    #mpReportes .reporte-sin-datos {
+        color: #6b7280 !important;
+    }
+
+    #mpReportes .reporte-seccion-titulo {
+        background: #1f4e79 !important;
+        color: #ffffff !important;
+    }
+
+    #mpReportes .reporte-grupo-titulo {
+        background: #e8eef5 !important;
+        color: #1f4e79 !important;
+        border-color: #d7dde3 !important;
+        border-left-color: #1f4e79 !important;
+    }
+
+    #mpReportes .reporte-estado {
+        background: #eef2f7 !important;
+        color: #1f2937 !important;
+        border-color: #d7dde3 !important;
+    }
+
+    #mpReportes .reporte-tabla th {
+        background: #f3f6f9 !important;
+        color: #263238 !important;
+    }
+
+    #mpReportes .reporte-tabla tbody tr:nth-child(even),
+    #mpReportes .reporte-tabla tbody tr:hover {
+        background: #fafbfc !important;
+    }
+
+    #mpReportes .reporte-tabla {
+        font-size: 9px;
+    }
+
+    #mpReportes .reporte-tabla th,
+    #mpReportes .reporte-tabla td {
+        padding: 5px 4px;
+    }
+
+    #mpReportes .reporte-grupo,
+    #mpReportes .reporte-encabezado,
+    #mpReportes .reporte-info,
+    #mpReportes .reporte-pie {
+        page-break-inside: avoid;
+    }
+
+}
+
+.form-select,
+select {
+    background-color: var(--card) !important;
+    color: var(--txt) !important;
+    border: 1px solid var(--line) !important;
+}
+
+.form-select:focus,
+select:focus {
+    background-color: var(--card) !important;
+    color: var(--txt) !important;
+    border-color: var(--ac) !important;
+    box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.15) !important;
+}
+
+.form-select option,
+select option {
+    background-color: var(--card) !important;
+    color: var(--txt) !important;
+}
+
+html[data-theme="light"] .form-select:focus,
+html[data-theme="light"] select:focus {
+    box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.15) !important;
+}
+
+/* =========================================================
+   ADAPTACIÓN SWEETALERT2 AL TEMA (CLARO Y OSCURO)
+   ========================================================= */
+.swal2-popup {
+    background-color: var(--card) !important;
+    color: var(--txt) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45) !important;
+    font-family: inherit !important;
+}
+
+.swal2-title, 
+.swal2-html-container {
+    color: var(--txt) !important;
+}
+
+.swal2-footer {
+    border-top-color: var(--line) !important;
+    color: var(--mut) !important;
+}
+
+/* Botones principales de SweetAlert */
+.swal2-confirm {
+    background-color: var(--ac) !important;
+    color: #0f172a !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+}
+
+.swal2-deny,
+.swal2-cancel {
+    background-color: var(--panel) !important;
+    color: var(--txt) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 8px !important;
+}
+
+.swal2-cancel:hover,
+.swal2-deny:hover {
+    background-color: var(--line) !important;
+}
+
+/* Sombras en modo claro */
+html[data-theme="light"] .swal2-popup {
+    box-shadow: 0 20px 50px rgba(30, 45, 90, 0.15) !important;
+}
+
+/* =========================================================
+   ADAPTACIÓN DINÁMICA DE PLACEHOLDERS (MODO CLARO Y OSCURO)
+   ========================================================= */
+input::placeholder,
+textarea::placeholder,
+.form-control::placeholder {
+    color: var(--dim) !important;
+    opacity: 0.8;
+    transition: color 0.35s ease, opacity 0.2s ease;
+}
+
+input:focus::placeholder,
+textarea:focus::placeholder,
+.form-control:focus::placeholder {
+    opacity: 0.4;
+}
+
+/* Color específico para Modo Claro */
+html[data-theme="light"] input::placeholder,
+html[data-theme="light"] textarea::placeholder,
+html[data-theme="light"] .form-control::placeholder {
+    color: #94a3b8 !important;
+}
+
+
+/* ============================================================
+   ESTILOS COMPLETO Y ADAPTABLE PARA TOMA DE INVENTARIO
+   ============================================================ */
+
+/* Variables MODO CLARO (Default) */
+#modalInventario {
+    --inv-text-muted: #475569;
+    --inv-placeholder: #64748b;
+    --inv-title-color: #0284c7;
+    --inv-readonly-bg: #f1f5f9;
+    --inv-readonly-text: #334155;
+    --inv-border-color: #cbd5e1;
+    --inv-th-bg: #2d3748;       /* Plomo oscuro para el header */
+    --inv-th-text: #ffffff;
+    --inv-tbody-bg: #f8fafc;    /* Fondo claro para el cuerpo/mensaje de la tabla */
+    --inv-td-text: #1e293b;
+    --inv-group-bg: #e2e8f0;
+}
+
+/* Variables MODO OSCURO (Auto-adaptable) */
+[data-bs-theme="dark"] #modalInventario,
+[data-theme="dark"] #modalInventario,
+.dark #modalInventario,
+body.dark-mode #modalInventario {
+    --inv-text-muted: #94a3b8;
+    --inv-placeholder: #64748b;
+    --inv-title-color: #38bdf8;
+    --inv-readonly-bg: #0b1329;
+    --inv-readonly-text: #94a3b8;
+    --inv-border-color: #1e293b;
+    --inv-th-bg: #1e293b;       /* Plomo oscuro profundo para modo oscuro */
+    --inv-th-text: #f1f5f9;
+    --inv-tbody-bg: #0f172a;    /* Fondo oscuro para el cuerpo/mensaje de la tabla */
+    --inv-td-text: #cbd5e1;
+    --inv-group-bg: #1e293b;
+}
+
+/* 1. Texto de indicación / subtítulos superiores */
+#modalInventario .text-muted,
+#modalInventario span.text-muted.small {
+    color: var(--inv-text-muted) !important;
+    font-size: 0.875rem !important;
+}
+
+/* 2. Placeholders adaptables */
+#modalInventario ::placeholder,
+#modalInventario input::placeholder,
+#modalInventario select::placeholder {
+    color: var(--inv-placeholder) !important;
+    opacity: 1 !important;
+}
+
+/* 3. Títulos de Sección (Toma de Inventario, Datos Generales, Bienes) */
+#modalInventario h6.fw-bold {
+    color: var(--inv-title-color) !important;
+    letter-spacing: 0.5px;
+}
+
+/* 4. Encabezado de la Tabla de Toma de Inventario (TH) */
+#modalInventario #tblBienesInventario thead th {
+    background-color: var(--inv-th-bg) !important;
+    color: var(--inv-th-text) !important;
+    border-color: var(--inv-border-color) !important;
+    font-weight: 600;
+}
+
+/* 5. Cuerpo de la Tabla (TBODY y Celdas TD / Mensaje de vacíos) */
+#modalInventario #tblBienesInventario tbody,
+#modalInventario #tblBienesInventario tbody tr,
+#modalInventario #tblBienesInventario tbody td {
+    background-color: var(--inv-tbody-bg) !important;
+    color: var(--inv-td-text) !important;
+    border-color: var(--inv-border-color) !important;
+}
+
+/* 6. Inputs Readonly / Deshabilitados */
+#modalInventario input[readonly],
+#modalInventario select:disabled {
+    background-color: var(--inv-readonly-bg) !important;
+    color: var(--inv-readonly-text) !important;
+    border-color: var(--inv-border-color) !important;
+}
+
+/* 7. Separador "-" en el número de Toma de Inventario */
+#modalInventario .input-group-text {
+    background-color: var(--inv-group-bg) !important;
+    color: var(--inv-readonly-text) !important;
+    border-color: var(--inv-border-color) !important;
+}
+
+/* 8. Botón/Icono de Calendario (Ajuste para visibilidad en modo oscuro) */
+[data-bs-theme="dark"] #modalInventario input[type="date"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] #modalInventario input[type="date"]::-webkit-calendar-picker-indicator,
+.dark #modalInventario input[type="date"]::-webkit-calendar-picker-indicator,
+body.dark-mode #modalInventario input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.9) sepia(0.1) saturate(1) hue-rotate(180deg) !important;
+    cursor: pointer;
+}
+
+

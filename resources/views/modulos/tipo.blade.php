@@ -50,7 +50,7 @@
                     <input type="hidden" id="txtIdTipoOriginal" value="">
                     <div class="mb-3">
                         <label for="txtNombreTipo" class="form-label fw-bold">Nombre</label>
-                        <input type="text" class="form-control" id="txtNombreTipo" maxlength="60" required placeholder="Ingrese nombre del tipo">
+                        <input type="text" class="form-control" id="txtNombreTipo" maxlength="60" placeholder="Ingrese nombre del tipo">
                     </div>
                 </form>
             </div>

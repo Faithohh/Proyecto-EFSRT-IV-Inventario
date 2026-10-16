@@ -18,6 +18,8 @@
         })();
     </script>
     <link rel="stylesheet" href="{{ asset('css/estilos.Login.min.css') }}?v={{ time() }}">
+    <!-- SweetAlert2 CSS CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 
 <body class="mn">
@@ -51,6 +53,10 @@
         </form>
         <p class="mn-foot">&copy; {{ date('Y') }} SIIN</p>
     </div>
+
+    <!-- SweetAlert2 JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/alert.js') }}?v={{ time() }}"></script>
     <script src="{{ asset('js/tema.js') }}?v={{ time() }}"></script>
     <script src="{{ asset('js/login.js') }}?v={{ time() }}"></script>
 </body>

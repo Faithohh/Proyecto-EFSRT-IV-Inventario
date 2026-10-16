@@ -15,12 +15,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const contrasena = txtContrasena.value.trim();
 
         if (usuario.length === 0) {
-            alert("Datos Incompletos\nFalta ingresar usuario");
+            Alert.advertencia("Datos Incompletos", "Falta ingresar usuario");
             txtUsuario.focus();
             return false;
         }
         if (contrasena.length === 0) {
-            alert("Datos Incompletos\nFalta ingresar contraseña");
+            Alert.advertencia("Datos Incompletos", "Falta ingresar contraseña");
             txtContrasena.focus();
             return false;
         }
@@ -60,15 +60,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     btnIngresar.disabled = false;
                     cbxProgramaEstudio.focus();
                 } else {
-                    alert(
-                        "No tiene acceso a programa(s) de estudio\nConsulte con el Administrador de Sistemas",
+                    Alert.advertencia(
+                        "Acceso Denegado",
+                        "No tiene acceso a programa(s) de estudio\nConsulte con el Administrador de Sistemas"
                     );
                 }
                 return true;
             } else {
-                alert(
-                    "Alerta\n\nDatos Inválidos\n-----------------------------------\n" +
-                        (data.valid || "Error de credenciales"),
+                Alert.error(
+                    "Datos Inválidos",
+                    data.valid || "Error de credenciales"
                 );
                 txtUsuario.value = "";
                 txtContrasena.value = "";
@@ -78,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         } catch (error) {
             console.error("Error en la petición:", error);
-            alert("Ocurrió un error al procesar la solicitud con el servidor.");
+            Alert.error("Error de conexión", "Ocurrió un error al procesar la solicitud con el servidor.");
             return false;
         }
     }
@@ -106,15 +107,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data.success) {
                     window.location.href = data.redirectUrl || "/principal";
                 } else {
-                    alert(data.message || "No se pudo iniciar sesión.");
+                    Alert.error("Error de Sesión", data.message || "No se pudo iniciar sesión.");
                 }
             } catch (error) {
                 console.error("Error en la sesión:", error);
-                alert("Error al conectar para iniciar sesión.");
+                Alert.error("Error de conexión", "Error al conectar para iniciar sesión.");
             }
         } else {
-            alert(
-                "No tiene acceso a programa(s) de estudio\nConsulte con el Administrador de Sistemas",
+            Alert.advertencia(
+                "Acceso Denegado",
+                "No tiene acceso a programa(s) de estudio\nConsulte con el Administrador de Sistemas"
             );
         }
     }

@@ -22,7 +22,7 @@
     <!-- BUSCADOR -->
     <div class="tb-search">
         <label for="txtBuscarProgramaEstudio">BUSCAR:</label>
-        <input type="text" id="txtBuscarProgramaEstudio" autocomplete="off" placeholder="Escriba para filtrar...">
+        <input type="text" id="txtBuscarProgramaEstudio" autocomplete="off" placeholder="Escriba para filtrar por nombre...">
     </div>
 
     <!-- TABLA DE PROGRAMA DE ESTUDIO -->
@@ -56,15 +56,15 @@
                     <div class="row mb-3 align-items-center justify-content-center">
                         <label for="txtNombreProgramaEstudio" class="col-sm-4 col-md-3 col-form-label text-sm-end">Nombre del Programa:</label>
                         <div class="col-sm-7 col-md-8">
-                            <input type="text" class="form-control" id="txtNombreProgramaEstudio" maxlength="100" required>
+                            <input type="text" class="form-control" id="txtNombreProgramaEstudio" maxlength="100" placeholder="Ingrese el nombre del programa de estudio" required>
                         </div>
                     </div>
 
                     <div class="row mb-3 align-items-center justify-content-center">
                         <label for="cboCoordinadorArea" class="col-sm-4 col-md-3 col-form-label text-sm-end">Coordinador de Area:</label>
                         <div class="col-sm-7 col-md-8">
-                            <select class="form-select" id="cboCoordinadorArea" name="idCoordinadorArea">
-                                <option value="">-- Seleccione --</option>
+                            <select class="form-select" id="cboCoordinadorArea" name="idCoordinadorArea" required>
+                                <option value="">-- Seleccione el Coordinador de Área --</option>
                             </select>
                         </div>
                     </div>
@@ -72,8 +72,8 @@
                     <div class="row mb-3 align-items-center justify-content-center">
                         <label for="cboAsistenteAreaT1" class="col-sm-4 col-md-3 col-form-label text-sm-end">Asistente Area T1:</label>
                         <div class="col-sm-7 col-md-8">
-                            <select class="form-select" id="cboAsistenteAreaT1" name="idAsistenteAreaT1">
-                                <option value="">-- Seleccione --</option>
+                            <select class="form-select" id="cboAsistenteAreaT1" name="idAsistenteAreaT1" required>
+                                <option value="">-- Seleccione el Asistente T1 --</option>
                             </select>
                         </div>
                     </div>
@@ -81,16 +81,16 @@
                     <div class="row mb-3 align-items-center justify-content-center">
                         <label for="cboAsistenteAreaT2" class="col-sm-4 col-md-3 col-form-label text-sm-end">Asistente Area T2:</label>
                         <div class="col-sm-7 col-md-8">
-                            <select class="form-select" id="cboAsistenteAreaT2" name="idAsistenteAreaT2">
-                                <option value="">-- Seleccione --</option>
+                            <select class="form-select" id="cboAsistenteAreaT2" name="idAsistenteAreaT2" required>
+                                <option value="">-- Seleccione el Asistente T2 --</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="row mb-3 justify-content-center">
-                        <label for="txtObservacionProgramaEstudio" class="col-sm-4 col-md-3 col-form-label text-sm-end">Observacion:</label>
+                        <label for="txtObservacionProgramaEstudio" class="col-sm-4 col-md-3 col-form-label text-sm-end">Observación:</label>
                         <div class="col-sm-7 col-md-8">
-                            <textarea class="form-control" id="txtObservacionProgramaEstudio" rows="3"></textarea>
+                            <textarea class="form-control" id="txtObservacionProgramaEstudio" rows="3" placeholder="Ingrese alguna observación (opcional)"></textarea>
                         </div>
                     </div>
                 </form>

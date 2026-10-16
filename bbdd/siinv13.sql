@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 02-10-2026 a las 03:58:57
+-- Tiempo de generación: 16-10-2026 a las 04:08:43
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -1518,6 +1518,13 @@ CREATE TABLE `inventario_detalle` (
   `pcTerminalModifica` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `inventario_detalle`
+--
+
+INSERT INTO `inventario_detalle` (`idInventarioDetalle`, `idInventario`, `idBien`, `idGrupo`, `nombreGrupo`, `nroDRELM`, `cbi`, `idTipo`, `nombreTipo`, `descripcion`, `idMarca`, `nombreMarca`, `idModelo`, `nombreModelo`, `serieMedida`, `idEstado`, `nombreEstado`, `otrasEspecificaciones`, `st_registro`, `idUsuarioCrea`, `fechaCreacion`, `pcTerminalCrea`, `idUsuarioModifica`, `fechaModificacion`, `pcTerminalModifica`) VALUES
+(1, 6, 83, 6, 'MAQUINA 02', '11111', '123123', 4, 'ESTABILIZADOR', '12312', 53, 'aaa', 17, 'CPU CORE I5', '123', 4, 'MALO', '1231', 1, NULL, '2026-10-16 02:08:27', NULL, NULL, NULL, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -1878,8 +1885,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('DAIIzhJZ2wAG8v2Xmd2mwsP20IVMWRvEZOEBeHTx', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36', 'YTo3OntzOjY6Il90b2tlbiI7czo0MDoiWjhSUTI3bW9vRUl6THhNQzNSdzdwTVBLZFJxUWcxNDhrT2twWVowQiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mzk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9pbnZlbnRhcmlvL2xpc3RhciI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJpZFVzdWFyaW8iO3M6MzoiRkFJIjtzOjE3OiJpZFByb2dyYW1hRXN0dWRpbyI7czoxOiIyIjtzOjExOiJ0aXBvVXN1YXJpbyI7czoxMzoiQURNSU5JU1RSQURPUiI7czoxMjoidGl0dWxvU2VzaW9uIjtzOjExMjoiWyBTSUlOLTIwMjYtMSBdIC0gWyBERVNBUlJPTExPIERFIFNJU1RFTUFTIERFIElORk9STUFDScOTTiBdIC0gWyBGQUkgXSAtIFsgTFVDQVMgTUFUSElBUyBGQUlUSCBPUk1Fw5FPIEhFUlJFUkEgXSI7fQ==', 1790904798),
-('iU0xUiOZ4ETDZvEoz8JEVxMui8kkT6hdiU4npCot', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36', 'YTo3OntzOjY6Il90b2tlbiI7czo0MDoiNmVuNHJ0MFlaUXlvM0Fwb3ByY2pnYlZ3UWh3S0RUWFRVSFNXTFBPQiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mzc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wZXJzb25hbC9saXN0YXIiO3M6NToicm91dGUiO3M6MTU6InBlcnNvbmFsLmxpc3RhciI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6OToiaWRVc3VhcmlvIjtzOjM6IkZBSSI7czoxNzoiaWRQcm9ncmFtYUVzdHVkaW8iO3M6MToiMiI7czoxMToidGlwb1VzdWFyaW8iO3M6MTM6IkFETUlOSVNUUkFET1IiO3M6MTI6InRpdHVsb1Nlc2lvbiI7czoxMTI6IlsgU0lJTi0yMDI2LTEgXSAtIFsgREVTQVJST0xMTyBERSBTSVNURU1BUyBERSBJTkZPUk1BQ0nDk04gXSAtIFsgRkFJIF0gLSBbIExVQ0FTIE1BVEhJQVMgRkFJVEggT1JNRcORTyBIRVJSRVJBIF0iO30=', 1790901974);
+('hA3SeKCvIaKgvg5SB7RlA0eKl5hPU7dcwzqvck7G', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36', 'YTo3OntzOjY6Il90b2tlbiI7czo0MDoicEVyeElMaHJPaUNsTkdVQ1l0bUs5Q0ZmTjMwZktKNGt1Wm80RzlzVCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mzk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9pbnZlbnRhcmlvL2xpc3RhciI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJpZFVzdWFyaW8iO3M6MzoiRkFJIjtzOjE3OiJpZFByb2dyYW1hRXN0dWRpbyI7czoxOiIyIjtzOjExOiJ0aXBvVXN1YXJpbyI7czoxMzoiQURNSU5JU1RSQURPUiI7czoxMjoidGl0dWxvU2VzaW9uIjtzOjExMjoiWyBTSUlOLTIwMjYtMSBdIC0gWyBERVNBUlJPTExPIERFIFNJU1RFTUFTIERFIElORk9STUFDScOTTiBdIC0gWyBGQUkgXSAtIFsgTFVDQVMgTUFUSElBUyBGQUlUSCBPUk1Fw5FPIEhFUlJFUkEgXSI7fQ==', 1792116508);
 
 -- --------------------------------------------------------
 
@@ -1960,7 +1966,8 @@ INSERT INTO `toma_inventarios` (`id`, `anio`, `numero`, `sala_id`, `coordinador_
 (2, '123', 1, 4, 3, 7, 2, '2026-09-02', 'asd', 'ABIERTO', '2026-09-19 02:17:35', '2026-09-19 02:17:35'),
 (3, '2023', 1, 4, 7, 7, 7, '2026-09-09', 'ninguna observacion', 'ABIERTO', '2026-09-19 02:18:09', '2026-09-19 02:18:09'),
 (4, '2000', 1, 1, 2, 1, 3, '2026-09-08', 'asdasd', 'ABIERTO', '2026-09-19 02:30:21', '2026-09-19 02:30:21'),
-(5, '2001', 1, 9, 3, 6, 7, '2026-09-17', 'asdasd', 'ABIERTO', '2026-09-19 02:30:51', '2026-09-19 02:35:36');
+(5, '2001', 1, 9, 3, 6, 7, '2026-09-17', 'asdasd', 'ABIERTO', '2026-09-19 02:30:51', '2026-09-19 02:35:36'),
+(6, '2026', 2, 4, 1, 2, 6, '2026-10-15', 'todo bien', 'ABIERTO', '2026-10-16 07:08:27', '2026-10-16 07:08:27');
 
 -- --------------------------------------------------------
 
@@ -2326,7 +2333,7 @@ ALTER TABLE `inventario`
 -- AUTO_INCREMENT de la tabla `inventario_detalle`
 --
 ALTER TABLE `inventario_detalle`
-  MODIFY `idInventarioDetalle` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `idInventarioDetalle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `jobs`
@@ -2392,7 +2399,7 @@ ALTER TABLE `tipo`
 -- AUTO_INCREMENT de la tabla `toma_inventarios`
 --
 ALTER TABLE `toma_inventarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `users`
@@ -2441,7 +2448,7 @@ ALTER TABLE `inventario`
 -- Filtros para la tabla `inventario_detalle`
 --
 ALTER TABLE `inventario_detalle`
-  ADD CONSTRAINT `inventario_detalle_ibfk_1` FOREIGN KEY (`idInventario`) REFERENCES `inventario` (`idInventario`),
+  ADD CONSTRAINT `fk_detalle_toma_inventarios` FOREIGN KEY (`idInventario`) REFERENCES `toma_inventarios` (`id`),
   ADD CONSTRAINT `inventario_detalle_ibfk_2` FOREIGN KEY (`idBien`) REFERENCES `bien` (`idBien`),
   ADD CONSTRAINT `inventario_detalle_ibfk_3` FOREIGN KEY (`idGrupo`) REFERENCES `grupo` (`idGrupo`),
   ADD CONSTRAINT `inventario_detalle_ibfk_4` FOREIGN KEY (`idTipo`) REFERENCES `tipo` (`idTipo`),

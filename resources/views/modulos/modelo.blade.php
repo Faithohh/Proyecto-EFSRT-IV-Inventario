@@ -70,7 +70,7 @@
                     <div class="mb-3 row align-items-center">
                         <label for="txtNombreModelo" class="col-sm-4 col-form-label">Nombre del Modelo:</label>
                         <div class="col-sm-8">
-                            <input type="text" class="form-control" id="txtNombreModelo" maxlength="60" required autocomplete="off" placeholder="Ej. FLATRON E1942">
+                            <input type="text" class="form-control" id="txtNombreModelo" maxlength="60" autocomplete="off" placeholder="Ej. FLATRON E1942">
                         </div>
                     </div>
                 </form>

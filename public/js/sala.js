@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!salaSeleccionada) { 
-                alert("Seleccione una sala de la lista para editar."); 
+                Alert.advertencia("Selección requerida", "Seleccione una sala de la lista para editar."); 
                 return; 
             }
 
@@ -231,7 +231,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!salaSeleccionada) { 
-                alert("Seleccione una sala de la lista para consultar."); 
+                Alert.advertencia("Selección requerida", "Seleccione una sala de la lista para consultar."); 
                 return; 
             }
 
@@ -264,56 +264,42 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!salaSeleccionada) {
-                alert("Por favor, seleccione una sala de la tabla para eliminar.");
+                Alert.advertencia("Selección requerida", "Por favor, seleccione una sala de la tabla para eliminar.");
                 return;
             }
 
             var nombre = salaSeleccionada.nombre || "esta sala";
-            var msgEl = document.getElementById("txtSalaEliminar") || document.getElementById("msgConfirmarEliminarSala");
-            if (msgEl) {
-                msgEl.textContent = nombre;
-            }
 
-            var modalEl = document.getElementById("modalEliminarSala") || document.getElementById("modalConfirmarEliminarSala");
-            var btnEliminarAccion = document.getElementById("btnConfirmarEliminarSala") || document.getElementById("btnConfirmarEliminarSalaAccion");
+            Alert.confirmar("¿Eliminar registro?", '¿Está seguro de eliminar la sala "' + nombre + '"?', async function () {
+                var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
+                            document.querySelector('input[name="_token"]')?.value;
 
-            if (!modalEl) return;
+                try {
+                    var response = await fetch("/sala/eliminar", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN": token
+                        },
+                        body: JSON.stringify({ idSala: salaSeleccionada.idSala })
+                    });
 
-            var bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                    var data = await response.json();
 
-            if (btnEliminarAccion) {
-                btnEliminarAccion.onclick = async function () {
-                    bsModal.hide();
-
-                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
-                                document.querySelector('input[name="_token"]')?.value;
-
-                    try {
-                        var response = await fetch("/sala/eliminar", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                Accept: "application/json",
-                                "X-CSRF-TOKEN": token
-                            },
-                            body: JSON.stringify({ idSala: salaSeleccionada.idSala })
-                        });
-
-                        var data = await response.json();
-
-                        if (data.ok || data.success) {
+                    if (data.ok || data.success) {
+                        salaSeleccionada = null;
+                        Alert.exito("Eliminado", data.msg || data.message || "Sala eliminada correctamente.", async function () {
                             await mostrarSala();
-                        } else {
-                            alert(data.msg || data.message || "Error al eliminar la sala.");
-                        }
-                    } catch (e) {
-                        console.error("Error al eliminar:", e);
-                        alert("Error de conexión con el servidor.");
+                        });
+                    } else {
+                        Alert.error("Error al eliminar", data.msg || data.message || "Error al eliminar la sala.");
                     }
-                };
-            }
-
-            bsModal.show();
+                } catch (e) {
+                    console.error("Error al eliminar:", e);
+                    Alert.error("Error de conexión", "Error de conexión con el servidor.");
+                }
+            });
         }
 
         var btnGuardar = document.getElementById("btnGuardarSala");
@@ -332,7 +318,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 var idOriginal = document.getElementById("txtIdSalaOriginal")?.value || "";
 
                 if (!nombre) {
-                    alert("El nombre de la sala es obligatorio.");
+                    Alert.advertencia("Campo requerido", "El nombre de la sala es obligatorio.");
                     return;
                 }
 
@@ -358,20 +344,25 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (data.ok || data.success) {
                         var modal = getModalSala();
                         if (modal) modal.hide();
-                        await mostrarSala();
+                        Alert.exito("¡Guardado!", data.msg || data.message || "Registro guardado correctamente.", async function () {
+                            await mostrarSala();
+                        });
                     } else {
-                        alert(data.msg || data.message || "Error al guardar la sala.");
+                        Alert.error("Error al guardar", data.msg || data.message || "Error al guardar la sala.");
                     }
                 } catch (e) {
                     var modal = getModalSala();
                     if (modal) modal.hide();
-                    alert("Error de conexión al guardar.");
+                    Alert.error("Error de conexión", "Error de conexión al guardar.");
                 }
             });
         }
 
         function exportarExcel() {
-            if (!salaCache.length) { alert("No hay datos para exportar."); return; }
+            if (!salaCache.length) { 
+                Alert.advertencia("Sin datos", "No hay datos para exportar."); 
+                return; 
+            }
             var csv = "Nombre,Observacion,Fecha Creacion,Fecha Modificación,Usuario Crea,Usuario Modifica\n";
             salaCache.forEach(function (s) {
                 csv += '"' + (s.nombre || "") + '",' +

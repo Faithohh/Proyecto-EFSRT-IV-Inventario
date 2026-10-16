@@ -246,3 +246,52 @@ body.mn,
         border-color 0.35s ease,
         box-shadow 0.35s ease;
 }
+
+/* =========================================================
+   ADAPTACIÓN SWEETALERT2 AL TEMA (CLARO Y OSCURO)
+   ========================================================= */
+.swal2-popup {
+    background-color: var(--card) !important;
+    color: var(--txt) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45) !important;
+    font-family: inherit !important;
+}
+
+.swal2-title, 
+.swal2-html-container {
+    color: var(--txt) !important;
+}
+
+.swal2-footer {
+    border-top-color: var(--line) !important;
+    color: var(--mut) !important;
+}
+
+/* Botones principales de SweetAlert */
+.swal2-confirm {
+    background-color: var(--ac) !important;
+    color: #0f172a !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+}
+
+.swal2-deny,
+.swal2-cancel {
+    background-color: var(--panel) !important;
+    color: var(--txt) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 8px !important;
+}
+
+.swal2-cancel:hover,
+.swal2-deny:hover {
+    background-color: var(--line) !important;
+}
+
+/* Sombras en modo claro */
+html[data-theme="light"] .swal2-popup {
+    box-shadow: 0 20px 50px rgba(30, 45, 90, 0.15) !important;
+}

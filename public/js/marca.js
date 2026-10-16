@@ -116,7 +116,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        // Cargar al mostrar el panel
         if (!panelMarca.hidden && panelMarca.style.display !== "none") {
             mostrarMarca();
         }
@@ -132,7 +131,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         observer.observe(panelMarca, { attributes: true });
 
-        // Seleccionar fila de la tabla
         if (tblBody) {
             tblBody.addEventListener("click", function (e) {
                 var tr = e.target.closest("tr[data-id]");
@@ -150,7 +148,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
 
-        // Filtrar con el input de búsqueda
         if (txtBuscar) {
             txtBuscar.addEventListener("input", function () {
                 var q = txtBuscar.value.trim().toLowerCase();
@@ -162,8 +159,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 }));
             });
         }
-
-        // --- ACCIONES DE FORMULARIO ---
 
         function nuevoMarca() {
             var form = document.getElementById("formMarca");
@@ -187,7 +182,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         function editarMarca() {
             if (!marcaSeleccionada) { 
-                alert("Por favor, seleccione una marca de la lista para editar."); 
+                Alert.advertencia("Selección requerida", "Por favor, seleccione una marca de la lista para editar."); 
                 return; 
             }
 
@@ -213,7 +208,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         function verDetalle() {
             if (!marcaSeleccionada) { 
-                alert("Por favor, seleccione una marca de la lista para consultar."); 
+                Alert.advertencia("Selección requerida", "Por favor, seleccione una marca de la lista para consultar."); 
                 return; 
             }
 
@@ -239,54 +234,47 @@ document.addEventListener("DOMContentLoaded", function () {
 
         function confirmarEliminar() {
             if (!marcaSeleccionada) {
-                alert("Por favor, seleccione una marca de la tabla para eliminar.");
+                Alert.advertencia("Selección requerida", "Por favor, seleccione una marca de la tabla para eliminar.");
                 return;
             }
 
-            var nombre = marcaSeleccionada.nombre || marcaSeleccionada.idMarca;
-            var msgEl = document.getElementById("txtMarcaEliminar");
-            if (msgEl) msgEl.textContent = nombre;
+            var nombre = marcaSeleccionada.nombre || marcaSeleccionada.idMarca || "este registro";
 
-            var modalEl = document.getElementById("modalEliminarMarca");
-            if (!modalEl) return;
+            Alert.confirmar("¿Eliminar registro?", '¿Está seguro de eliminar la marca "' + nombre + '"?', async function () {
+                var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
+                            document.querySelector('input[name="_token"]')?.value;
 
-            var bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-            var btnConfirmar = document.getElementById("btnConfirmarEliminarMarca");
+                try {
+                    var response = await fetch("/marca/eliminar", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN": token
+                        },
+                        body: JSON.stringify({ idMarca: marcaSeleccionada.idMarca })
+                    });
 
-            if (btnConfirmar) {
-                btnConfirmar.onclick = async function () {
-                    bsModal.hide();
-                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
-                                document.querySelector('input[name="_token"]')?.value;
-
-                    try {
-                        var response = await fetch("/marca/eliminar", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                Accept: "application/json",
-                                "X-CSRF-TOKEN": token
-                            },
-                            body: JSON.stringify({ idMarca: marcaSeleccionada.idMarca })
-                        });
-
-                        var data = await response.json();
-                        if (data.ok) {
+                    var data = await response.json();
+                    if (data.ok || data.success) {
+                        Alert.exito("Eliminado", data.msg || data.message || "Marca eliminada correctamente.", async function () {
                             await mostrarMarca();
-                        } else {
-                            alert(data.msg || "Error al eliminar la marca.");
-                        }
-                    } catch (e) {
-                        console.error("Error al eliminar:", e);
-                        alert("Error de conexión con el servidor.");
+                        });
+                    } else {
+                        Alert.error("Error al eliminar", data.msg || data.message || "Error al eliminar la marca.");
                     }
-                };
-            }
-            bsModal.show();
+                } catch (e) {
+                    console.error("Error al eliminar:", e);
+                    Alert.error("Error de conexión", "Error de conexión con el servidor.");
+                }
+            });
         }
 
         function exportarExcel() {
-            if (!marcaCache.length) { alert("No hay datos para exportar."); return; }
+            if (!marcaCache.length) { 
+                Alert.advertencia("Sin datos", "No hay datos para exportar."); 
+                return; 
+            }
             var csv = "Nombre,Fecha Creacion,Fecha Modificacion,Usuario Crea,Usuario Modifica\n";
             marcaCache.forEach(function (m) {
                 csv += '"' + (m.nombre || "") + '","' + 
@@ -302,7 +290,6 @@ document.addEventListener("DOMContentLoaded", function () {
             link.click();
         }
 
-        // --- MANEJADOR DE EVENTOS EN BARRA DE HERRAMIENTAS ---
         panelMarca.addEventListener("click", function (e) {
             var btn = e.target.closest(".tb-btn");
             if (!btn) return;
@@ -321,7 +308,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // Guardar cambios desde el Modal
         var btnGuardar = document.getElementById("btnGuardarMarca");
         if (btnGuardar) {
             btnGuardar.addEventListener("click", async function () {
@@ -335,7 +321,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 var idOriginal = txtOrig ? txtOrig.value : "";
 
                 if (!nombre) {
-                    alert("El nombre de la marca es obligatorio.");
+                    Alert.advertencia("Campo requerido", "El nombre de la marca es obligatorio.");
                     return;
                 }
 
@@ -359,17 +345,19 @@ document.addEventListener("DOMContentLoaded", function () {
                     });
 
                     var data = await response.json();
-                    if (data.ok) {
+                    if (data.ok || data.success) {
                         var modal = getModalMarca();
                         if (modal) modal.hide();
-                        await mostrarMarca();
+                        Alert.exito("¡Guardado!", data.msg || data.message || "Registro guardado correctamente.", async function () {
+                            await mostrarMarca();
+                        });
                     } else {
-                        alert(data.msg || "Error al guardar la marca.");
+                        Alert.error("Error al guardar", data.msg || data.message || "Error al guardar la marca.");
                     }
                 } catch (e) {
                     var modal = getModalMarca();
                     if (modal) modal.hide();
-                    alert("Error de conexión al guardar.");
+                    Alert.error("Error de conexión", "Error de conexión al guardar.");
                 }
             });
         }

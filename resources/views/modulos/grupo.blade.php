@@ -22,7 +22,7 @@
 
     <div class="tb-search">
         <label for="txtBuscarGrupo">BUSCAR:</label>
-        <input type="text" id="txtBuscarGrupo" autocomplete="off" placeholder="Escriba para filtrar...">
+        <input type="text" id="txtBuscarGrupo" autocomplete="off" placeholder="Escriba para filtrar por nombre o usuario...">
     </div>
 
     <div class="tb-table-wrap">
@@ -64,7 +64,7 @@
                     <div class="row align-items-center mb-3">
                         <label for="txtNombreGrupo" class="col-sm-4 col-form-label">Nombre del Grupo:</label>
                         <div class="col-sm-8">
-                            <input type="text" class="form-control" id="txtNombreGrupo" name="nombre" maxlength="60" required placeholder="">
+                            <input type="text" class="form-control" id="txtNombreGrupo" name="nombre" maxlength="60" required placeholder="Ingrese el nombre del grupo">
                         </div>
                     </div>
 

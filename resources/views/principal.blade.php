@@ -18,6 +18,8 @@
         })();
     </script>
     <link rel="stylesheet" href="{{ asset('css/estilos.Principal.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/acerca_de.css') }}?v={{ time() }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 </head>
@@ -80,7 +82,6 @@
                     <div class="mp-sep"></div>
                     <button type="button" class="mp-opt" data-modulo="bien">Bienes</button>
                     <button type="button" class="mp-opt" data-modulo="toma_inventario">Toma de Inventario</button>
-                    <button type="button" class="mp-opt">Reporte bien</button>
                 </div>
             </div>
             <div class="mp-item">
@@ -108,7 +109,7 @@
                         <path d="M9.5 9.5a2.5 2.5 0 0 1 4.9.8c0 1.7-2.4 2-2.4 3.7M12 17h.01" />
                     </svg>Ayuda</button>
                 <div class="mp-menu" id="m-ayuda">
-                    <button type="button" class="mp-opt">Acerca de..</button>
+                    <button type="button" class="mp-opt" id="btnAcercaDe">Acerca de...</button>
                 </div>
             </div>
         </nav>
@@ -155,21 +156,82 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> 
-    <script src="{{ asset('js/tema.js') }}?v={{ time() }}"></script> 
-    <script src="{{ asset('js/principal.js') }}?v={{ time() }}"></script> 
-    <script src="{{ asset('js/usuarios.js') }}?v={{ time() }}"></script> 
-    <script src="{{ asset('js/personal.js') }}?v={{ time() }}"></script> 
-    <script src="{{ asset('js/ProgramaEstudio.js') }}?v={{ time() }}"></script> 
-    <script src="{{ asset('js/grupo.js') }}?v={{ time() }}"></script> 
-    <script src="{{ asset('js/estado.js') }}?v={{ time() }}"></script> 
-    <script src="{{ asset('js/marca.js') }}?v={{ time() }}"></script> 
-    <script src="{{ asset('js/modelo.js') }}?v={{ time() }}"></script> 
-    <script src="{{ asset('js/sala.js') }}?v={{ time() }}"></script> 
-    <script src="{{ asset('js/tipo.js') }}?v={{ time() }}"></script> 
-    <script src="{{ asset('js/bienes.js') }}?v={{ time() }}"></script> 
-    <script src="{{ asset('js/toma_inventario.js') }}?v={{ time() }}"></script> 
-    <script src="{{ asset('js/reportes.js') }}?v={{ time() }}"></script> 
-</body> 
- 
+    <div class="modal fade" id="modalAcercaDe" tabindex="-1" aria-labelledby="tituloAcercaDe" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content acerca-contenido">
+                <div class="modal-header acerca-header">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="acerca-icono">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title mb-1" id="tituloAcercaDe">Sistema de Inventario</h5>
+                            <span class="acerca-subtitulo">SIIN · Versión 1.0.0</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body acerca-body">
+                    <div class="acerca-institucion">
+                        I.E.S.T.P. «JULIO CÉSAR TELLO»
+                    </div>
+
+                    <p class="acerca-descripcion">
+                        Sistema desarrollado para facilitar el registro,
+                        la consulta y el control de los bienes institucionales,
+                        manteniendo organizada la información de los inventarios.
+                    </p>
+
+                    <div class="acerca-datos">
+                        <div>
+                            <span>Versión</span>
+                            <strong>1.0.0</strong>
+                        </div>
+                        <div>
+                            <span>Tecnologías</span>
+                            <strong>Laravel, PHP y MariaDB</strong>
+                        </div>
+                        <div>
+                            <span>Tipo de aplicación</span>
+                            <strong>Sistema web</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer acerca-footer d-flex justify-content-between align-items-center">
+                    <!-- Contenedor con el GIF y el Texto alineados -->
+                    <div class="d-flex align-items-center gap-2">
+                        <img src="img/linux-tux.gif" alt="Tux" style="height: 28px; width: auto;">
+                        <span>© 2026 · SIIN</span>
+                    </div>
+
+                    <!-- Botón Aceptar -->
+                    <button type="button" class="btn acerca-btn" data-bs-dismiss="modal">
+                        Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ asset('js/alert.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('js/tema.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/acerca_de.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/principal.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/usuarios.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/personal.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/ProgramaEstudio.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/grupo.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/estado.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/marca.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/modelo.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/sala.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/tipo.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/bienes.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/toma_inventario.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/reportes.js') }}?v={{ time() }}"></script>
+</body>
+
 </html>

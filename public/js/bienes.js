@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "txtDescripcionBien": data.descripcion || "",
                 "txtSerieMedida": data.serieMedida || "",
                 "txtOtrasEspecificaciones": data.otrasEspecificaciones || "",
-                "cboSala": data.idSala || "",
+                "cboSala": data.idSala || (cboFiltroSala ? cboFiltroSala.value : ""),
                 "cboGrupo": data.idGrupo || "",
                 "cboTipo": data.idTipo || "",
                 "cboMarca": data.idMarca || "",
@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
             tblBody.innerHTML = lista.map(item => `
-                <tr data-id="${esc(item.idBien)}">
+                <tr data-id="${esc(item.idBien)}" style="cursor:pointer;">
                     <td>${esc(item.cbi)}</td>
                     <td>${esc(item.descripcion)}</td>
                     <td>${esc(item.tipo)}</td>
@@ -191,7 +191,6 @@ document.addEventListener("DOMContentLoaded", function () {
             pintarBien(filtrados);
         }
 
-        
         function mostrarModal(titulo, esSoloLectura) {
             var title = document.getElementById("modalBienTitle");
             if (title) title.textContent = titulo;
@@ -205,16 +204,26 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         async function abrirModalNuevo() {
+            var salaSeleccionadaFiltro = cboFiltroSala ? cboFiltroSala.value : "";
+            if (!salaSeleccionadaFiltro) {
+                Alert.advertencia("Selección requerida", "Seleccione una sala antes de agregar.");
+                return;
+            }
+
             document.getElementById("formBien")?.reset();
             await cargarCombosModal();
             cargarCamposFormulario({});
+            
+            var cboModalSala = document.getElementById("cboSala");
+            if (cboModalSala) cboModalSala.value = salaSeleccionadaFiltro;
+
             mostrarModal("Nuevo Bien", false);
         }
 
         async function abrirModalFormulario(titulo, esSoloLectura) {
             var item = obtenerSeleccionado();
             if (!item) {
-                alert("Por favor, seleccione un registro de la tabla.");
+                Alert.advertencia("Selección requerida", "Por favor, seleccione un registro de la tabla.");
                 return;
             }
             await cargarCombosModal();
@@ -223,9 +232,56 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         async function guardarBien() {
+            var cbi = document.getElementById("txtCbi")?.value.trim();
             var descripcion = document.getElementById("txtDescripcionBien")?.value.trim();
+            var serieMedida = document.getElementById("txtSerieMedida")?.value.trim();
+            var otrasEspecificaciones = document.getElementById("txtOtrasEspecificaciones")?.value.trim();
+            var idSala = document.getElementById("cboSala")?.value;
+            var idGrupo = document.getElementById("cboGrupo")?.value;
+            var idTipo = document.getElementById("cboTipo")?.value;
+            var idMarca = document.getElementById("cboMarca")?.value;
+            var idModelo = document.getElementById("cboModelo")?.value;
+            var idEstado = document.getElementById("cboEstado")?.value;
+
+            // VALIDACIÓN DE CAMPOS OBLIGATORIOS
+            if (!cbi) {
+                Alert.advertencia("Campo requerido", "El CBI es obligatorio.");
+                return;
+            }
             if (!descripcion) {
-                alert("La descripción del bien es obligatoria.");
+                Alert.advertencia("Campo requerido", "La descripción del bien es obligatoria.");
+                return;
+            }
+            if (!idSala) {
+                Alert.advertencia("Campo requerido", "Debe seleccionar una sala.");
+                return;
+            }
+            if (!idGrupo) {
+                Alert.advertencia("Campo requerido", "Debe seleccionar un grupo.");
+                return;
+            }
+            if (!idTipo) {
+                Alert.advertencia("Campo requerido", "Debe seleccionar un tipo.");
+                return;
+            }
+            if (!idMarca) {
+                Alert.advertencia("Campo requerido", "Debe seleccionar una marca.");
+                return;
+            }
+            if (!idModelo) {
+                Alert.advertencia("Campo requerido", "Debe seleccionar un modelo.");
+                return;
+            }
+            if (!idEstado) {
+                Alert.advertencia("Campo requerido", "Debe seleccionar un estado.");
+                return;
+            }
+            if (!serieMedida) {
+                Alert.advertencia("Campo requerido", "La serie / medida es obligatoria.");
+                return;
+            }
+            if (!otrasEspecificaciones) {
+                Alert.advertencia("Campo requerido", "Las otras especificaciones son obligatorias.");
                 return;
             }
 
@@ -239,16 +295,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     },
                     body: JSON.stringify({
                         idOriginal: document.getElementById("txtIdBienOriginal")?.value,
-                        cbi: document.getElementById("txtCbi")?.value,
+                        cbi: cbi,
                         descripcion: descripcion,
-                        serieMedida: document.getElementById("txtSerieMedida")?.value,
-                        otrasEspecificaciones: document.getElementById("txtOtrasEspecificaciones")?.value,
-                        idSala: document.getElementById("cboSala")?.value,
-                        idGrupo: document.getElementById("cboGrupo")?.value,
-                        idTipo: document.getElementById("cboTipo")?.value,
-                        idMarca: document.getElementById("cboMarca")?.value,
-                        idModelo: document.getElementById("cboModelo")?.value,
-                        idEstado: document.getElementById("cboEstado")?.value
+                        serieMedida: serieMedida,
+                        otrasEspecificaciones: otrasEspecificaciones,
+                        idSala: idSala,
+                        idGrupo: idGrupo,
+                        idTipo: idTipo,
+                        idMarca: idMarca,
+                        idModelo: idModelo,
+                        idEstado: idEstado
                     })
                 });
 
@@ -256,60 +312,57 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (data.ok) {
                     var modalEl = document.getElementById("modalBien");
                     if (modalEl) bootstrap.Modal.getInstance(modalEl)?.hide();
-                    await listarBien();
+                    Alert.exito("¡Guardado!", data.msg || "Bien guardado correctamente.", async function () {
+                        await listarBien();
+                    });
                 } else {
-                    alert(data.msg || "Error al guardar el bien.");
+                    Alert.error("Error al guardar", data.msg || "Error al guardar el bien.");
                 }
             } catch (e) {
-                alert("Error de conexión al guardar.");
+                Alert.error("Error de conexión", "Error de conexión al guardar.");
             }
         }
 
         function confirmarEliminar() {
             var item = obtenerSeleccionado();
             if (!item) {
-                alert("Por favor, seleccione un registro de la tabla para eliminar.");
+                Alert.advertencia("Selección requerida", "Por favor, seleccione un registro de la tabla para eliminar.");
                 return;
             }
 
-            var modalEl = document.getElementById("modalConfirmarEliminar");
-            var msgEl = document.getElementById("msgConfirmarEliminar");
-            var btnEliminar = document.getElementById("btnConfirmarEliminarAccion");
+            var nombre = item.descripcion || item.idBien || "este bien";
 
-            if (!modalEl) return;
+            Alert.confirmar("¿Eliminar registro?", `¿Está seguro de eliminar el bien "${nombre}"?`, async function () {
+                try {
+                    var res = await fetch("/bienes/eliminar", {
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": getCsrfToken(),
+                            "Content-Type": "application/json",
+                            Accept: "application/json"
+                        },
+                        body: JSON.stringify({ idBien: item.idBien })
+                    });
 
-            if (msgEl) msgEl.textContent = `¿Está seguro de eliminar el bien "${item.descripcion || item.idBien}"?`;
-            var bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-
-            if (btnEliminar) {
-                btnEliminar.onclick = async function () {
-                    bsModal.hide();
-                    try {
-                        var res = await fetch("/bienes/eliminar", {
-                            method: "POST",
-                            headers: {
-                                "X-CSRF-TOKEN": getCsrfToken(),
-                                "Content-Type": "application/json",
-                                Accept: "application/json"
-                            },
-                            body: JSON.stringify({ idBien: item.idBien })
+                    var data = await res.json();
+                    if (data.ok) {
+                        bienSeleccionado = null;
+                        Alert.exito("Eliminado", data.msg || "Bien eliminado correctamente.", async function () {
+                            await listarBien();
                         });
-
-                        var data = await res.json();
-                        if (data.ok) await listarBien();
-                        else alert(data.msg || "Error al eliminar el bien.");
-                    } catch (err) {
-                        alert("Error de conexión con el servidor.");
+                    } else {
+                        Alert.error("Error al eliminar", data.msg || "Error al eliminar el bien.");
                     }
-                };
-            }
-
-            bsModal.show();
+                } catch (err) {
+                    console.error("Error al eliminar:", err);
+                    Alert.error("Error de conexión", "Error de conexión con el servidor.");
+                }
+            });
         }
 
         function exportarExcel() {
             if (!bienCache || !bienCache.length) { 
-                alert("No hay datos para exportar."); 
+                Alert.advertencia("Sin datos", "No hay datos para exportar."); 
                 return; 
             }
             var csv = "cbi,descripcion,Tipo,Marca,Modelo,Estado,Grupo,serieMedida,otrasEspecificaciones,fechaCreacion,fechaModificacion,idUsuarioCrea,idUsuarioModifica\n";

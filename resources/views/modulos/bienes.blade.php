@@ -1,11 +1,9 @@
 <style>
-    /* Forzar que el panel contenedor principal tome la altura adecuada */
     #mpBien, .mp-panel {
         max-width: 100% !important;
         overflow: hidden !important; 
     }
 
-    /* Contenedor de la tabla: Scroll vertical y horizontal integrados con alto fijo responsive */
     .tb-table-wrap {
         width: 100% !important;
         max-height: calc(100vh - 220px) !important; /* Limita la altura para no empujar la pantalla */
@@ -16,7 +14,6 @@
         position: relative;
     }
 
-    /* Ancho forzado para que quepan las 13 columnas sin comprimirse */
     .tb-table {
         width: 100% !important;
         min-width: 1700px !important;
@@ -25,26 +22,23 @@
         table-layout: auto !important;
     }
 
-    /* TRUCO: Fijar la cabecera arriba para que no se pierda al bajar */
     .tb-table thead th {
         position: sticky !important;
         top: 0 !important;
         z-index: 10 !important;
-        background-color: #0f172a !important; /* Fondo oscuro para que no se traslape con los datos */
+        background-color: #0f172a !important; 
         box-shadow: 0 1px 2px rgba(0,0,0,0.5);
     }
 
-    /* Evitar que el texto rompa filas de forma extraña */
     .tb-table th, 
     .tb-table td {
         white-space: nowrap !important;
         padding: 8px 12px !important;
     }
 
-    /* TRUCO: Personalización de scrollbars (tanto vertical como horizontal siempre visibles) */
     .tb-table-wrap::-webkit-scrollbar {
-        height: 12px !important; /* Barra horizontal más gruesa y fácil de agarrar */
-        width: 10px !important;  /* Barra vertical */
+        height: 12px !important; 
+        width: 10px !important;  
     }
 
     .tb-table-wrap::-webkit-scrollbar-track {
@@ -58,7 +52,7 @@
     }
 
     .tb-table-wrap::-webkit-scrollbar-thumb:hover {
-        background: #3b82f6 !important; /* Resalta en azul al pasar el mouse */
+        background: #3b82f6 !important; 
     }
 </style>
 
@@ -98,7 +92,7 @@
         </div>
     </div>
 
-    <!-- Tabla con Scroll Fijo (Barra Horizontal visible siempre al fondo de la pantalla) -->
+    <!-- Tabla con Scroll Fijo -->
     <div class="tb-table-wrap">
         <table class="tb-table" id="tblBien">
             <thead>
@@ -139,19 +133,19 @@
                     <div class="row g-2">
                         <div class="col-md-4">
                             <label class="form-label">CBI</label>
-                            <input type="text" class="form-control form-control-sm" name="cbi" id="txtCbi">
+                            <input type="text" class="form-control form-control-sm" name="cbi" id="txtCbi" placeholder="Ej. CBI-2024-001" autocomplete="off">
                         </div>
                         <div class="col-md-8">
                             <label class="form-label">Descripción</label>
-                            <input type="text" class="form-control form-control-sm" name="descripcion" id="txtDescripcionBien" required>
+                            <input type="text" class="form-control form-control-sm" name="descripcion" id="txtDescripcionBien" placeholder="Ej. Monitor LED 24 pulgadas" autocomplete="off">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Serie / Medida</label>
-                            <input type="text" class="form-control form-control-sm" name="serieMedida" id="txtSerieMedida">
+                            <input type="text" class="form-control form-control-sm" name="serieMedida" id="txtSerieMedida" placeholder="Ej. SN-8930214 / 24 Pulgadas" autocomplete="off">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Otras Especificaciones</label>
-                            <input type="text" class="form-control form-control-sm" name="otrasEspecificaciones" id="txtOtrasEspecificaciones">
+                            <input type="text" class="form-control form-control-sm" name="otrasEspecificaciones" id="txtOtrasEspecificaciones" placeholder="Ej. Incluye cable HDMI y fuente de poder" autocomplete="off">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Sala</label>

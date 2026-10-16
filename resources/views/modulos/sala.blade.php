@@ -69,7 +69,7 @@
                     <div class="row mb-3 align-items-center">
                         <label for="txtNombreSala" class="col-sm-4 col-form-label text-sm-end fw-bold">Nombre de Sala:</label>
                         <div class="col-sm-8">
-                            <input type="text" class="form-control" id="txtNombreSala" maxlength="60" required autocomplete="off" placeholder="Ej. Aula 102">
+                            <input type="text" class="form-control" id="txtNombreSala" maxlength="60" autocomplete="off" placeholder="Ej. Aula 102">
                         </div>
                     </div>
 

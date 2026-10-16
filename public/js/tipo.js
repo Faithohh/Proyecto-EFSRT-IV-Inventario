@@ -9,11 +9,11 @@ document.addEventListener("DOMContentLoaded", function () {
         var tipoCache = [];
         var tipoSeleccionado = null;
 
-        var modalTipo = new bootstrap.Modal(document.getElementById("modalTipo"));
-
-        // Modal global/reutilizable de eliminación
-        var elemModalEliminar = document.getElementById("modalConfirmarEliminar");
-        var modalEliminar = elemModalEliminar ? new bootstrap.Modal(elemModalEliminar) : null;
+        function getModalTipo() {
+            var el = document.getElementById("modalTipo");
+            if (!el) return null;
+            return bootstrap.Modal.getInstance(el) || new bootstrap.Modal(el);
+        }
 
         function esc(v) {
             return String(v || "").replace(/[&<">]/g, function (c) {
@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
 
-        // Habilita o inhabilita el formulario modal de Tipo
         function setEstadoFormularioTipo(deshabilitado) {
             var form = document.getElementById("formTipo");
             var modalEl = document.getElementById("modalTipo");
@@ -43,17 +42,19 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         function pintarTipo(lista) {
+            if (!tblBody) return;
             if (!lista.length) {
                 tblBody.innerHTML = '<tr><td class="text-center">Sin tipos registrados.</td></tr>';
                 return;
             }
             tblBody.innerHTML = lista.map(function (t) {
-                return '<tr data-id="' + esc(t.NOMBRE) + '">' +
+                return '<tr data-id="' + esc(t.NOMBRE) + '" style="cursor:pointer;">' +
                     '<td>' + esc(t.NOMBRE) + '</td></tr>';
             }).join("");
         }
 
         async function mostrarTipo() {
+            if (!tblBody) return;
             tblBody.innerHTML = '<tr><td class="text-center">Cargando...</td></tr>';
             tipoSeleccionado = null;
 
@@ -65,19 +66,36 @@ document.addEventListener("DOMContentLoaded", function () {
                 pintarTipo(tipoCache);
                 if (txtBuscar) txtBuscar.value = "";
             } catch (e) {
-                tblBody.innerHTML = '<tr><td class="text-center">' + esc(e.message) + '</td></tr>';
+                tblBody.innerHTML = '<tr><td class="text-center text-danger">' + esc(e.message) + '</td></tr>';
             }
         }
 
-        tblBody.addEventListener("click", function (e) {
-            var tr = e.target.closest("tr[data-id]");
-            if (!tr) return;
-            tblBody.querySelectorAll("tr").forEach(function (x) { x.classList.remove("sel", "selected", "table-active"); });
-            tr.classList.add("sel", "selected", "table-active");
+        if (!panelTipo.hidden && panelTipo.style.display !== "none") {
+            mostrarTipo();
+        }
 
-            var id = tr.getAttribute("data-id");
-            tipoSeleccionado = tipoCache.find(function (item) { return String(item.NOMBRE) === String(id); });
+        var observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                if (mutation.attributeName === "hidden" || mutation.attributeName === "style") {
+                    if (!panelTipo.hidden && panelTipo.style.display !== "none") {
+                        mostrarTipo();
+                    }
+                }
+            });
         });
+        observer.observe(panelTipo, { attributes: true });
+
+        if (tblBody) {
+            tblBody.addEventListener("click", function (e) {
+                var tr = e.target.closest("tr[data-id]");
+                if (!tr) return;
+                tblBody.querySelectorAll("tr").forEach(function (x) { x.classList.remove("sel", "selected", "table-active"); });
+                tr.classList.add("sel", "selected", "table-active");
+
+                var id = tr.getAttribute("data-id");
+                tipoSeleccionado = tipoCache.find(function (item) { return String(item.NOMBRE) === String(id); });
+            });
+        }
 
         if (txtBuscar) {
             txtBuscar.addEventListener("input", function () {
@@ -100,12 +118,13 @@ document.addEventListener("DOMContentLoaded", function () {
             if (modalTitle) modalTitle.textContent = "Nuevo Tipo";
 
             setEstadoFormularioTipo(false);
-            modalTipo.show();
+            var modal = getModalTipo();
+            if (modal) modal.show();
         }
 
         function editarTipo() {
             if (!tipoSeleccionado) {
-                var s = tblBody.querySelector("tr.sel, tr.selected, tr.table-active");
+                var s = tblBody ? tblBody.querySelector("tr.sel, tr.selected, tr.table-active") : null;
                 if (s) {
                     var id = s.getAttribute("data-id");
                     tipoSeleccionado = tipoCache.find(function (t) { return String(t.NOMBRE) === String(id); });
@@ -113,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!tipoSeleccionado) {
-                alert("Seleccione un tipo de la lista para editar.");
+                Alert.advertencia("Selección requerida", "Seleccione un tipo de la lista para editar.");
                 return;
             }
 
@@ -126,12 +145,13 @@ document.addEventListener("DOMContentLoaded", function () {
             if (modalTitle) modalTitle.textContent = "Editar Tipo";
 
             setEstadoFormularioTipo(false);
-            modalTipo.show();
+            var modal = getModalTipo();
+            if (modal) modal.show();
         }
 
         function verDetalle() {
             if (!tipoSeleccionado) {
-                var s = tblBody.querySelector("tr.sel, tr.selected, tr.table-active");
+                var s = tblBody ? tblBody.querySelector("tr.sel, tr.selected, tr.table-active") : null;
                 if (s) {
                     var id = s.getAttribute("data-id");
                     tipoSeleccionado = tipoCache.find(function (t) { return String(t.NOMBRE) === String(id); });
@@ -139,7 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!tipoSeleccionado) {
-                alert("Seleccione un tipo de la lista para consultar.");
+                Alert.advertencia("Selección requerida", "Seleccione un tipo de la lista para consultar.");
                 return;
             }
 
@@ -152,12 +172,13 @@ document.addEventListener("DOMContentLoaded", function () {
             if (modalTitle) modalTitle.textContent = "Consulta de Tipo";
 
             setEstadoFormularioTipo(true);
-            modalTipo.show();
+            var modal = getModalTipo();
+            if (modal) modal.show();
         }
 
         function eliminarTipo() {
             if (!tipoSeleccionado) {
-                var s = tblBody.querySelector("tr.sel, tr.selected, tr.table-active");
+                var s = tblBody ? tblBody.querySelector("tr.sel, tr.selected, tr.table-active") : null;
                 if (s) {
                     var id = s.getAttribute("data-id");
                     tipoSeleccionado = tipoCache.find(function (t) { return String(t.NOMBRE) === String(id); });
@@ -165,24 +186,42 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!tipoSeleccionado) {
-                alert("Por favor, seleccione un tipo de la tabla para eliminar.");
+                Alert.advertencia("Selección requerida", "Por favor, seleccione un tipo de la tabla para eliminar.");
                 return;
             }
 
             var nombre = tipoSeleccionado.NOMBRE || "este tipo";
 
-            var msgElem = document.getElementById("msgConfirmarEliminar");
-            if (msgElem) {
-                msgElem.innerHTML = '¿Está seguro de eliminar el tipo <strong>' + esc(nombre) + '</strong>?';
-            }
+            Alert.confirmar("¿Eliminar registro?", '¿Está seguro de eliminar el tipo "' + nombre + '"?', async function () {
+                var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
+                            document.querySelector('input[name="_token"]')?.value;
 
-            var btnConfirmar = document.getElementById("btnConfirmarEliminarAccion");
-            if (btnConfirmar) {
-                btnConfirmar.dataset.id = tipoSeleccionado.NOMBRE;
-                btnConfirmar.dataset.modulo = "tipo";
-            }
+                try {
+                    var response = await fetch("/tipo/eliminar", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN": token
+                        },
+                        body: JSON.stringify({ nombre: nombre })
+                    });
 
-            if (modalEliminar) modalEliminar.show();
+                    var data = await response.json();
+
+                    if (data.ok || data.success) {
+                        tipoSeleccionado = null;
+                        Alert.exito("Eliminado", data.msg || data.message || "Tipo eliminado correctamente.", async function () {
+                            await mostrarTipo();
+                        });
+                    } else {
+                        Alert.error("Error al eliminar", data.msg || data.message || "Error al eliminar el tipo.");
+                    }
+                } catch (e) {
+                    console.error("Error al eliminar:", e);
+                    Alert.error("Error de conexión", "Error de conexión con el servidor.");
+                }
+            });
         }
 
         var btnGuardar = document.getElementById("btnGuardarTipo");
@@ -194,16 +233,19 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
-                var nombre = document.getElementById("txtNombreTipo").value.trim();
-                var idOriginal = document.getElementById("txtIdTipoOriginal").value;
+                var txtNombre = document.getElementById("txtNombreTipo");
+                var nombre = txtNombre ? txtNombre.value.trim() : "";
+                var txtOrig = document.getElementById("txtIdTipoOriginal");
+                var idOriginal = txtOrig ? txtOrig.value : "";
 
                 if (!nombre) {
-                    alert("El nombre del tipo es obligatorio.");
+                    Alert.advertencia("Campo requerido", "El nombre del tipo es obligatorio.");
                     return;
                 }
 
                 try {
-                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || document.querySelector('input[name="_token"]')?.value;
+                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
+                                document.querySelector('input[name="_token"]')?.value;
                     var response = await fetch("/tipo/guardar", {
                         method: "POST",
                         headers: {
@@ -219,55 +261,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     var data = await response.json();
                     if (data.ok || data.success) {
-                        modalTipo.hide();
-                        await mostrarTipo();
+                        var modal = getModalTipo();
+                        if (modal) modal.hide();
+                        Alert.exito("¡Guardado!", data.msg || data.message || "Registro guardado correctamente.", async function () {
+                            await mostrarTipo();
+                        });
                     } else {
-                        alert(data.msg || data.message || "Error al guardar el tipo.");
+                        Alert.error("Error al guardar", data.msg || data.message || "Error al guardar el tipo.");
                     }
                 } catch (e) {
-                    modalTipo.hide();
-                    alert("Error de conexión al guardar.");
-                }
-            });
-        }
-
-        var btnConfirmarAccion = document.getElementById("btnConfirmarEliminarAccion");
-        if (btnConfirmarAccion) {
-            btnConfirmarAccion.addEventListener("click", async function () {
-                if (btnConfirmarAccion.dataset.modulo !== "tipo") return;
-
-                var nombre = btnConfirmarAccion.dataset.id;
-                if (!nombre) return;
-
-                try {
-                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || document.querySelector('input[name="_token"]')?.value;
-                    var response = await fetch("/tipo/eliminar", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Accept: "application/json",
-                            "X-CSRF-TOKEN": token
-                        },
-                        body: JSON.stringify({ nombre: nombre })
-                    });
-
-                    var data = await response.json();
-                    if (modalEliminar) modalEliminar.hide();
-
-                    if (data.ok || data.success) {
-                        await mostrarTipo();
-                    } else {
-                        alert(data.msg || data.message || "Error al eliminar el tipo.");
-                    }
-                } catch (e) {
-                    if (modalEliminar) modalEliminar.hide();
-                    alert("Error de conexión con el servidor.");
+                    var modal = getModalTipo();
+                    if (modal) modal.hide();
+                    Alert.error("Error de conexión", "Error de conexión al guardar.");
                 }
             });
         }
 
         function exportarExcel() {
-            if (!tipoCache.length) { alert("No hay datos para exportar."); return; }
+            if (!tipoCache.length) { 
+                Alert.advertencia("Sin datos", "No hay datos para exportar."); 
+                return; 
+            }
             var csv = "Nombre\n";
             tipoCache.forEach(function (t) {
                 csv += '"' + (t.NOMBRE || "") + '"\n';
@@ -283,20 +297,22 @@ document.addEventListener("DOMContentLoaded", function () {
             document.body.removeChild(link);
         }
 
-        panelTipo.querySelectorAll(".tb-btn").forEach(function (b) {
-            b.addEventListener("click", function () {
-                var acc = b.dataset.acc;
-                if (acc === "nuevo") nuevoTipo();
-                else if (acc === "editar") editarTipo();
-                else if (acc === "eliminar") eliminarTipo();
-                else if (acc === "recargar") mostrarTipo();
-                else if (acc === "imprimir" || acc === "consultar" || acc === "detalle") verDetalle();
-                else if (acc === "excel") exportarExcel();
-                else if (acc === "salir") {
-                    panelTipo.hidden = true;
-                    if (bienvenida) bienvenida.hidden = false;
-                }
-            });
+        panelTipo.addEventListener("click", function (e) {
+            var btn = e.target.closest(".tb-btn");
+            if (!btn) return;
+
+            var acc = btn.dataset.acc;
+
+            if (acc === "nuevo") nuevoTipo();
+            else if (acc === "editar") editarTipo();
+            else if (acc === "eliminar") eliminarTipo();
+            else if (acc === "recargar") mostrarTipo();
+            else if (acc === "imprimir" || acc === "consultar" || acc === "detalle") verDetalle();
+            else if (acc === "excel") exportarExcel();
+            else if (acc === "salir") {
+                panelTipo.hidden = true;
+                if (bienvenida) bienvenida.hidden = false;
+            }
         });
 
         window.addEventListener("modulo:abrir", function (e) {

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\VerificarSesion;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -11,7 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Alias para usar Route::middleware('sesion') en routes/web.php
+        $middleware->alias([
+            'sesion' => VerificarSesion::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

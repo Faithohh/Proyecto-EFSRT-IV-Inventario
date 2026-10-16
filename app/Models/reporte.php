@@ -6,14 +6,13 @@ use Illuminate\Support\Facades\DB;
 
 class Reporte
 {
-    public static function listarInventarios()
+    public static function listarInventarios($idProgramaEstudio)
     {
         return DB::table('toma_inventarios as ti')
             ->leftJoin('sala as s', 'ti.sala_id', '=', 's.idSala')
             ->leftJoin('personal as c', 'ti.coordinador_id', '=', 'c.idPersonal')
             ->leftJoin('personal as a1', 'ti.asistente1_id', '=', 'a1.idPersonal')
             ->leftJoin('personal as a2', 'ti.asistente2_id', '=', 'a2.idPersonal')
-            ->leftJoin('bien as b', 'ti.sala_id', '=', 'b.idSala')
             ->select(
                 'ti.id as idInventario',
                 DB::raw("CONCAT(ti.anio, '-', ti.numero) as INVENTARIO"),
@@ -26,8 +25,8 @@ class Reporte
                     COALESCE(a1.nombres, ''), ' ',
                     COALESCE(a1.apellidos, '')
                 )) as ASISTENTE_T1"),
-                DB::raw("CASE 
-                    WHEN ti.asistente2_id IS NOT NULL 
+                DB::raw("CASE
+                    WHEN ti.asistente2_id IS NOT NULL
                     THEN TRIM(CONCAT(
                         COALESCE(a2.nombres, ''), ' ',
                         COALESCE(a2.apellidos, '')
@@ -36,31 +35,22 @@ class Reporte
                 END as ASISTENTE_T2"),
                 'ti.fecha_entrega as FECHA_ENTREGA',
                 DB::raw("COALESCE(ti.observacion, '-') as OBSERVACION"),
-                DB::raw("COUNT(b.idBien) as CANTIDAD_DE_BIENES"),
+                DB::raw("(
+                    SELECT COUNT(*)
+                    FROM bien AS b
+                    WHERE b.idSala = ti.sala_id
+                    AND b.st_registro = 1
+                ) as CANTIDAD_DE_BIENES"),
                 'ti.estado as ESTADO'
             )
-            ->groupBy(
-                'ti.id',
-                'ti.anio',
-                'ti.numero',
-                's.nombre',
-                'c.nombres',
-                'c.apellidos',
-                'a1.nombres',
-                'a1.apellidos',
-                'a2.nombres',
-                'a2.apellidos',
-                'ti.asistente2_id',
-                'ti.fecha_entrega',
-                'ti.observacion',
-                'ti.estado'
-            )
-            ->orderBy('ti.id', 'DESC')
+            ->where('s.idProgramaEstudio', $idProgramaEstudio)
+            ->where('ti.estado', 'CERRADO')
+            ->orderByDesc('ti.id')
             ->get()
             ->toArray();
     }
 
-    public static function generarInforme($idInventario)
+    public static function generarInforme($idInventario, $idProgramaEstudio)
     {
         $inventario = DB::table('toma_inventarios as ti')
             ->leftJoin('sala as s', 'ti.sala_id', '=', 's.idSala')
@@ -80,8 +70,8 @@ class Reporte
                     COALESCE(a1.nombres, ''), ' ',
                     COALESCE(a1.apellidos, '')
                 )) as ASISTENTE_T1"),
-                DB::raw("CASE 
-                    WHEN ti.asistente2_id IS NOT NULL 
+                DB::raw("CASE
+                    WHEN ti.asistente2_id IS NOT NULL
                     THEN TRIM(CONCAT(
                         COALESCE(a2.nombres, ''), ' ',
                         COALESCE(a2.apellidos, '')
@@ -93,6 +83,8 @@ class Reporte
                 'ti.estado as ESTADO'
             )
             ->where('ti.id', $idInventario)
+            ->where('s.idProgramaEstudio', $idProgramaEstudio)
+            ->where('ti.estado', 'CERRADO')
             ->first();
 
         if (!$inventario) {
@@ -100,6 +92,10 @@ class Reporte
         }
 
         $bienes = DB::table('bien as b')
+            ->join('inventario_detalle as d', function ($join) use ($idInventario) {
+                $join->on('d.idBien', '=', 'b.idBien')
+                    ->where('d.idInventario', '=', $idInventario);
+            })
             ->leftJoin('grupo as g', 'b.idGrupo', '=', 'g.idGrupo')
             ->leftJoin('marca as m', 'b.idMarca', '=', 'm.idMarca')
             ->leftJoin('modelo as mo', 'b.idModelo', '=', 'mo.idModelo')
@@ -107,7 +103,7 @@ class Reporte
             ->select(
                 'b.idBien',
                 DB::raw("COALESCE(g.nombre, 'SIN GRUPO') as GRUPO"),
-                DB::raw("'-' as INV_DRELM"),
+                DB::raw("COALESCE(NULLIF(TRIM(d.nroDRELM), ''), '-') as INV_DRELM"),
                 'b.cbi as CBI',
                 'b.descripcion as DESCRIPCION',
                 'm.nombre as MARCA',
@@ -116,7 +112,6 @@ class Reporte
                 'e.nombre as ESTADO',
                 'b.otrasEspecificaciones as OTRAS_ESPECIFICACIONES'
             )
-            ->where('b.idSala', $inventario->sala_id)
             ->where('b.st_registro', 1)
             ->orderBy('g.nombre')
             ->orderBy('b.descripcion')

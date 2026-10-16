@@ -14,23 +14,20 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
 
-        // --- FUNCIÓN DE FECHA CORREGIDA CON RESTA DE 5 HORAS (UTC-5) Y AM/PM ---
         function formatearFecha(f) {
             if (!f) return "";
 
             var fechaStr = String(f).trim();
-            // Expresión regular para extraer año, mes, día, hora y minutos directamente del string
             var regex = /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[ T](\d{1,2}):(\d{1,2}))?/;
             var match = fechaStr.match(regex);
 
             if (match) {
                 var anio = parseInt(match[1], 10);
-                var mes = parseInt(match[2], 10) - 1; // En JavaScript los meses son de 0 a 11
+                var mes = parseInt(match[2], 10) - 1;
                 var dia = parseInt(match[3], 10);
                 var horas = match[4] ? parseInt(match[4], 10) : 0;
                 var minutos = match[5] ? parseInt(match[5], 10) : 0;
 
-                // Crear el objeto Fecha y aplicar el ajuste de -5 horas (UTC -> Hora Local)
                 var d = new Date(anio, mes, dia, horas, minutos);
                 d.setHours(d.getHours() - 5);
 
@@ -40,7 +37,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 var dHoras24 = d.getHours();
                 var dMin = String(d.getMinutes()).padStart(2, '0');
 
-                // Conversión a 12 horas con AM/PM
                 var ampm = dHoras24 >= 12 ? 'PM' : 'AM';
                 var dHoras12 = dHoras24 % 12;
                 dHoras12 = dHoras12 ? dHoras12 : 12;
@@ -48,7 +44,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 return dDia + '/' + dMes + '/' + dAnio + ' ' + String(dHoras12).padStart(2, '0') + ':' + dMin + ' ' + ampm;
             }
 
-            // Fallback por si viniera en un objeto Date u otro formato reconocible
             var fallbackDate = new Date(f);
             if (isNaN(fallbackDate.getTime())) return f;
 
@@ -183,7 +178,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!grupoSeleccionado) {
-                alert("Por favor, seleccione un registro de la tabla para editar.");
+                Alert.advertencia("Selección requerida", "Por favor, seleccione un registro de la tabla para editar.");
                 return;
             }
 
@@ -219,7 +214,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!grupoSeleccionado) {
-                alert("Por favor, seleccione un registro para consultar.");
+                Alert.advertencia("Selección requerida", "Por favor, seleccione un registro para consultar.");
                 return;
             }
 
@@ -259,7 +254,7 @@ document.addEventListener("DOMContentLoaded", function () {
             var idOriginal = txtOrig ? txtOrig.value : "";
 
             if (!nombre) {
-                alert("El nombre del grupo es obligatorio.");
+                Alert.advertencia("Campo requerido", "El nombre del grupo es obligatorio.");
                 return;
             }
 
@@ -290,9 +285,11 @@ document.addEventListener("DOMContentLoaded", function () {
                         var modal = bootstrap.Modal.getInstance(modalEl);
                         if (modal) modal.hide();
                     }
-                    await listarGrupo();
+                    Alert.exito("¡Guardado!", data.msg || data.message || "Registro guardado correctamente.", async function () {
+                        await listarGrupo();
+                    });
                 } else {
-                    alert(data.msg || data.message || "Error al guardar la marca.");
+                    Alert.error("Error al guardar", data.msg || data.message || "Error al guardar el grupo.");
                 }
             } catch (e) {
                 var modalEl = document.getElementById("modalGrupo") || document.getElementById("grupo_modal");
@@ -300,7 +297,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     var modal = bootstrap.Modal.getInstance(modalEl);
                     if (modal) modal.hide();
                 }
-                alert("Error de conexión al guardar.");
+                Alert.error("Error de conexión", "Error de conexión al guardar.");
             }
         }
 
@@ -314,60 +311,45 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!grupoSeleccionado) {
-                alert("Por favor, seleccione un registro de la tabla para eliminar.");
+                Alert.advertencia("Selección requerida", "Por favor, seleccione un registro de la tabla para eliminar.");
                 return;
             }
 
-            var modalEl = document.getElementById("modalConfirmarEliminar");
-            var msgEl = document.getElementById("msgConfirmarEliminar");
-            var btnEliminar = document.getElementById("btnConfirmarEliminarAccion");
+            var nombre = grupoSeleccionado.nombre || grupoSeleccionado.idGrupo || "este registro";
 
-            if (!modalEl) return;
+            Alert.confirmar("¿Eliminar registro?", '¿Está seguro de eliminar el grupo "' + nombre + '"?', async function () {
+                var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
+                            document.querySelector('input[name="_token"]')?.value;
 
-            var nombre = grupoSeleccionado.nombre || grupoSeleccionado.idGrupo;
-            if (msgEl) {
-                msgEl.textContent = '¿Está seguro de eliminar el grupo "' + nombre + '"?';
-            }
+                try {
+                    var res = await fetch("/grupo/eliminar", {
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": token,
+                            "Content-Type": "application/json",
+                            Accept: "application/json"
+                        },
+                        body: JSON.stringify({ idGrupo: grupoSeleccionado.idGrupo })
+                    });
 
-            var bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-
-            if (btnEliminar) {
-                btnEliminar.onclick = async function () {
-                    bsModal.hide();
-
-                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
-                                document.querySelector('input[name="_token"]')?.value;
-
-                    try {
-                        var res = await fetch("/grupo/eliminar", {
-                            method: "POST",
-                            headers: {
-                                "X-CSRF-TOKEN": token,
-                                "Content-Type": "application/json",
-                                Accept: "application/json"
-                            },
-                            body: JSON.stringify({ idGrupo: grupoSeleccionado.idGrupo })
-                        });
-
-                        var data = await res.json();
-                        if (data.ok) {
+                    var data = await res.json();
+                    if (data.ok || data.success) {
+                        Alert.exito("Eliminado", data.msg || data.message || "Grupo eliminado correctamente.", async function () {
                             await listarGrupo();
-                        } else {
-                            alert(data.msg || "Error al eliminar el grupo.");
-                        }
-                    } catch (err) {
-                        console.error("Error al eliminar:", err);
-                        alert("Error de conexión con el servidor.");
+                        });
+                    } else {
+                        Alert.error("Error al eliminar", data.msg || data.message || "Error al eliminar el grupo.");
                     }
-                };
-            }
-
-            bsModal.show();
+                } catch (err) {
+                    console.error("Error al eliminar:", err);
+                    Alert.error("Error de conexión", "Error de conexión con el servidor.");
+                }
+            });
         }
 
         function exportarExcel() {
             if (!grupoCache || !grupoCache.length) { 
-                alert("No hay datos para exportar."); 
+                Alert.advertencia("Sin datos", "No hay datos para exportar."); 
                 return; 
             }
             var csv = "Nombre,idUsuarioCrea,fechaCreacion,idUsuarioModifica,fechaModificacion\n";

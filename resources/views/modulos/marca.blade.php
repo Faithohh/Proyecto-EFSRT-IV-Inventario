@@ -36,7 +36,7 @@
     <!-- BUSCADOR -->
     <div class="tb-search">
         <label for="txtBuscarMarca">BUSCAR:</label>
-        <input type="text" id="txtBuscarMarca" autocomplete="off" placeholder="Escriba para filtrar...">
+        <input type="text" id="txtBuscarMarca" autocomplete="off" placeholder="Escriba para filtrar por nombre o usuario...">
     </div>
 
     <!-- TABLA -->
@@ -79,7 +79,7 @@
                         <div class="mb-3 row align-items-center">
                             <label for="txtNombreMarca" class="col-sm-4 col-form-label">Nombre de Marca:</label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" id="txtNombreMarca" required autocomplete="off">
+                                <input type="text" class="form-control" id="txtNombreMarca" required autocomplete="off" placeholder="Ingrese el nombre de la marca">
                             </div>
                         </div>
 

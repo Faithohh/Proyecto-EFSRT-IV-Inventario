@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!modeloSeleccionado) { 
-                alert("Seleccione un modelo de la lista para editar."); 
+                Alert.advertencia("Selección requerida", "Seleccione un modelo de la lista para editar."); 
                 return; 
             }
 
@@ -225,7 +225,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!modeloSeleccionado) { 
-                alert("Seleccione un modelo de la lista para consultar."); 
+                Alert.advertencia("Selección requerida", "Seleccione un modelo de la lista para consultar."); 
                 return; 
             }
 
@@ -252,57 +252,42 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!modeloSeleccionado) {
-                alert("Por favor, seleccione un modelo de la tabla para eliminar.");
+                Alert.advertencia("Selección requerida", "Por favor, seleccione un modelo de la tabla para eliminar.");
                 return;
             }
 
             var nombre = modeloSeleccionado.nombre || "este modelo";
-            var msgEl = document.getElementById("msgConfirmarEliminarModelo");
-            if (msgEl) {
-                msgEl.textContent = "¿Está seguro de eliminar el modelo " + nombre + "?";
-            }
 
-            var modalEl = document.getElementById("modalConfirmarEliminarModelo");
-            var btnEliminarAccion = document.getElementById("btnConfirmarEliminarModeloAccion");
+            Alert.confirmar("¿Eliminar registro?", '¿Está seguro de eliminar el modelo "' + nombre + '"?', async function () {
+                var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
+                            document.querySelector('input[name="_token"]')?.value;
 
-            if (!modalEl) return;
+                try {
+                    var response = await fetch("/modelo/eliminar", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN": token
+                        },
+                        body: JSON.stringify({ idModelo: modeloSeleccionado.idModelo })
+                    });
 
-            var bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                    var data = await response.json();
 
-            if (btnEliminarAccion) {
-                btnEliminarAccion.onclick = async function () {
-                    bsModal.hide();
-
-                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
-                                document.querySelector('input[name="_token"]')?.value;
-
-                    try {
-                        var response = await fetch("/modelo/eliminar", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                Accept: "application/json",
-                                "X-CSRF-TOKEN": token
-                            },
-                            body: JSON.stringify({ idModelo: modeloSeleccionado.idModelo })
-                        });
-
-                        var data = await response.json();
-
-                        if (data.ok || data.success) {
-                            modeloSeleccionado = null;
+                    if (data.ok || data.success) {
+                        modeloSeleccionado = null;
+                        Alert.exito("Eliminado", data.msg || data.message || "Modelo eliminado correctamente.", async function () {
                             await mostrarModelo();
-                        } else {
-                            alert(data.msg || data.message || "Error al eliminar el modelo.");
-                        }
-                    } catch (e) {
-                        console.error("Error al eliminar:", e);
-                        alert("Error de conexión con el servidor.");
+                        });
+                    } else {
+                        Alert.error("Error al eliminar", data.msg || data.message || "Error al eliminar el modelo.");
                     }
-                };
-            }
-
-            bsModal.show();
+                } catch (e) {
+                    console.error("Error al eliminar:", e);
+                    Alert.error("Error de conexión", "Error de conexión con el servidor.");
+                }
+            });
         }
 
         var btnGuardar = document.getElementById("btnGuardarModelo");
@@ -320,7 +305,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 var idOriginal = txtOrig ? txtOrig.value : "";
 
                 if (!nombre) {
-                    alert("El nombre del modelo es obligatorio.");
+                    Alert.advertencia("Campo requerido", "El nombre del modelo es obligatorio.");
                     return;
                 }
 
@@ -344,20 +329,25 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (data.ok || data.success) {
                         var modal = getModalModelo();
                         if (modal) modal.hide();
-                        await mostrarModelo();
+                        Alert.exito("¡Guardado!", data.msg || data.message || "Registro guardado correctamente.", async function () {
+                            await mostrarModelo();
+                        });
                     } else {
-                        alert(data.msg || data.message || "Error al guardar el modelo.");
+                        Alert.error("Error al guardar", data.msg || data.message || "Error al guardar el modelo.");
                     }
                 } catch (e) {
                     var modal = getModalModelo();
                     if (modal) modal.hide();
-                    alert("Error de conexión al guardar.");
+                    Alert.error("Error de conexión", "Error de conexión al guardar.");
                 }
             });
         }
 
         function exportarExcel() {
-            if (!modeloCache.length) { alert("No hay datos para exportar."); return; }
+            if (!modeloCache.length) { 
+                Alert.advertencia("Sin datos", "No hay datos para exportar."); 
+                return; 
+            }
             var csv = "ID Prog. Estudio,Nombre,Fecha Creación,Fecha Modificación,Usuario Crea,Usuario Modifica\n";
             modeloCache.forEach(function (m) {
                 csv += '"' + (m.idProgramaEstudio || "") + '",' +

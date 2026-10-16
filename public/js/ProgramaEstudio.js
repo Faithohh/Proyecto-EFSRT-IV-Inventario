@@ -219,7 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!programaSeleccionado) { 
-                alert("Seleccione un programa de estudio de la lista para editar."); 
+                Alert.advertencia("Selección requerida", "Seleccione un programa de estudio de la lista para editar."); 
                 return; 
             }
 
@@ -242,7 +242,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!programaSeleccionado) { 
-                alert("Seleccione un programa de estudio de la lista para consultar."); 
+                Alert.advertencia("Selección requerida", "Seleccione un programa de estudio de la lista para consultar."); 
                 return; 
             }
 
@@ -265,27 +265,13 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!programaSeleccionado) {
-                alert("Por favor, seleccione un programa de estudio de la tabla para eliminar.");
+                Alert.advertencia("Selección requerida", "Por favor, seleccione un programa de estudio de la tabla para eliminar.");
                 return;
             }
 
             var nombre = programaSeleccionado.nombre || programaSeleccionado.idProgramaEstudio || "este registro";
-            
-            var msgEl = document.getElementById("txtProgramaEstudioEliminar");
-            if (msgEl) {
-                msgEl.textContent = nombre;
-            }
 
-            var modalEl = document.getElementById("modalEliminarProgramaEstudio");
-            var btnEliminarAccion = document.getElementById("btnConfirmarEliminarProgramaEstudio");
-
-            if (!modalEl) return;
-
-            var bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-
-            btnEliminarAccion.onclick = async function () {
-                bsModal.hide();
-
+            Alert.confirmar("¿Eliminar registro?", "¿Está seguro de eliminar " + nombre + "?", async function () {
                 var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || document.querySelector('input[name="_token"]')?.value;
 
                 try {
@@ -301,33 +287,48 @@ document.addEventListener("DOMContentLoaded", function () {
                     var data = await response.json();
 
                     if (data.ok || data.success) {
-                        await mostrarProgramaEstudio();
+                        Alert.exito("Eliminado", data.msg || data.message || "Programa de estudio eliminado correctamente.", async function () {
+                            await mostrarProgramaEstudio();
+                        });
                     } else {
-                        alert(data.msg || data.message || "Error al eliminar el programa de estudio.");
+                        Alert.error("Error al eliminar", data.msg || data.message || "Error al eliminar el programa de estudio.");
                     }
                 } catch (e) {
-                    alert("Error de conexión con el servidor.");
+                    console.error("Error al eliminar:", e);
+                    Alert.error("Error de conexión", "Error de conexión con el servidor.");
                 }
-            };
-
-            bsModal.show();
+            });
         }
 
         var btnGuardar = document.getElementById("btnGuardarProgramaEstudio");
         if (btnGuardar) {
             btnGuardar.addEventListener("click", async function () {
-                var form = document.getElementById("formProgramaEstudio");
-                if (form && !form.checkValidity()) {
-                    form.reportValidity();
+                var nombre = document.getElementById("txtNombreProgramaEstudio")?.value.trim() || "";
+                var idOriginal = document.getElementById("txtIdProgramaEstudioOriginal")?.value || "";
+                var idCoordinadorArea = document.getElementById("cboCoordinadorArea")?.value || "";
+                var idAsistenteAreaT1 = document.getElementById("cboAsistenteAreaT1")?.value || "";
+                var idAsistenteAreaT2 = document.getElementById("cboAsistenteAreaT2")?.value || "";
+                var observacion = document.getElementById("txtObservacionProgramaEstudio")?.value.trim() || "";
+
+                if (!nombre) {
+                    Alert.advertencia("Campo requerido", "Por favor, ingrese el nombre del programa de estudio.");
                     return;
                 }
 
-                var nombre = document.getElementById("txtNombreProgramaEstudio").value.trim();
-                var idOriginal = document.getElementById("txtIdProgramaEstudioOriginal").value;
-                var idCoordinadorArea = document.getElementById("cboCoordinadorArea").value;
-                var idAsistenteAreaT1 = document.getElementById("cboAsistenteAreaT1").value;
-                var idAsistenteAreaT2 = document.getElementById("cboAsistenteAreaT2").value;
-                var observacion = document.getElementById("txtObservacionProgramaEstudio").value.trim();
+                if (!idCoordinadorArea) {
+                    Alert.advertencia("Campo requerido", "Por favor, seleccione el Coordinador de Área.");
+                    return;
+                }
+
+                if (!idAsistenteAreaT1) {
+                    Alert.advertencia("Campo requerido", "Por favor, seleccione el Asistente T1.");
+                    return;
+                }
+
+                if (!idAsistenteAreaT2) {
+                    Alert.advertencia("Campo requerido", "Por favor, seleccione el Asistente T2.");
+                    return;
+                }
 
                 try {
                     var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || document.querySelector('input[name="_token"]')?.value;
@@ -341,9 +342,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         body: JSON.stringify({
                             idProgramaEstudio: idOriginal || null,
                             nombre: nombre,
-                            idCoordinadorArea: idCoordinadorArea || null,
-                            idAsistenteAreaT1: idAsistenteAreaT1 || null,
-                            idAsistenteAreaT2: idAsistenteAreaT2 || null,
+                            idCoordinadorArea: idCoordinadorArea,
+                            idAsistenteAreaT1: idAsistenteAreaT1,
+                            idAsistenteAreaT2: idAsistenteAreaT2,
                             observacion: observacion
                         })
                     });
@@ -351,23 +352,30 @@ document.addEventListener("DOMContentLoaded", function () {
                     var data = await response.json();
                     if (data.ok || data.success) {
                         modalPrograma.hide();
-                        await mostrarProgramaEstudio();
+                        Alert.exito("¡Guardado!", data.msg || data.message || "Registro guardado correctamente.", async function () {
+                            await mostrarProgramaEstudio();
+                        });
                     } else {
-                        alert(data.msg || data.message || "Error al guardar el registro.");
+                        Alert.error("Error al guardar", data.msg || data.message || "Error al guardar el registro.");
                     }
                 } catch (e) {
+                    console.error("Error al guardar:", e);
                     modalPrograma.hide();
-                    alert("Error de conexión al guardar.");
+                    Alert.error("Error de conexión", "Error de conexión al guardar.");
                 }
             });
         }
 
         function exportarExcel() {
-            if (!programaCache.length) { alert("No hay datos para exportar."); return; }
+            if (!programaCache.length) { 
+                Alert.advertencia("Sin datos", "No hay datos para exportar."); 
+                return; 
+            }
             var csv = "Nombre,Estado\n";
             programaCache.forEach(function (item) {
                 var estado = (item.st_registro == 1 || item.st_registro == true) ? "ACTIVO" : "INACTIVO";
-                csv += '"' + (item.nombre || "") + '","' + estado + '"\n';
+                var nombre = (item.nombre || "").replace(/"/g, '""');
+                csv += '"' + nombre + '","' + estado + '"\n';
             });
             var blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
             var link = document.createElement("a");

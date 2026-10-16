@@ -1,0 +1,138 @@
+.acerca-contenido {
+    background: var(--panel, #0e1322);
+    color: var(--txt, #eef1f8);
+    border: 1px solid var(--line, #212a44);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.acerca-header {
+    border-bottom: 1px solid var(--line, #212a44);
+    padding: 22px;
+}
+
+.acerca-header .btn-close {
+    opacity: 0.7;
+}
+
+.acerca-icono {
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(59, 130, 246, 0.14);
+    color: #60a5fa;
+    font-size: 27px;
+    flex-shrink: 0;
+}
+
+.acerca-subtitulo {
+    color: var(--muted, #8b95aa);
+    font-size: 13px;
+}
+
+.acerca-body {
+    padding: 24px;
+}
+
+.acerca-institucion {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+}
+
+.acerca-descripcion {
+    color: var(--muted, #aab2c5);
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 22px;
+}
+
+.acerca-datos {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--line, #212a44);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.acerca-datos > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 15px;
+    border-bottom: 1px solid var(--line, #212a44);
+    font-size: 12px;
+}
+
+.acerca-datos > div:last-child {
+    border-bottom: none;
+}
+
+.acerca-datos span {
+    color: var(--muted, #8b95aa);
+}
+
+.acerca-datos strong {
+    text-align: right;
+    font-weight: 600;
+}
+
+.acerca-footer {
+    border-top: 1px solid var(--line, #212a44);
+    padding: 16px 22px;
+}
+
+.acerca-footer > span {
+    color: var(--muted, #8b95aa);
+    font-size: 12px;
+    margin-right: auto;
+}
+
+.acerca-btn {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border: 1px solid #2563eb !important;
+    padding: 8px 22px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 1 !important;
+}
+
+.acerca-btn:hover,
+.acerca-btn:focus,
+.acerca-btn:active {
+    background: #1d4ed8 !important;
+    color: #ffffff !important;
+    border-color: #1d4ed8 !important;
+}
+
+.acerca-btn:focus-visible {
+    outline: 2px solid #93c5fd;
+    outline-offset: 3px;
+}
+
+.acerca-creditos {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: auto;
+}
+
+.acerca-footer > span {
+    color: var(--muted, #8b95aa);
+    font-size: 12px;
+}
+
+.acerca-gif {
+    width: 25px;
+    height: auto;
+    max-height: 30px;
+    object-fit: contain;
+}

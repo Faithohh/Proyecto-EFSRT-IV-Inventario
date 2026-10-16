@@ -37,7 +37,7 @@
     <!-- Filtro de Búsqueda -->
     <div class="tb-search">
         <label for="txtBuscarPersonal">BUSCAR:</label>
-        <input type="text" id="txtBuscarPersonal" autocomplete="off" placeholder="Escriba para filtrar...">
+        <input type="text" id="txtBuscarPersonal" autocomplete="off" placeholder="Escriba el nombre, DNI o email para filtrar...">
     </div>
 
     <!-- Tabla de Personal -->
@@ -75,22 +75,22 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="personal_dni" class="form-label">DNI</label>
-                            <input type="text" class="form-control" id="personal_dni" name="dni" required maxlength="15">
+                            <input type="text" class="form-control" id="personal_dni" name="dni" maxlength="8" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Ingrese el DNI (8 dígitos)">
                         </div>
                         <div class="col-md-6">
                             <label for="personal_nombreCompleto" class="form-label">Nombre Completo</label>
-                            <input type="text" class="form-control" id="personal_nombreCompleto" name="nombreCompleto" required>
+                            <input type="text" class="form-control" id="personal_nombreCompleto" name="nombreCompleto" placeholder="Ingrese el nombre completo">
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="personal_celular" class="form-label">Celular</label>
-                            <input type="text" class="form-control" id="personal_celular" name="celular">
+                            <input type="text" class="form-control" id="personal_celular" name="celular" maxlength="9" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Ingrese el celular (9 dígitos)">
                         </div>
                         <div class="col-md-6">
                             <label for="personal_email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="personal_email" name="email">
+                            <input type="email" class="form-control" id="personal_email" name="email" placeholder="Ingrese el correo electrónico">
                         </div>
                     </div>
 

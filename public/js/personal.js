@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
 
-        // Función helper para remover palabras duplicadas consecutivas en el nombre (ej. "TEO TEO" -> "TEO")
         function limpiarNombreDuplicado(texto) {
             if (!texto) return "";
             var palabras = texto.trim().split(/\s+/);
@@ -147,7 +146,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         function abrirModalEditar() {
             if (!personalSeleccionado) {
-                alert("Por favor, seleccione un registro de la tabla.");
+                Alert.advertencia("Selección requerida", "Por favor, seleccione un registro de la tabla.");
                 return;
             }
 
@@ -175,7 +174,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!personalSeleccionado) {
-                alert("Por favor, seleccione un registro para consultar.");
+                Alert.advertencia("Selección requerida", "Por favor, seleccione un registro para consultar.");
                 return;
             }
 
@@ -197,6 +196,36 @@ document.addEventListener("DOMContentLoaded", function () {
             var form = document.getElementById("form_personal");
             if (!form) return;
 
+            var dni = document.getElementById("personal_dni")?.value.trim() || "";
+            var nombreCompleto = document.getElementById("personal_nombreCompleto")?.value.trim() || "";
+            var celular = document.getElementById("personal_celular")?.value.trim() || "";
+            var email = document.getElementById("personal_email")?.value.trim() || "";
+
+            if (!dni) {
+                Alert.advertencia("Campo requerido", "Por favor, ingrese el número de DNI.");
+                return;
+            }
+
+            if (!nombreCompleto) {
+                Alert.advertencia("Campo requerido", "Por favor, ingrese el nombre completo.");
+                return;
+            }
+
+            if (!celular) {
+                Alert.advertencia("Campo requerido", "Por favor, ingrese el número de celular.");
+                return;
+            }
+
+            if (!email) {
+                Alert.advertencia("Campo requerido", "Por favor, ingrese el correo electrónico.");
+                return;
+            }
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                Alert.advertencia("Formato incorrecto", "Por favor, ingrese un correo electrónico válido.");
+                return;
+            }
+
             var formData = new FormData(form);
             var token = document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('input[name="_token"]')?.value;
 
@@ -212,39 +241,27 @@ document.addEventListener("DOMContentLoaded", function () {
                     var modalEl = document.getElementById("personal_modal");
                     var modal = bootstrap.Modal.getInstance(modalEl);
                     if (modal) modal.hide();
-                    await listarPersonal();
+                    Alert.exito("¡Guardado!", data.msg || data.message || "Registro guardado correctamente.", async function () {
+                        await listarPersonal();
+                    });
                 } else {
-                    alert(data.msg || data.message || "Error al guardar el registro.");
+                    Alert.error("Error al guardar", data.msg || data.message || "Error al guardar el registro.");
                 }
             } catch (error) {
                 console.error("Error al guardar:", error);
-                alert("Error de conexión al guardar.");
+                Alert.error("Error de conexión", "Error de conexión al guardar.");
             }
         }
 
         function confirmarEliminar() {
             if (!personalSeleccionado) {
-                alert("Por favor, seleccione un registro de la tabla.");
+                Alert.advertencia("Selección requerida", "Por favor, seleccione un registro de la tabla.");
                 return;
             }
 
             var nombre = limpiarNombreDuplicado(personalSeleccionado.nombreCompleto || personalSeleccionado.nombres || "este registro");
-            
-            var msgEl = document.getElementById("msgConfirmarEliminar");
-            if (msgEl) {
-                msgEl.textContent = "¿Está seguro de eliminar a " + nombre + "?";
-            }
 
-            var modalEl = document.getElementById("modalConfirmarEliminar");
-            var btnEliminar = document.getElementById("btnConfirmarEliminarAccion");
-
-            if (!modalEl) return;
-
-            var bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-
-            btnEliminar.onclick = async function () {
-                bsModal.hide();
-
+            Alert.confirmar("¿Eliminar registro?", "¿Está seguro de eliminar a " + nombre + "?", async function () {
                 var token = document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('input[name="_token"]')?.value;
 
                 try {
@@ -258,19 +275,22 @@ document.addEventListener("DOMContentLoaded", function () {
                     });
                     var data = await res.json();
                     if (data.ok || data.success) {
-                        await listarPersonal();
+                        Alert.exito("Eliminado", data.msg || data.message || "Registro eliminado correctamente.", async function () {
+                            await listarPersonal();
+                        });
+                    } else {
+                        Alert.error("Error al eliminar", data.msg || data.message || "No se pudo eliminar el registro.");
                     }
                 } catch (err) {
                     console.error("Error al eliminar:", err);
+                    Alert.error("Error de conexión", "Error de conexión al eliminar.");
                 }
-            };
-
-            bsModal.show();
+            });
         }
 
         function exportarExcel() {
             if (!personalCache || !personalCache.length) { 
-                alert("No hay datos para exportar."); 
+                Alert.advertencia("Sin datos", "No hay datos para exportar."); 
                 return; 
             }
             var csv = "Nombre Completo,DNI,Celular,Email,Estado\n";

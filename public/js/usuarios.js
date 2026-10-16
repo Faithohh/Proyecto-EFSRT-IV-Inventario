@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!usuarioSeleccionado) { 
-                alert("Seleccione un usuario de la lista para editar."); 
+                Alert.advertencia("Selección requerida", "Seleccione un usuario de la lista para editar."); 
                 return; 
             }
             
@@ -179,7 +179,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 txtId.readOnly = true;
             }
             
-            // Asignar contraseña al campo de texto
             if (txtPass) {
                 txtPass.value = u.contrasena || u.contraseña || u.clave || u.password || "";
             }
@@ -200,27 +199,13 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!usuarioSeleccionado) {
-                alert("Por favor, seleccione un usuario de la tabla para eliminar.");
+                Alert.advertencia("Selección requerida", "Por favor, seleccione un usuario de la tabla para eliminar.");
                 return;
             }
 
             var nombre = usuarioSeleccionado.idUsuario || "este usuario";
-            
-            var msgEl = document.getElementById("msgConfirmarEliminar");
-            if (msgEl) {
-                msgEl.textContent = "¿Está seguro de eliminar al usuario " + nombre + "?";
-            }
 
-            var modalEl = document.getElementById("modalConfirmarEliminar");
-            var btnEliminarAccion = document.getElementById("btnConfirmarEliminarAccion");
-
-            if (!modalEl) return;
-
-            var bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-
-            btnEliminarAccion.onclick = async function () {
-                bsModal.hide();
-
+            Alert.confirmar("¿Eliminar usuario?", "¿Está seguro de eliminar al usuario " + nombre + "?", async function () {
                 var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || document.querySelector('input[name="_token"]')?.value;
 
                 try {
@@ -237,17 +222,17 @@ document.addEventListener("DOMContentLoaded", function () {
                     var data = await response.json();
 
                     if (data.ok || data.success) {
-                        await mostrarUsuarios();
+                        Alert.exito("Eliminado", data.msg || "Usuario eliminado correctamente.", async function () {
+                            await mostrarUsuarios();
+                        });
                     } else {
-                        alert(data.msg || data.message || "Error al eliminar el usuario.");
+                        Alert.error("Error al eliminar", data.msg || data.message || "Error al eliminar el usuario.");
                     }
                 } catch (e) {
                     console.error("Error al eliminar:", e);
-                    alert("Error de conexión con el servidor.");
+                    Alert.error("Error de conexión", "Error de conexión con el servidor.");
                 }
-            };
-
-            bsModal.show();
+            });
         }
 
         async function verDetalle() {
@@ -260,7 +245,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!usuarioSeleccionado) { 
-                alert("Seleccione un usuario de la lista para consultar su información."); 
+                Alert.advertencia("Selección requerida", "Seleccione un usuario de la lista para consultar su información."); 
                 return; 
             }
             
@@ -293,7 +278,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             } catch (e) {
                 console.error("Error al obtener información:", e);
-                alert("Ocurrió un error al cargar los datos: " + e.message);
+                Alert.error("Error de consulta", "Ocurrió un error al cargar los datos: " + e.message);
             }
         }
 
@@ -307,7 +292,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 var idOriginal = document.getElementById("txtIdUsuarioOriginal").value;
                 
                 if (!idUsuario || (!idOriginal && !contrasena) || !tipoUsuario || !idPersonal) {
-                    alert("Complete todos los campos requeridos.");
+                    Alert.advertencia("Campos incompletos", "Complete todos los campos requeridos.");
                     return;
                 }
                 
@@ -332,19 +317,24 @@ document.addEventListener("DOMContentLoaded", function () {
                     var data = await response.json();
                     if (data.ok || data.success) {
                         modalUsuario.hide();
-                        await mostrarUsuarios();
+                        Alert.exito("¡Guardado!", data.msg || "Usuario guardado correctamente.", async function () {
+                            await mostrarUsuarios();
+                        });
                     } else {
-                        alert(data.msg || data.message || "Error al guardar");
+                        Alert.error("Error al guardar", data.msg || data.message || "Error al guardar");
                     }
                 } catch (e) {
                     modalUsuario.hide();
-                    alert("Error de conexión: " + e.message);
+                    Alert.error("Error de conexión", "Ocurrió un problema: " + e.message);
                 }
             });
         }
 
         function exportarExcel() {
-            if (!usuariosCache.length) { alert("No hay datos para exportar."); return; }
+            if (!usuariosCache.length) { 
+                Alert.advertencia("Sin datos", "No hay datos para exportar."); 
+                return; 
+            }
             var csv = "ID Usuario,Personal Asociado,Tipo de Usuario\n";
             usuariosCache.forEach(function (u) {
                 var personalText = u.personal || u.personalAsociado || u.nombrePersonal || "Sin asignar";
