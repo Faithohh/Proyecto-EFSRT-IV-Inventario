@@ -208,19 +208,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const cboSala = document.getElementById("cboSalaInventario");
 
-if (cboSala) {
-    cboSala.addEventListener("change", async () => {
-        if (inventarioSoloLectura) return;
+    if (cboSala) {
+        cboSala.addEventListener("change", async () => {
+            if (inventarioSoloLectura) return;
 
-        limpiarBienesInventario();
+            limpiarBienesInventario();
 
-        const idSala = cboSala.value;
+            const idSala = cboSala.value;
 
-        if (idSala) {
-            await cargarBienesPorSala(idSala);
-        }
-    });
-}
+            if (idSala) {
+                await cargarBienesPorSala(idSala);
+            }
+        });
+    }
 
     const txtAnio = document.getElementById("txtSerie");
 
@@ -814,11 +814,15 @@ async function cargarBienesPorSala(idSala) {
             const inputDrelm = document.createElement("input");
 
             inputDrelm.type = "text";
+            inputDrelm.inputMode = "numeric";
             inputDrelm.className = "form-control form-control-sm txtNroDrelm";
-            inputDrelm.maxLength = 10;
             inputDrelm.placeholder = "NRO_DRELM";
             inputDrelm.dataset.idBien = bien.idBien;
             inputDrelm.disabled = inventarioSoloLectura;
+
+            inputDrelm.addEventListener("input", function () {
+                this.value = this.value.replace(/[^0-9]/g, "");
+            });
 
             tdDrelm.appendChild(inputDrelm);
             tr.appendChild(tdDrelm);
