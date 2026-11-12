@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", function () {
     (function () {
         var panelSala = document.getElementById("mpSala");
@@ -64,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         function esc(v) {
-            return String(v || "").replace(/[&<">]/g, function (c) {
+            return String(v || "").replace(/[&<>"]/g, function (c) {
                 return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
             });
         }
@@ -80,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             }
 
-            var btnGuardar = document.getElementById("btnGuardarSala") || 
+            var btnGuardar = document.getElementById("btnGuardarSala") ||
                              (form ? form.querySelector('button[type="submit"]') : null) ||
                              (modalEl ? modalEl.querySelector('.btn-primary') : null);
 
@@ -91,11 +92,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
         function pintarSala(lista) {
             if (!tblBody) return;
+
             if (!lista || !lista.length) {
-                tblBody.innerHTML = '<tr><td colspan="6" class="text-center">Sin salas registradas.</td></tr>';
+                tblBody.innerHTML = '<tr><td colspan="8" class="text-center">Sin salas registradas.</td></tr>';
                 return;
             }
+
             tblBody.innerHTML = lista.map(function (s) {
+                var activo = Number(s.st_registro) === 1;
+
                 return '<tr data-id="' + esc(s.idSala) + '" style="cursor:pointer;">' +
                     '<td>' + esc(s.nombre) + '</td>' +
                     '<td>' + esc(s.observacion) + '</td>' +
@@ -103,13 +108,24 @@ document.addEventListener("DOMContentLoaded", function () {
                     '<td>' + esc(formatearFecha(s.fechaModificacion)) + '</td>' +
                     '<td>' + esc(s.idUsuarioCrea) + '</td>' +
                     '<td>' + esc(s.idUsuarioModifica) + '</td>' +
+                    '<td class="text-center align-middle">' +
+                        (activo
+                            ? '<span class="badge bg-success" title="Activo"><i class="bi bi-check-circle-fill"></i></span>'
+                            : '<span class="badge bg-secondary" title="Inactivo"><i class="bi bi-x-circle-fill"></i></span>') +
+                    '</td>' +
+                    '<td class="text-center align-middle">' +
+                        '<button type="button" class="btn btn-sm ' + (activo ? 'btn-outline-danger' : 'btn-outline-success') + '" data-estado="' + (activo ? '0' : '1') + '" data-id="' + esc(s.idSala) + '" title="' + (activo ? 'Desactivar' : 'Activar') + '">' +
+                            (activo ? '<i class="bi bi-trash"></i>' : '<i class="bi bi-check-lg"></i>') +
+                        '</button>' +
+                    '</td>' +
                     '</tr>';
             }).join("");
         }
 
         async function mostrarSala() {
             if (!tblBody) return;
-            tblBody.innerHTML = '<tr><td colspan="6" class="text-center">Cargando...</td></tr>';
+
+            tblBody.innerHTML = '<tr><td colspan="8" class="text-center">Cargando...</td></tr>';
             salaSeleccionada = null;
 
             try {
@@ -124,9 +140,63 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (txtBuscar) txtBuscar.value = "";
             } catch (e) {
                 console.error("Error al cargar salas:", e);
-                tblBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">' + esc(e.message) + '</td></tr>';
+                tblBody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">' + esc(e.message) + '</td></tr>';
             }
         }
+
+
+async function cambiarEstadoSala(idSala, activar) {
+    var sala = salaCache.find(function (item) {
+        return String(item.idSala) === String(idSala);
+    });
+
+    if (!sala) return;
+
+    var accion = activar ? "activar" : "desactivar";
+    var endpoint = activar ? "/sala/activar" : "/sala/eliminar";
+
+    Alert.confirmar(
+        activar ? "¿Activar sala?" : "¿Desactivar sala?",
+        '¿Está seguro de ' + accion + ' la sala "' + (sala.nombre || "") + '"?',
+        async function () {
+            var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ||
+                        document.querySelector('input[name="_token"]')?.value;
+
+            try {
+                var response = await fetch(endpoint, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN": token
+                    },
+                    body: JSON.stringify({ idSala: idSala })
+                });
+
+                var data = await response.json();
+
+                if (data.ok || data.success) {
+                    salaSeleccionada = null;
+
+                    await mostrarSala();
+
+                    window.dispatchEvent(new Event("salas:actualizadas"));
+
+                    Alert.exito(
+                        "¡Correcto!",
+                        data.msg || data.message || "Estado de la sala actualizado correctamente."
+                    );
+                } else {
+                    Alert.error("Error", data.msg || data.message || "No se pudo actualizar el estado de la sala.");
+                }
+            } catch (e) {
+                console.error("Error al cambiar estado:", e);
+                Alert.error("Error de conexión", "No se pudo conectar con el servidor.");
+            }
+        }
+    );
+}
+
 
         if (!panelSala.hidden && panelSala.style.display !== "none") {
             mostrarSala();
@@ -141,29 +211,50 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         });
+
         observer.observe(panelSala, { attributes: true });
 
         if (tblBody) {
             tblBody.addEventListener("click", function (e) {
+                if (e.target.closest("button[data-estado]")) return;
+
                 var tr = e.target.closest("tr[data-id]");
                 if (!tr) return;
 
-                tblBody.querySelectorAll("tr").forEach(function (x) { 
-                    x.classList.remove("sel", "selected", "table-active"); 
+                tblBody.querySelectorAll("tr").forEach(function (x) {
+                    x.classList.remove("sel", "selected", "table-active");
                 });
+
                 tr.classList.add("sel", "selected", "table-active");
 
                 var id = tr.getAttribute("data-id");
-                salaSeleccionada = salaCache.find(function (item) { 
-                    return String(item.idSala) === String(id); 
+                salaSeleccionada = salaCache.find(function (item) {
+                    return String(item.idSala) === String(id);
                 });
+            });
+
+            tblBody.addEventListener("click", function (e) {
+                var btn = e.target.closest("button[data-estado]");
+                if (!btn) return;
+
+                e.stopPropagation();
+
+                var tr = btn.closest("tr[data-id]");
+                if (!tr) return;
+
+                var idSala = tr.getAttribute("data-id");
+                var activar = btn.getAttribute("data-estado") === "1";
+
+                cambiarEstadoSala(idSala, activar);
             });
         }
 
         if (txtBuscar) {
             txtBuscar.addEventListener("input", function () {
                 var q = txtBuscar.value.trim().toLowerCase();
+
                 if (!q) return pintarSala(salaCache);
+
                 pintarSala(salaCache.filter(function (s) {
                     return (s.nombre || "").toLowerCase().includes(q) ||
                            (s.observacion || "").toLowerCase().includes(q) ||
@@ -193,13 +284,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 var s = tblBody ? tblBody.querySelector("tr.sel, tr.selected, tr.table-active") : null;
                 if (s) {
                     var id = s.getAttribute("data-id");
-                    salaSeleccionada = salaCache.find(function (item) { return String(item.idSala) === String(id); });
+                    salaSeleccionada = salaCache.find(function (item) {
+                        return String(item.idSala) === String(id);
+                    });
                 }
             }
 
-            if (!salaSeleccionada) { 
-                Alert.advertencia("Selección requerida", "Seleccione una sala de la lista para editar."); 
-                return; 
+            if (!salaSeleccionada) {
+                Alert.advertencia("Selección requerida", "Seleccione una sala de la lista para editar.");
+                return;
+            }
+
+            if (Number(salaSeleccionada.st_registro) !== 1) {
+                Alert.advertencia("Sala inactiva", "No se puede editar una sala que se encuentra inactiva.");
+                return;
             }
 
             var txtOrig = document.getElementById("txtIdSalaOriginal");
@@ -226,13 +324,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 var s = tblBody ? tblBody.querySelector("tr.sel, tr.selected, tr.table-active") : null;
                 if (s) {
                     var id = s.getAttribute("data-id");
-                    salaSeleccionada = salaCache.find(function (item) { return String(item.idSala) === String(id); });
+                    salaSeleccionada = salaCache.find(function (item) {
+                        return String(item.idSala) === String(id);
+                    });
                 }
             }
 
-            if (!salaSeleccionada) { 
-                Alert.advertencia("Selección requerida", "Seleccione una sala de la lista para consultar."); 
-                return; 
+            if (!salaSeleccionada) {
+                Alert.advertencia("Selección requerida", "Seleccione una sala de la lista para consultar.");
+                return;
             }
 
             var txtOrig = document.getElementById("txtIdSalaOriginal");
@@ -259,53 +359,31 @@ document.addEventListener("DOMContentLoaded", function () {
                 var s = tblBody ? tblBody.querySelector("tr.sel, tr.selected, tr.table-active") : null;
                 if (s) {
                     var id = s.getAttribute("data-id");
-                    salaSeleccionada = salaCache.find(function (item) { return String(item.idSala) === String(id); });
+                    salaSeleccionada = salaCache.find(function (item) {
+                        return String(item.idSala) === String(id);
+                    });
                 }
             }
 
             if (!salaSeleccionada) {
-                Alert.advertencia("Selección requerida", "Por favor, seleccione una sala de la tabla para eliminar.");
+                Alert.advertencia("Selección requerida", "Por favor, seleccione una sala de la tabla para desactivar.");
                 return;
             }
 
-            var nombre = salaSeleccionada.nombre || "esta sala";
+            if (Number(salaSeleccionada.st_registro) !== 1) {
+                Alert.advertencia("Sala inactiva", "La sala seleccionada ya se encuentra inactiva.");
+                return;
+            }
 
-            Alert.confirmar("¿Eliminar registro?", '¿Está seguro de eliminar la sala "' + nombre + '"?', async function () {
-                var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
-                            document.querySelector('input[name="_token"]')?.value;
-
-                try {
-                    var response = await fetch("/sala/eliminar", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Accept: "application/json",
-                            "X-CSRF-TOKEN": token
-                        },
-                        body: JSON.stringify({ idSala: salaSeleccionada.idSala })
-                    });
-
-                    var data = await response.json();
-
-                    if (data.ok || data.success) {
-                        salaSeleccionada = null;
-                        Alert.exito("Eliminado", data.msg || data.message || "Sala eliminada correctamente.", async function () {
-                            await mostrarSala();
-                        });
-                    } else {
-                        Alert.error("Error al eliminar", data.msg || data.message || "Error al eliminar la sala.");
-                    }
-                } catch (e) {
-                    console.error("Error al eliminar:", e);
-                    Alert.error("Error de conexión", "Error de conexión con el servidor.");
-                }
-            });
+            cambiarEstadoSala(salaSeleccionada.idSala, false);
         }
 
         var btnGuardar = document.getElementById("btnGuardarSala");
+
         if (btnGuardar) {
             btnGuardar.addEventListener("click", async function () {
                 var form = document.getElementById("formSala");
+
                 if (form && !form.checkValidity()) {
                     form.reportValidity();
                     return;
@@ -323,8 +401,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 try {
-                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
+                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ||
                                 document.querySelector('input[name="_token"]')?.value;
+
                     var response = await fetch("/sala/guardar", {
                         method: "POST",
                         headers: {
@@ -341,9 +420,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     });
 
                     var data = await response.json();
+
                     if (data.ok || data.success) {
                         var modal = getModalSala();
                         if (modal) modal.hide();
+
                         Alert.exito("¡Guardado!", data.msg || data.message || "Registro guardado correctamente.", async function () {
                             await mostrarSala();
                         });
@@ -351,36 +432,42 @@ document.addEventListener("DOMContentLoaded", function () {
                         Alert.error("Error al guardar", data.msg || data.message || "Error al guardar la sala.");
                     }
                 } catch (e) {
-                    var modal = getModalSala();
-                    if (modal) modal.hide();
+                    console.error("Error al guardar:", e);
                     Alert.error("Error de conexión", "Error de conexión al guardar.");
                 }
             });
         }
 
         function exportarExcel() {
-            if (!salaCache.length) { 
-                Alert.advertencia("Sin datos", "No hay datos para exportar."); 
-                return; 
+            if (!salaCache.length) {
+                Alert.advertencia("Sin datos", "No hay datos para exportar.");
+                return;
             }
-            var csv = "Nombre,Observacion,Fecha Creacion,Fecha Modificación,Usuario Crea,Usuario Modifica\n";
+
+            var csv = "Nombre,Observacion,Fecha Creacion,Fecha Modificacion,Usuario Crea,Usuario Modifica,Estado\n";
+
             salaCache.forEach(function (s) {
                 csv += '"' + (s.nombre || "") + '",' +
                        '"' + (s.observacion || "") + '",' +
                        '"' + (formatearFecha(s.fechaCreacion) || "") + '",' +
                        '"' + (formatearFecha(s.fechaModificacion) || "") + '",' +
                        '"' + (s.idUsuarioCrea || "") + '",' +
-                       '"' + (s.idUsuarioModifica || "") + '"\n';
+                       '"' + (s.idUsuarioModifica || "") + '",' +
+                       '"' + (Number(s.st_registro) === 1 ? "Activo" : "Inactivo") + '"\n';
             });
+
             var blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
             var link = document.createElement("a");
             var url = URL.createObjectURL(blob);
+
             link.setAttribute("href", url);
             link.setAttribute("download", "salas_" + new Date().toISOString().slice(0, 10) + ".csv");
             link.style.visibility = "hidden";
+
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         }
 
         panelSala.addEventListener("click", function (e) {

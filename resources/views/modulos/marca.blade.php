@@ -1,3 +1,4 @@
+
 <section class="mp-panel" id="mpMarca" hidden>
     <!-- CABECERA DEL MÓDULO -->
     <div class="mp-panel-header d-flex align-items-center mb-3">
@@ -49,15 +50,19 @@
                     <th>Fecha Modificación</th>
                     <th>Usuario Crea</th>
                     <th>Usuario Modifica</th>
+                    <th class="text-center" style="width: 55px; min-width: 55px;">ESTADO</th>
+                    <th class="text-center" style="width: 55px; min-width: 55px;">ACCIÓN</th>
                 </tr>
             </thead>
             <tbody>
-                <tr><td colspan="5" class="text-center">Cargando...</td></tr>
+                <tr>
+                    <td colspan="7" class="text-center">Cargando...</td>
+                </tr>
             </tbody>
         </table>
     </div>
 
-    <!-- MODAL FORMULARIO (NUEVO / EDITAR / DETALLE) - ALINEADO ARRIBA -->
+    <!-- MODAL FORMULARIO (NUEVO / EDITAR / DETALLE) -->
     <div class="modal fade" id="modalMarca" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -71,15 +76,16 @@
 
                         <!-- PROGRAMA DE ESTUDIO -->
                         <div class="mb-3">
-                            <span>Programa de estudio: <strong id="lblProgramaEstudioMarca">2</strong></span>
-                            <input type="hidden" id="txtIdProgramaEstudioMarca" value="2">
+                            <span>Programa de estudio: </span>
+                            <strong id="lblProgramaEstudioMarca">{{ session('idProgramaEstudio', 2) }}</strong>
+                            <input type="hidden" id="txtIdProgramaEstudioMarca" value="{{ session('idProgramaEstudio', 2) }}">
                         </div>
 
-                        <!-- NOMBRE DE MARCA HORIZONTAL -->
+                        <!-- NOMBRE DE MARCA -->
                         <div class="mb-3 row align-items-center">
                             <label for="txtNombreMarca" class="col-sm-4 col-form-label">Nombre de Marca:</label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" id="txtNombreMarca" required autocomplete="off" placeholder="Ingrese el nombre de la marca">
+                                <input type="text" class="form-control" id="txtNombreMarca" maxlength="60" required autocomplete="off" placeholder="Ingrese el nombre de la marca">
                             </div>
                         </div>
 
@@ -93,25 +99,6 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-primary" id="btnGuardarMarca">Guardar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL ELIMINAR - CENTRADO AL MEDIO -->
-    <div class="modal fade" id="modalEliminarMarca" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">Confirmar Eliminación</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>¿Está seguro de eliminar la marca <strong id="txtMarcaEliminar"></strong>?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" id="btnConfirmarEliminarMarca">Eliminar</button>
                 </div>
             </div>
         </div>

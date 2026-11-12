@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\DB;
 use App\Models\Tipo;
 use Exception;
 
@@ -58,10 +57,27 @@ class TipoController extends Controller
     {
         try {
             $nombre = $request->input('nombre');
-            DB::table('tipo')->where('NOMBRE', $nombre)->delete();
-            return response()->json(['ok' => true, 'msg' => 'Tipo eliminado correctamente']);
+            $idUsuario = Session::get('idUsuario', 'SISTEMA');
+
+            Tipo::eliminar($nombre, $idUsuario);
+
+            return response()->json(['ok' => true, 'msg' => 'Tipo desactivado correctamente']);
         } catch (Exception $e) {
-            return response()->json(['ok' => false, 'msg' => 'Error al eliminar el tipo: ' . $e->getMessage()]);
+            return response()->json(['ok' => false, 'msg' => 'Error al desactivar el tipo: ' . $e->getMessage()]);
+        }
+    }
+
+    public function activar(Request $request)
+    {
+        try {
+            $nombre = $request->input('nombre');
+            $idUsuario = Session::get('idUsuario', 'SISTEMA');
+
+            Tipo::activar($nombre, $idUsuario);
+
+            return response()->json(['ok' => true, 'msg' => 'Tipo activado correctamente']);
+        } catch (Exception $e) {
+            return response()->json(['ok' => false, 'msg' => 'Error al activar el tipo: ' . $e->getMessage()]);
         }
     }
 }

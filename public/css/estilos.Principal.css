@@ -1516,3 +1516,120 @@ body.dark-mode #modalInventario input[type="date"]::-webkit-calendar-picker-indi
 }
 
 
+
+    /* ==========================================================================
+       1. VARIABLES DE TEMA (MODO CLARO Y OSCURO)
+       ========================================================================== */
+    :root {
+        --tb-btn-activar-bg: #198754;
+        --tb-btn-activar-text: #ffffff;
+        --tb-btn-activar-border: #198754;
+        --tb-btn-activar-hover: #157347;
+
+        --tb-btn-desactivar-bg: #dc3545;
+        --tb-btn-desactivar-text: #ffffff;
+        --tb-btn-desactivar-border: #dc3545;
+        --tb-btn-desactivar-hover: #bb2d3b;
+    }
+
+    [data-bs-theme="dark"],
+    body.dark,
+    body.dark-mode,
+    html.dark {
+        --tb-btn-activar-bg: rgba(25, 135, 84, 0.25);
+        --tb-btn-activar-text: #75b798;
+        --tb-btn-activar-border: rgba(117, 183, 152, 0.5);
+        --tb-btn-activar-hover: #198754;
+
+        --tb-btn-desactivar-bg: rgba(220, 53, 69, 0.25);
+        --tb-btn-desactivar-text: #ea868f;
+        --tb-btn-desactivar-border: rgba(234, 134, 143, 0.5);
+        --tb-btn-desactivar-hover: #dc3545;
+    }
+
+    /* ==========================================================================
+       2. AJUSTE SEGURO PARA TODAS LAS TABLAS (SIN AFECTAR CELDAS ÚNICAS)
+       ========================================================================== */
+    .tb-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    table.tb-table {
+        width: 100% !important;
+        min-width: 0 !important;
+        table-layout: auto !important;
+    }
+
+    table.tb-table th,
+    table.tb-table td {
+        padding: 7px 8px !important;
+        font-size: 0.82rem !important;
+        vertical-align: middle !important;
+    }
+
+    /* Solo aplica a las últimas 2 columnas si la fila tiene más de 2 celdas */
+    table.tb-table th:nth-last-child(2):not(:first-child),
+    table.tb-table td:nth-last-child(2):not(:first-child):not([colspan]),
+    table.tb-table th:last-child:not(:only-child),
+    table.tb-table td:last-child:not(:only-child):not([colspan]) {
+        width: 1% !important;
+        white-space: nowrap !important;
+        text-align: center !important;
+    }
+
+    /* ==========================================================================
+       3. AJUSTE ESPECÍFICO SOLO PARA LA TABLA DE GRUPO (#tblGrupo)
+       ========================================================================== */
+    #tblGrupo td:nth-child(3),
+    #tblGrupo td:nth-child(5) {
+        white-space: normal !important;
+        max-width: 115px;
+    }
+
+    /* ==========================================================================
+       4. ESTILO DE BOTONES DE ACCIÓN (CLARO Y OSCURO PARA TODAS LAS TABLAS)
+       ========================================================================== */
+    table.tb-table td:last-child button,
+    table.tb-table td:last-child .btn {
+        padding: 4px 10px !important;
+        font-size: 0.76rem !important;
+        font-weight: 600 !important;
+        border-radius: 5px !important;
+        border: 1px solid transparent !important;
+        white-space: nowrap !important;
+        transition: all 0.2s ease;
+        box-shadow: none !important;
+    }
+
+    /* Botón DESACTIVAR */
+    table.tb-table td:last-child .btn-danger,
+    table.tb-table td:last-child button[data-accion="desactivar"],
+    table.tb-table td:last-child .btn-desactivar {
+        background-color: var(--tb-btn-desactivar-bg) !important;
+        color: var(--tb-btn-desactivar-text) !important;
+        border-color: var(--tb-btn-desactivar-border) !important;
+    }
+
+    table.tb-table td:last-child .btn-danger:hover,
+    table.tb-table td:last-child button[data-accion="desactivar"]:hover,
+    table.tb-table td:last-child .btn-desactivar:hover {
+        background-color: var(--tb-btn-desactivar-hover) !important;
+        color: #ffffff !important;
+    }
+
+    /* Botón ACTIVAR */
+    table.tb-table td:last-child .btn-success,
+    table.tb-table td:last-child button[data-accion="activar"],
+    table.tb-table td:last-child .btn-activar {
+        background-color: var(--tb-btn-activar-bg) !important;
+        color: var(--tb-btn-activar-text) !important;
+        border-color: var(--tb-btn-activar-border) !important;
+    }
+
+    table.tb-table td:last-child .btn-success:hover,
+    table.tb-table td:last-child button[data-accion="activar"]:hover,
+    table.tb-table td:last-child .btn-activar:hover {
+        background-color: var(--tb-btn-activar-hover) !important;
+        color: #ffffff !important;
+    }

@@ -28,7 +28,6 @@ class ProgramaEstudio
 
     public static function obtenerUsuarios()
     {
-        // Trae la lista general de usuarios/personal para poblar combos al crear/editar
         return DB::table('usuario as u')
             ->join('personal as p', 'u.idPersonal', '=', 'p.idPersonal')
             ->select(

@@ -1,3 +1,4 @@
+
 <style>
     #mpBien, .mp-panel {
         max-width: 100% !important;
@@ -110,10 +111,12 @@
                     <th>fechaModificacion</th>
                     <th>idUsuarioCrea</th>
                     <th>idUsuarioModifica</th>
+                    <th>Registro</th>
+                    <th>Acción</th>
                 </tr>
             </thead>
             <tbody id="tbody_bien">
-                <tr><td colspan="13" class="text-center">Cargando...</td></tr>
+                <tr><td colspan="15" class="text-center">Cargando...</td></tr>
             </tbody>
         </table>
     </div>

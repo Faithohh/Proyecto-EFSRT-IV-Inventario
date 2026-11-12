@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", function () {
     (function () {
         var panelModelo = document.getElementById("mpModelo");
@@ -64,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         function esc(v) {
-            return String(v || "").replace(/[&<">]/g, function (c) {
+            return String(v || "").replace(/[&<>"]/g, function (c) {
                 return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
             });
         }
@@ -80,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             }
 
-            var btnGuardar = document.getElementById("btnGuardarModelo") || 
+            var btnGuardar = document.getElementById("btnGuardarModelo") ||
                              (form ? form.querySelector('button[type="submit"]') : null) ||
                              (modalEl ? modalEl.querySelector('.btn-primary') : null);
 
@@ -91,11 +92,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
         function pintarModelo(lista) {
             if (!tblBody) return;
+
             if (!lista || !lista.length) {
-                tblBody.innerHTML = '<tr><td colspan="6" class="text-center">Sin modelos registrados.</td></tr>';
+                tblBody.innerHTML = '<tr><td colspan="8" class="text-center">Sin modelos registrados.</td></tr>';
                 return;
             }
+
             tblBody.innerHTML = lista.map(function (m) {
+                var activo = Number(m.st_registro) === 1;
+
                 return '<tr data-id="' + esc(m.idModelo) + '" style="cursor:pointer;">' +
                     '<td>' + esc(m.idProgramaEstudio) + '</td>' +
                     '<td>' + esc(m.nombre) + '</td>' +
@@ -103,13 +108,26 @@ document.addEventListener("DOMContentLoaded", function () {
                     '<td>' + esc(formatearFecha(m.fechaModificacion)) + '</td>' +
                     '<td>' + esc(m.idUsuarioCrea) + '</td>' +
                     '<td>' + esc(m.idUsuarioModifica) + '</td>' +
+                    '<td class="text-center">' +
+                        '<span class="badge ' + (activo ? 'bg-success' : 'bg-secondary') + '" title="' + (activo ? 'Activo' : 'Inactivo') + '">' +
+                            '<i class="bi ' + (activo ? 'bi-check-circle-fill' : 'bi-x-circle-fill') + '"></i>' +
+                        '</span>' +
+                    '</td>' +
+                    '<td class="text-center">' +
+                        '<button type="button" class="btn btn-sm ' + (activo ? 'btn-outline-danger' : 'btn-outline-success') +
+                        '" data-id="' + esc(m.idModelo) + '" data-estado="' + (activo ? '1' : '0') +
+                        '" title="' + (activo ? 'Desactivar' : 'Activar') + '">' +
+                        '<i class="bi ' + (activo ? 'bi-trash' : 'bi-check-lg') + '"></i>' +
+                        '</button>' +
+                    '</td>' +
                     '</tr>';
             }).join("");
         }
 
         async function mostrarModelo() {
             if (!tblBody) return;
-            tblBody.innerHTML = '<tr><td colspan="6" class="text-center">Cargando...</td></tr>';
+
+            tblBody.innerHTML = '<tr><td colspan="8" class="text-center">Cargando...</td></tr>';
             modeloSeleccionado = null;
 
             try {
@@ -124,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (txtBuscar) txtBuscar.value = "";
             } catch (e) {
                 console.error("Error al cargar modelos:", e);
-                tblBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">' + esc(e.message) + '</td></tr>';
+                tblBody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">' + esc(e.message) + '</td></tr>';
             }
         }
 
@@ -145,17 +163,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (tblBody) {
             tblBody.addEventListener("click", function (e) {
+                var btnEstado = e.target.closest("button[data-estado]");
+
+                if (btnEstado) {
+                    cambiarEstadoModelo(btnEstado);
+                    return;
+                }
+
                 var tr = e.target.closest("tr[data-id]");
                 if (!tr) return;
 
-                tblBody.querySelectorAll("tr").forEach(function (x) { 
-                    x.classList.remove("sel", "selected", "table-active"); 
+                tblBody.querySelectorAll("tr").forEach(function (x) {
+                    x.classList.remove("sel", "selected", "table-active");
                 });
+
                 tr.classList.add("sel", "selected", "table-active");
 
                 var id = tr.getAttribute("data-id");
-                modeloSeleccionado = modeloCache.find(function (item) { 
-                    return String(item.idModelo) === String(id); 
+                modeloSeleccionado = modeloCache.find(function (item) {
+                    return String(item.idModelo) === String(id);
                 });
             });
         }
@@ -164,6 +190,7 @@ document.addEventListener("DOMContentLoaded", function () {
             txtBuscar.addEventListener("input", function () {
                 var q = txtBuscar.value.trim().toLowerCase();
                 if (!q) return pintarModelo(modeloCache);
+
                 pintarModelo(modeloCache.filter(function (m) {
                     return (m.nombre || "").toLowerCase().includes(q) ||
                            (m.idProgramaEstudio || "").toString().toLowerCase().includes(q) ||
@@ -197,9 +224,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
 
-            if (!modeloSeleccionado) { 
-                Alert.advertencia("Selección requerida", "Seleccione un modelo de la lista para editar."); 
-                return; 
+            if (!modeloSeleccionado) {
+                Alert.advertencia("Selección requerida", "Seleccione un modelo de la lista para editar.");
+                return;
+            }
+
+            if (Number(modeloSeleccionado.st_registro) !== 1) {
+                Alert.advertencia("Modelo inactivo", "No se puede editar un modelo desactivado.");
+                return;
             }
 
             var txtOrig = document.getElementById("txtIdModeloOriginal");
@@ -224,9 +256,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
 
-            if (!modeloSeleccionado) { 
-                Alert.advertencia("Selección requerida", "Seleccione un modelo de la lista para consultar."); 
-                return; 
+            if (!modeloSeleccionado) {
+                Alert.advertencia("Selección requerida", "Seleccione un modelo de la lista para consultar.");
+                return;
             }
 
             var txtOrig = document.getElementById("txtIdModeloOriginal");
@@ -252,39 +284,67 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (!modeloSeleccionado) {
-                Alert.advertencia("Selección requerida", "Por favor, seleccione un modelo de la tabla para eliminar.");
+                Alert.advertencia("Selección requerida", "Seleccione un modelo de la tabla para desactivar.");
                 return;
             }
 
-            var nombre = modeloSeleccionado.nombre || "este modelo";
+            if (Number(modeloSeleccionado.st_registro) !== 1) {
+                Alert.advertencia("Modelo inactivo", "Este modelo ya se encuentra desactivado.");
+                return;
+            }
 
-            Alert.confirmar("¿Eliminar registro?", '¿Está seguro de eliminar el modelo "' + nombre + '"?', async function () {
-                var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
+            cambiarEstadoModeloConfirmado(modeloSeleccionado.idModelo, modeloSeleccionado.nombre, true);
+        }
+
+        function cambiarEstadoModelo(btn) {
+            var id = btn.dataset.id;
+            var estado = btn.dataset.estado === "1";
+            var modelo = modeloCache.find(function (m) {
+                return String(m.idModelo) === String(id);
+            });
+
+            if (!modelo) return;
+
+            cambiarEstadoModeloConfirmado(id, modelo.nombre, estado);
+        }
+
+        function cambiarEstadoModeloConfirmado(idModelo, nombre, desactivar) {
+            var titulo = desactivar ? "¿Desactivar modelo?" : "¿Activar modelo?";
+            var mensaje = desactivar
+                ? '¿Está seguro de desactivar el modelo "' + nombre + '"?'
+                : '¿Desea volver a activar el modelo "' + nombre + '"?';
+
+            Alert.confirmar(titulo, mensaje, async function () {
+                var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ||
                             document.querySelector('input[name="_token"]')?.value;
 
                 try {
-                    var response = await fetch("/modelo/eliminar", {
+                    var response = await fetch(desactivar ? "/modelo/eliminar" : "/modelo/activar", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                             Accept: "application/json",
                             "X-CSRF-TOKEN": token
                         },
-                        body: JSON.stringify({ idModelo: modeloSeleccionado.idModelo })
+                        body: JSON.stringify({ idModelo: idModelo })
                     });
 
                     var data = await response.json();
 
                     if (data.ok || data.success) {
                         modeloSeleccionado = null;
-                        Alert.exito("Eliminado", data.msg || data.message || "Modelo eliminado correctamente.", async function () {
-                            await mostrarModelo();
-                        });
+                        Alert.exito(
+                            desactivar ? "Desactivado" : "Activado",
+                            data.msg || data.message || (desactivar ? "Modelo desactivado correctamente." : "Modelo activado correctamente."),
+                            async function () {
+                                await mostrarModelo();
+                            }
+                        );
                     } else {
-                        Alert.error("Error al eliminar", data.msg || data.message || "Error al eliminar el modelo.");
+                        Alert.error("Error", data.msg || data.message || "No se pudo cambiar el estado del modelo.");
                     }
                 } catch (e) {
-                    console.error("Error al eliminar:", e);
+                    console.error("Error al cambiar estado:", e);
                     Alert.error("Error de conexión", "Error de conexión con el servidor.");
                 }
             });
@@ -310,8 +370,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 try {
-                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
+                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ||
                                 document.querySelector('input[name="_token"]')?.value;
+
                     var response = await fetch("/modelo/guardar", {
                         method: "POST",
                         headers: {
@@ -326,9 +387,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     });
 
                     var data = await response.json();
+
                     if (data.ok || data.success) {
                         var modal = getModalModelo();
                         if (modal) modal.hide();
+
                         Alert.exito("¡Guardado!", data.msg || data.message || "Registro guardado correctamente.", async function () {
                             await mostrarModelo();
                         });
@@ -336,27 +399,30 @@ document.addEventListener("DOMContentLoaded", function () {
                         Alert.error("Error al guardar", data.msg || data.message || "Error al guardar el modelo.");
                     }
                 } catch (e) {
-                    var modal = getModalModelo();
-                    if (modal) modal.hide();
+                    console.error("Error al guardar:", e);
                     Alert.error("Error de conexión", "Error de conexión al guardar.");
                 }
             });
         }
 
         function exportarExcel() {
-            if (!modeloCache.length) { 
-                Alert.advertencia("Sin datos", "No hay datos para exportar."); 
-                return; 
+            if (!modeloCache.length) {
+                Alert.advertencia("Sin datos", "No hay datos para exportar.");
+                return;
             }
-            var csv = "ID Prog. Estudio,Nombre,Fecha Creación,Fecha Modificación,Usuario Crea,Usuario Modifica\n";
+
+            var csv = "ID Prog. Estudio,Nombre,Fecha Creación,Fecha Modificación,Usuario Crea,Usuario Modifica,Estado\n";
+
             modeloCache.forEach(function (m) {
                 csv += '"' + (m.idProgramaEstudio || "") + '",' +
                        '"' + (m.nombre || "") + '",' +
                        '"' + (formatearFecha(m.fechaCreacion) || "") + '",' +
                        '"' + (formatearFecha(m.fechaModificacion) || "") + '",' +
                        '"' + (m.idUsuarioCrea || "") + '",' +
-                       '"' + (m.idUsuarioModifica || "") + '"\n';
+                       '"' + (m.idUsuarioModifica || "") + '",' +
+                       '"' + (Number(m.st_registro) === 1 ? "Activo" : "Inactivo") + '"\n';
             });
+
             var blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
             var link = document.createElement("a");
             var url = URL.createObjectURL(blob);
@@ -366,6 +432,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         }
 
         panelModelo.addEventListener("click", function (e) {

@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", function () {
     (function () {
         var panelTipo = document.getElementById("mpTipo");
@@ -32,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             }
 
-            var btnGuardar = document.getElementById("btnGuardarTipo") || 
+            var btnGuardar = document.getElementById("btnGuardarTipo") ||
                              (form ? form.querySelector('button[type="submit"]') : null) ||
                              (modalEl ? modalEl.querySelector('.btn-primary') : null);
 
@@ -43,30 +44,50 @@ document.addEventListener("DOMContentLoaded", function () {
 
         function pintarTipo(lista) {
             if (!tblBody) return;
-            if (!lista.length) {
-                tblBody.innerHTML = '<tr><td class="text-center">Sin tipos registrados.</td></tr>';
+
+            if (!lista || !lista.length) {
+                tblBody.innerHTML = '<tr><td colspan="3" class="text-center">Sin tipos registrados.</td></tr>';
                 return;
             }
+
             tblBody.innerHTML = lista.map(function (t) {
+                var activo = Number(t.st_registro) === 1;
+
                 return '<tr data-id="' + esc(t.NOMBRE) + '" style="cursor:pointer;">' +
-                    '<td>' + esc(t.NOMBRE) + '</td></tr>';
+                    '<td>' + esc(t.NOMBRE) + '</td>' +
+                    '<td class="text-center align-middle">' +
+                        (activo
+                            ? '<span class="badge bg-success" title="Activo"><i class="bi bi-check-circle-fill"></i></span>'
+                            : '<span class="badge bg-secondary" title="Inactivo"><i class="bi bi-x-circle-fill"></i></span>') +
+                    '</td>' +
+                    '<td class="text-center align-middle">' +
+                        '<button type="button" class="btn btn-sm ' + (activo ? 'btn-outline-danger' : 'btn-outline-success') + '" data-id="' + esc(t.NOMBRE) + '" data-estado="' + (activo ? '0' : '1') + '" title="' + (activo ? 'Desactivar' : 'Activar') + '">' +
+                            (activo ? '<i class="bi bi-trash"></i>' : '<i class="bi bi-check-lg"></i>') +
+                        '</button>' +
+                    '</td>' +
+                    '</tr>';
             }).join("");
         }
 
         async function mostrarTipo() {
             if (!tblBody) return;
-            tblBody.innerHTML = '<tr><td class="text-center">Cargando...</td></tr>';
+
+            tblBody.innerHTML = '<tr><td colspan="3" class="text-center">Cargando...</td></tr>';
             tipoSeleccionado = null;
 
             try {
                 var r = await fetch("/tipo/listar", { headers: { Accept: "application/json" } });
+                if (!r.ok) throw new Error("Error HTTP " + r.status);
+
                 var j = await r.json();
                 if (!j.ok) throw new Error(j.msg || "Sin datos");
+
                 tipoCache = j.data || [];
                 pintarTipo(tipoCache);
                 if (txtBuscar) txtBuscar.value = "";
             } catch (e) {
-                tblBody.innerHTML = '<tr><td class="text-center text-danger">' + esc(e.message) + '</td></tr>';
+                console.error("Error al cargar tipos:", e);
+                tblBody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">' + esc(e.message) + '</td></tr>';
             }
         }
 
@@ -87,20 +108,45 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (tblBody) {
             tblBody.addEventListener("click", function (e) {
+                if (e.target.closest("button[data-estado]")) return;
+
                 var tr = e.target.closest("tr[data-id]");
                 if (!tr) return;
-                tblBody.querySelectorAll("tr").forEach(function (x) { x.classList.remove("sel", "selected", "table-active"); });
+
+                tblBody.querySelectorAll("tr").forEach(function (x) {
+                    x.classList.remove("sel", "selected", "table-active");
+                });
+
                 tr.classList.add("sel", "selected", "table-active");
 
                 var id = tr.getAttribute("data-id");
-                tipoSeleccionado = tipoCache.find(function (item) { return String(item.NOMBRE) === String(id); });
+                tipoSeleccionado = tipoCache.find(function (item) {
+                    return String(item.NOMBRE) === String(id);
+                });
+            });
+
+            tblBody.addEventListener("click", function (e) {
+                var btn = e.target.closest("button[data-estado]");
+                if (!btn) return;
+
+                e.stopPropagation();
+
+                var tr = btn.closest("tr[data-id]");
+                if (!tr) return;
+
+                var nombre = tr.getAttribute("data-id");
+                var activar = btn.getAttribute("data-estado") === "1";
+
+                cambiarEstadoTipo(nombre, activar);
             });
         }
 
         if (txtBuscar) {
             txtBuscar.addEventListener("input", function () {
                 var q = txtBuscar.value.trim().toLowerCase();
+
                 if (!q) return pintarTipo(tipoCache);
+
                 pintarTipo(tipoCache.filter(function (t) {
                     return (t.NOMBRE || "").toLowerCase().includes(q);
                 }));
@@ -127,12 +173,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 var s = tblBody ? tblBody.querySelector("tr.sel, tr.selected, tr.table-active") : null;
                 if (s) {
                     var id = s.getAttribute("data-id");
-                    tipoSeleccionado = tipoCache.find(function (t) { return String(t.NOMBRE) === String(id); });
+                    tipoSeleccionado = tipoCache.find(function (t) {
+                        return String(t.NOMBRE) === String(id);
+                    });
                 }
             }
 
             if (!tipoSeleccionado) {
                 Alert.advertencia("Selección requerida", "Seleccione un tipo de la lista para editar.");
+                return;
+            }
+
+            if (Number(tipoSeleccionado.st_registro) !== 1) {
+                Alert.advertencia("Tipo inactivo", "No se puede editar un tipo desactivado. Primero debe activarlo.");
                 return;
             }
 
@@ -154,7 +207,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 var s = tblBody ? tblBody.querySelector("tr.sel, tr.selected, tr.table-active") : null;
                 if (s) {
                     var id = s.getAttribute("data-id");
-                    tipoSeleccionado = tipoCache.find(function (t) { return String(t.NOMBRE) === String(id); });
+                    tipoSeleccionado = tipoCache.find(function (t) {
+                        return String(t.NOMBRE) === String(id);
+                    });
                 }
             }
 
@@ -181,47 +236,72 @@ document.addEventListener("DOMContentLoaded", function () {
                 var s = tblBody ? tblBody.querySelector("tr.sel, tr.selected, tr.table-active") : null;
                 if (s) {
                     var id = s.getAttribute("data-id");
-                    tipoSeleccionado = tipoCache.find(function (t) { return String(t.NOMBRE) === String(id); });
+                    tipoSeleccionado = tipoCache.find(function (t) {
+                        return String(t.NOMBRE) === String(id);
+                    });
                 }
             }
 
             if (!tipoSeleccionado) {
-                Alert.advertencia("Selección requerida", "Por favor, seleccione un tipo de la tabla para eliminar.");
+                Alert.advertencia("Selección requerida", "Por favor, seleccione un tipo de la tabla para desactivar.");
                 return;
             }
 
-            var nombre = tipoSeleccionado.NOMBRE || "este tipo";
+            if (Number(tipoSeleccionado.st_registro) !== 1) {
+                Alert.advertencia("Tipo inactivo", "El tipo seleccionado ya está desactivado.");
+                return;
+            }
 
-            Alert.confirmar("¿Eliminar registro?", '¿Está seguro de eliminar el tipo "' + nombre + '"?', async function () {
-                var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
-                            document.querySelector('input[name="_token"]')?.value;
+            cambiarEstadoTipo(tipoSeleccionado.NOMBRE, false);
+        }
 
-                try {
-                    var response = await fetch("/tipo/eliminar", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Accept: "application/json",
-                            "X-CSRF-TOKEN": token
-                        },
-                        body: JSON.stringify({ nombre: nombre })
-                    });
-
-                    var data = await response.json();
-
-                    if (data.ok || data.success) {
-                        tipoSeleccionado = null;
-                        Alert.exito("Eliminado", data.msg || data.message || "Tipo eliminado correctamente.", async function () {
-                            await mostrarTipo();
-                        });
-                    } else {
-                        Alert.error("Error al eliminar", data.msg || data.message || "Error al eliminar el tipo.");
-                    }
-                } catch (e) {
-                    console.error("Error al eliminar:", e);
-                    Alert.error("Error de conexión", "Error de conexión con el servidor.");
-                }
+        async function cambiarEstadoTipo(nombre, activar) {
+            var tipo = tipoCache.find(function (t) {
+                return String(t.NOMBRE) === String(nombre);
             });
+
+            if (!tipo) return;
+
+            var titulo = activar ? "¿Activar tipo?" : "¿Desactivar tipo?";
+            var mensaje = activar
+                ? '¿Está seguro de activar el tipo "' + nombre + '"?'
+                : '¿Está seguro de desactivar el tipo "' + nombre + '"?';
+
+            Alert.confirmar(titulo, mensaje, async function () {
+                await enviarEstadoTipo(nombre, activar);
+            });
+        }
+
+        async function enviarEstadoTipo(nombre, activar) {
+            var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ||
+                        document.querySelector('input[name="_token"]')?.value;
+
+            try {
+                var response = await fetch(activar ? "/tipo/activar" : "/tipo/eliminar", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN": token
+                    },
+                    body: JSON.stringify({ nombre: nombre })
+                });
+
+                var data = await response.json();
+
+                if (data.ok || data.success) {
+                    tipoSeleccionado = null;
+
+                    Alert.exito(activar ? "Activado" : "Desactivado", data.msg || data.message || "Estado actualizado correctamente.", async function () {
+                        await mostrarTipo();
+                    });
+                } else {
+                    Alert.error("Error", data.msg || data.message || "No se pudo cambiar el estado del tipo.");
+                }
+            } catch (e) {
+                console.error("Error al cambiar estado:", e);
+                Alert.error("Error de conexión", "Error de conexión con el servidor.");
+            }
         }
 
         var btnGuardar = document.getElementById("btnGuardarTipo");
@@ -244,8 +324,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 try {
-                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
+                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ||
                                 document.querySelector('input[name="_token"]')?.value;
+
                     var response = await fetch("/tipo/guardar", {
                         method: "POST",
                         headers: {
@@ -260,9 +341,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     });
 
                     var data = await response.json();
+
                     if (data.ok || data.success) {
                         var modal = getModalTipo();
                         if (modal) modal.hide();
+
                         Alert.exito("¡Guardado!", data.msg || data.message || "Registro guardado correctamente.", async function () {
                             await mostrarTipo();
                         });
@@ -270,31 +353,37 @@ document.addEventListener("DOMContentLoaded", function () {
                         Alert.error("Error al guardar", data.msg || data.message || "Error al guardar el tipo.");
                     }
                 } catch (e) {
-                    var modal = getModalTipo();
-                    if (modal) modal.hide();
+                    console.error("Error al guardar:", e);
                     Alert.error("Error de conexión", "Error de conexión al guardar.");
                 }
             });
         }
 
         function exportarExcel() {
-            if (!tipoCache.length) { 
-                Alert.advertencia("Sin datos", "No hay datos para exportar."); 
-                return; 
+            if (!tipoCache.length) {
+                Alert.advertencia("Sin datos", "No hay datos para exportar.");
+                return;
             }
-            var csv = "Nombre\n";
+
+            var csv = "Nombre,Estado\n";
+
             tipoCache.forEach(function (t) {
-                csv += '"' + (t.NOMBRE || "") + '"\n';
+                csv += '"' + (t.NOMBRE || "") + '","' +
+                    (Number(t.st_registro) === 1 ? "Activo" : "Inactivo") + '"\n';
             });
+
             var blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
             var link = document.createElement("a");
             var url = URL.createObjectURL(blob);
+
             link.setAttribute("href", url);
             link.setAttribute("download", "tipos_" + new Date().toISOString().slice(0, 10) + ".csv");
             link.style.visibility = "hidden";
+
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         }
 
         panelTipo.addEventListener("click", function (e) {

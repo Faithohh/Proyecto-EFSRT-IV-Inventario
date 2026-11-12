@@ -122,6 +122,52 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    
+
+    // Exportar PDF
+    const btnExportarPDF = document.getElementById("btnExportarPDF");
+
+    if (btnExportarPDF) {
+        btnExportarPDF.addEventListener("click", function () {
+            const combo = document.getElementById("cbInventario");
+
+            if (!combo || !combo.value) {
+                mostrarAdvertencia(
+                    "Seleccione un inventario",
+                    "Debe seleccionar un inventario antes de exportar el PDF."
+                );
+
+                return;
+            }
+
+            window.location.href =
+                "/reportes/exportar-pdf/" + encodeURIComponent(combo.value);
+        });
+    }
+
+
+    // Exportar Excel
+    const btnExportarExcel = document.getElementById("btnExportarExcel");
+
+    if (btnExportarExcel) {
+        btnExportarExcel.addEventListener("click", function () {
+            const combo = document.getElementById("cbInventario");
+
+            if (!combo || !combo.value) {
+                mostrarAdvertencia(
+                    "Seleccione un inventario",
+                    "Debe seleccionar un inventario antes de exportar el Excel."
+                );
+
+                return;
+            }
+
+            window.location.href =
+                "/reportes/exportar-excel/" + encodeURIComponent(combo.value);
+        });
+    }
+
+
     function cargarInforme(idInventario) {
         document.getElementById("contenedorReporte").innerHTML = `
             <div class="reporte-cargando">

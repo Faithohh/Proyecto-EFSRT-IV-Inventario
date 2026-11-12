@@ -58,6 +58,8 @@ Route::middleware('sesion')->group(function () {
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
     Route::get('/reportes/inventarios', [ReporteController::class, 'listarInventarios'])->name('reportes.inventarios');
     Route::get('/reportes/informe/{idInventario}', [ReporteController::class, 'generarInforme'])->name('reportes.informe');
+    Route::get('/reportes/exportar-excel/{idInventario}', [ReporteController::class, 'exportarExcel'])->name('reportes.exportarExcel');
+    Route::get('/reportes/exportar-pdf/{idInventario}', [ReporteController::class, 'exportarPDF'])->name('reportes.exportarPDF');
 
 
     // Rutas de Módulo Usuarios
@@ -92,6 +94,8 @@ Route::middleware('sesion')->group(function () {
     Route::get('/grupo/buscar/{idGrupo}', [GrupoController::class, 'buscar'])->name('grupo.buscar');
     Route::post('/grupo/guardar', [GrupoController::class, 'guardar'])->name('grupo.guardar');
     Route::post('/grupo/eliminar', [GrupoController::class, 'eliminar'])->name('grupo.eliminar');
+    Route::post('/grupo/activar', [GrupoController::class, 'activar'])->name('grupo.activar');
+
 
 
     // Rutas de Módulo Estado
@@ -105,7 +109,7 @@ Route::middleware('sesion')->group(function () {
     Route::post('/estado/eliminar', [EstadoController::class, 'eliminar'])->name('estado.eliminar');
 
 
-    // Rutas de Módulo Marca
+ // Rutas de Módulo Marca
     Route::get('/marca', function () {
         return view('modulos.marca');
     })->name('marca.index');
@@ -114,28 +118,30 @@ Route::middleware('sesion')->group(function () {
     Route::get('/marca/buscar/{idMarca}', [MarcaController::class, 'buscar'])->name('marca.buscar');
     Route::post('/marca/guardar', [MarcaController::class, 'guardar'])->name('marca.guardar');
     Route::post('/marca/eliminar', [MarcaController::class, 'eliminar'])->name('marca.eliminar');
+    Route::post('/marca/activar', [MarcaController::class, 'activar'])->name('marca.activar');
+
+ // Rutas de Módulo Modelo
+   Route::get('/modelo', function () {
+       return view('modulos.modelo');
+   })->name('modelo.index');
+
+   Route::get('/modelo/listar', [ModeloController::class, 'listar'])->name('modelo.listar');
+   Route::get('/modelo/buscar/{idModelo}', [ModeloController::class, 'buscar'])->name('modelo.buscar');
+   Route::post('/modelo/guardar', [ModeloController::class, 'guardar'])->name('modelo.guardar');
+   Route::post('/modelo/eliminar', [ModeloController::class, 'eliminar'])->name('modelo.eliminar');
+   Route::post('/modelo/activar', [ModeloController::class, 'activar'])->name('modelo.activar');
 
 
-    // Rutas de Módulo Modelo
-    Route::get('/modelo', function () {
-        return view('modulos.modelo');
-    })->name('modelo.index');
+   // Rutas de Módulo Sala
+   Route::get('/sala', function () {
+       return view('modulos.sala');
+   })->name('sala.index');
 
-    Route::get('/modelo/listar', [ModeloController::class, 'listar'])->name('modelo.listar');
-    Route::get('/modelo/buscar/{idModelo}', [ModeloController::class, 'buscar'])->name('modelo.buscar');
-    Route::post('/modelo/guardar', [ModeloController::class, 'guardar'])->name('modelo.guardar');
-    Route::post('/modelo/eliminar', [ModeloController::class, 'eliminar'])->name('modelo.eliminar');
-
-
-    // Rutas de Módulo Sala
-    Route::get('/sala', function () {
-        return view('modulos.sala');
-    })->name('sala.index');
-
-    Route::get('/sala/listar', [SalaController::class, 'listar'])->name('sala.listar');
-    Route::get('/sala/buscar/{idSala}', [SalaController::class, 'buscar'])->name('sala.buscar');
-    Route::post('/sala/guardar', [SalaController::class, 'guardar'])->name('sala.guardar');
-    Route::post('/sala/eliminar', [SalaController::class, 'eliminar'])->name('sala.eliminar');
+   Route::get('/sala/listar', [SalaController::class, 'listar'])->name('sala.listar');
+   Route::get('/sala/buscar/{idSala}', [SalaController::class, 'buscar'])->name('sala.buscar');
+   Route::post('/sala/guardar', [SalaController::class, 'guardar'])->name('sala.guardar');
+   Route::post('/sala/eliminar', [SalaController::class, 'eliminar'])->name('sala.eliminar');
+   Route::post('/sala/activar', [SalaController::class, 'activar'])->name('sala.activar');
 
 
     // Rutas de Módulo Tipo
@@ -147,6 +153,7 @@ Route::middleware('sesion')->group(function () {
     Route::get('/tipo/buscar/{idTipo}', [TipoController::class, 'buscar'])->name('tipo.buscar');
     Route::post('/tipo/guardar', [TipoController::class, 'guardar'])->name('tipo.guardar');
     Route::post('/tipo/eliminar', [TipoController::class, 'eliminar'])->name('tipo.eliminar');
+    Route::post('/tipo/activar', [TipoController::class, 'activar'])->name('tipo.activar');
 
 
     // Rutas de Módulo Programa de Estudio
@@ -161,16 +168,17 @@ Route::middleware('sesion')->group(function () {
     Route::delete('/programa-estudio/eliminar/{idProgramaEstudio}', [ProgramaEstudioController::class, 'eliminar'])->name('programa.eliminar');
 
 
-    // Rutas de Módulo Bienes
-    Route::get('/bienes', function () {
-        return view('modulos.bienes');
-    })->name('bienes.index');
+   // Rutas de Módulo Bienes
+Route::get('/bienes', function () {
+    return view('modulos.bienes');
+})->name('bienes.index');
 
-    Route::get('/bienes/listar', [BienController::class, 'listar'])->name('bienes.listar');
-    Route::get('/bienes/salas', [BienController::class, 'listarSalas'])->name('bienes.salas');
-    Route::get('/bienes/combos', [BienController::class, 'cargarCombos'])->name('bienes.combos');
-    Route::get('/bienes/buscar/{idBien}', [BienController::class, 'buscar'])->name('bienes.buscar');
-    Route::post('/bienes/guardar', [BienController::class, 'guardar'])->name('bienes.guardar');
-    Route::post('/bienes/eliminar', [BienController::class, 'eliminar'])->name('bienes.eliminar');
+Route::get('/bienes/listar', [BienController::class, 'listar'])->name('bienes.listar');
+Route::get('/bienes/salas', [BienController::class, 'listarSalas'])->name('bienes.salas');
+Route::get('/bienes/combos', [BienController::class, 'cargarCombos'])->name('bienes.combos');
+Route::get('/bienes/buscar/{idBien}', [BienController::class, 'buscar'])->name('bienes.buscar');
+Route::post('/bienes/guardar', [BienController::class, 'guardar'])->name('bienes.guardar');
+Route::post('/bienes/eliminar', [BienController::class, 'eliminar'])->name('bienes.eliminar');
+Route::post('/bienes/activar', [BienController::class, 'activar'])->name('bienes.activar');
 
 });

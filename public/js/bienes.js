@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", function () {
     (function () {
         var panelBien = document.getElementById("mpBien") || document;
@@ -16,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         function getCsrfToken() {
-            return document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
+            return document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ||
                    document.querySelector('input[name="_token"]')?.value || "";
         }
 
@@ -99,26 +100,41 @@ document.addEventListener("DOMContentLoaded", function () {
         function pintarBien(lista) {
             if (!tblBody) return;
             if (!lista.length) {
-                tblBody.innerHTML = '<tr><td colspan="13" class="text-center">No hay registros disponibles</td></tr>';
+                tblBody.innerHTML = '<tr><td colspan="15" class="text-center">No hay registros disponibles</td></tr>';
                 return;
             }
-            tblBody.innerHTML = lista.map(item => `
-                <tr data-id="${esc(item.idBien)}" style="cursor:pointer;">
-                    <td>${esc(item.cbi)}</td>
-                    <td>${esc(item.descripcion)}</td>
-                    <td>${esc(item.tipo)}</td>
-                    <td>${esc(item.marca)}</td>
-                    <td>${esc(item.modelo)}</td>
-                    <td>${esc(item.estado)}</td>
-                    <td>${esc(item.grupo)}</td>
-                    <td>${esc(item.serieMedida)}</td>
-                    <td>${esc(item.otrasEspecificaciones)}</td>
-                    <td>${esc(formatearFecha(item.fechaCreacion))}</td>
-                    <td>${esc(formatearFecha(item.fechaModificacion))}</td>
-                    <td>${esc(item.idUsuarioCrea)}</td>
-                    <td>${esc(item.idUsuarioModifica)}</td>
-                </tr>
-            `).join("");
+
+            tblBody.innerHTML = lista.map(item => {
+                var activo = Number(item.st_registro) === 1;
+
+                return `
+                    <tr data-id="${esc(item.idBien)}" style="cursor:pointer;">
+                        <td>${esc(item.cbi)}</td>
+                        <td>${esc(item.descripcion)}</td>
+                        <td>${esc(item.tipo)}</td>
+                        <td>${esc(item.marca)}</td>
+                        <td>${esc(item.modelo)}</td>
+                        <td>${esc(item.estado)}</td>
+                        <td>${esc(item.grupo)}</td>
+                        <td>${esc(item.serieMedida)}</td>
+                        <td>${esc(item.otrasEspecificaciones)}</td>
+                        <td>${esc(formatearFecha(item.fechaCreacion))}</td>
+                        <td>${esc(formatearFecha(item.fechaModificacion))}</td>
+                        <td>${esc(item.idUsuarioCrea)}</td>
+                        <td>${esc(item.idUsuarioModifica)}</td>
+                        <td>
+                            <span class="badge ${activo ? 'bg-success' : 'bg-secondary'}" title="${activo ? 'Activo' : 'Inactivo'}">
+                                <i class="bi ${activo ? 'bi-check-circle-fill' : 'bi-x-circle-fill'}"></i>
+                            </span>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm ${activo ? 'btn-outline-danger' : 'btn-outline-success'}" data-estado="${activo ? 0 : 1}" data-id="${esc(item.idBien)}" title="${activo ? 'Desactivar' : 'Activar'}">
+                                <i class="bi ${activo ? 'bi-trash' : 'bi-check-lg'}"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join("");
         }
 
         async function cargarSalasFiltro() {
@@ -158,11 +174,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         async function listarBien() {
             if (!tblBody) return;
-            tblBody.innerHTML = '<tr><td colspan="13" class="text-center">Cargando...</td></tr>';
+            tblBody.innerHTML = '<tr><td colspan="15" class="text-center">Cargando...</td></tr>';
             bienSeleccionado = null;
 
             try {
-                var r = await fetch("/bienes/listar", { headers: { Accept: "application/json" } });
+                var r = await fetch("/bienes/listar?todos=1", { headers: { Accept: "application/json" } });
                 if (!r.ok) throw new Error("Error HTTP " + r.status + ": No se pudo conectar con el servidor.");
 
                 var j = await r.json();
@@ -173,7 +189,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 aplicarFiltros();
             } catch (e) {
                 console.error("Error al cargar bienes:", e);
-                tblBody.innerHTML = `<tr><td colspan="13" class="text-center text-danger">${esc(e.message || "Error al cargar datos")}</td></tr>`;
+                tblBody.innerHTML = `<tr><td colspan="15" class="text-center text-danger">${esc(e.message || "Error al cargar datos")}</td></tr>`;
             }
         }
 
@@ -213,7 +229,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("formBien")?.reset();
             await cargarCombosModal();
             cargarCamposFormulario({});
-            
+
             var cboModalSala = document.getElementById("cboSala");
             if (cboModalSala) cboModalSala.value = salaSeleccionadaFiltro;
 
@@ -323,55 +339,68 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        function confirmarEliminar() {
-            var item = obtenerSeleccionado();
-            if (!item) {
-                Alert.advertencia("Selección requerida", "Por favor, seleccione un registro de la tabla para eliminar.");
-                return;
-            }
+        function cambiarEstadoBien(id, activar) {
+            var item = bienCache.find(g => String(g.idBien) === String(id));
+            if (!item) return;
 
-            var nombre = item.descripcion || item.idBien || "este bien";
+            var accion = activar ? "activar" : "desactivar";
+            var titulo = activar ? "¿Activar registro?" : "¿Desactivar registro?";
+            var mensaje = activar
+                ? `¿Está seguro de activar el bien "${item.descripcion}"?`
+                : `¿Está seguro de desactivar el bien "${item.descripcion}"?`;
 
-            Alert.confirmar("¿Eliminar registro?", `¿Está seguro de eliminar el bien "${nombre}"?`, async function () {
+            Alert.confirmar(titulo, mensaje, async function () {
                 try {
-                    var res = await fetch("/bienes/eliminar", {
+                    var res = await fetch(activar ? "/bienes/activar" : "/bienes/eliminar", {
                         method: "POST",
                         headers: {
                             "X-CSRF-TOKEN": getCsrfToken(),
                             "Content-Type": "application/json",
                             Accept: "application/json"
                         },
-                        body: JSON.stringify({ idBien: item.idBien })
+                        body: JSON.stringify({ idBien: id })
                     });
 
                     var data = await res.json();
+
                     if (data.ok) {
                         bienSeleccionado = null;
-                        Alert.exito("Eliminado", data.msg || "Bien eliminado correctamente.", async function () {
+                        Alert.exito(activar ? "Activado" : "Desactivado", data.msg || `Bien ${accion}do correctamente.`, async function () {
                             await listarBien();
                         });
                     } else {
-                        Alert.error("Error al eliminar", data.msg || "Error al eliminar el bien.");
+                        Alert.error("Error", data.msg || `Error al ${accion} el bien.`);
                     }
                 } catch (err) {
-                    console.error("Error al eliminar:", err);
+                    console.error("Error al cambiar estado:", err);
                     Alert.error("Error de conexión", "Error de conexión con el servidor.");
                 }
             });
         }
 
-        function exportarExcel() {
-            if (!bienCache || !bienCache.length) { 
-                Alert.advertencia("Sin datos", "No hay datos para exportar."); 
-                return; 
+        function confirmarEliminar() {
+            var item = obtenerSeleccionado();
+            if (!item) {
+                Alert.advertencia("Selección requerida", "Por favor, seleccione un registro de la tabla para desactivar.");
+                return;
             }
-            var csv = "cbi,descripcion,Tipo,Marca,Modelo,Estado,Grupo,serieMedida,otrasEspecificaciones,fechaCreacion,fechaModificacion,idUsuarioCrea,idUsuarioModifica\n";
+
+            cambiarEstadoBien(item.idBien, false);
+        }
+
+        function exportarExcel() {
+            if (!bienCache || !bienCache.length) {
+                Alert.advertencia("Sin datos", "No hay datos para exportar.");
+                return;
+            }
+            var csv = "cbi,descripcion,Tipo,Marca,Modelo,Estado,Grupo,serieMedida,otrasEspecificaciones,fechaCreacion,fechaModificacion,idUsuarioCrea,idUsuarioModifica,Registro\n";
             bienCache.forEach(item => {
                 var cols = [
                     item.cbi, item.descripcion, item.tipo, item.marca, item.modelo,
                     item.estado, item.grupo, item.serieMedida, item.otrasEspecificaciones,
                     formatearFecha(item.fechaCreacion), formatearFecha(item.fechaModificacion),
-                    item.idUsuarioCrea, item.idUsuarioModifica
+                    item.idUsuarioCrea, item.idUsuarioModifica,
+                    Number(item.st_registro) === 1 ? "Activo" : "Inactivo"
                 ];
                 csv += cols.map(c => `"${String(c || "").replace(/"/g, '""')}"`).join(",") + "\n";
             });
@@ -385,12 +414,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (tblBody) {
             tblBody.addEventListener("click", function (e) {
+                if (e.target.closest("button[data-estado]")) return;
+
                 var tr = e.target.closest("tr[data-id]");
                 if (!tr) return;
+
                 tblBody.querySelectorAll("tr").forEach(x => x.classList.remove("table-active", "selected", "sel"));
                 tr.classList.add("table-active", "selected", "sel");
+
                 var id = tr.getAttribute("data-id");
                 bienSeleccionado = bienCache.find(g => String(g.idBien) === String(id));
+            });
+
+            tblBody.addEventListener("click", function (e) {
+                var btn = e.target.closest("button[data-estado]");
+                if (!btn) return;
+
+                e.stopPropagation();
+
+                var tr = btn.closest("tr[data-id]");
+                if (!tr) return;
+
+                var id = tr.getAttribute("data-id");
+                var activar = btn.getAttribute("data-estado") === "1";
+
+                cambiarEstadoBien(id, activar);
             });
         }
 
@@ -419,6 +467,20 @@ document.addEventListener("DOMContentLoaded", function () {
         window.addEventListener("modulo:abrir", e => {
             var mod = (e.detail || "").toLowerCase();
             if (mod === "bienes" || mod === "bien") listarBien();
+        });
+
+        window.addEventListener("salas:actualizadas", async function () {
+            var salaSeleccionada = cboFiltroSala ? cboFiltroSala.value : "";
+
+            await cargarSalasFiltro();
+
+            if (cboFiltroSala) {
+                var existe = Array.from(cboFiltroSala.options).some(o => o.value === salaSeleccionada);
+                cboFiltroSala.value = existe ? salaSeleccionada : "";
+            }
+
+            await cargarCombosModal();
+            aplicarFiltros();
         });
 
         cargarSalasFiltro();

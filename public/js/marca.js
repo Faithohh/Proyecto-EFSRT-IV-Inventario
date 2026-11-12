@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", function () {
     (function () {
         var panelMarca = document.getElementById("mpMarca");
@@ -18,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (match) {
                 var anio = parseInt(match[1], 10);
-                var mes = parseInt(match[2], 10) - 1; 
+                var mes = parseInt(match[2], 10) - 1;
                 var dia = parseInt(match[3], 10);
                 var horas = match[4] ? parseInt(match[4], 10) : 0;
                 var minutos = match[5] ? parseInt(match[5], 10) : 0;
@@ -81,23 +82,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
         function pintarMarca(lista) {
             if (!tblBody) return;
+
             if (!lista || !lista.length) {
-                tblBody.innerHTML = '<tr><td colspan="5" class="text-center">Sin marcas registradas.</td></tr>';
+                tblBody.innerHTML = '<tr><td colspan="7" class="text-center">Sin marcas registradas.</td></tr>';
                 return;
             }
+
             tblBody.innerHTML = lista.map(function (m) {
+                var activo = Number(m.st_registro) === 1;
+
                 return '<tr data-id="' + esc(m.idMarca) + '" style="cursor:pointer;">' +
                     '<td>' + esc(m.nombre) + '</td>' +
                     '<td>' + esc(formatearFecha(m.fechaCreacion)) + '</td>' +
                     '<td>' + esc(formatearFecha(m.fechaModificacion)) + '</td>' +
                     '<td>' + esc(m.idUsuarioCrea) + '</td>' +
-                    '<td>' + esc(m.idUsuarioModifica) + '</td></tr>';
+                    '<td>' + esc(m.idUsuarioModifica) + '</td>' +
+                    '<td class="text-center align-middle">' +
+                        (activo
+                            ? '<span class="badge bg-success" title="Activo"><i class="bi bi-check-circle-fill"></i></span>'
+                            : '<span class="badge bg-secondary" title="Inactivo"><i class="bi bi-x-circle-fill"></i></span>') +
+                    '</td>' +
+                    '<td class="text-center align-middle">' +
+                        '<button type="button" class="btn btn-sm ' + (activo ? 'btn-outline-danger' : 'btn-outline-success') + ' btn-cambiar-estado-marca" data-id="' + esc(m.idMarca) + '" data-estado="' + (activo ? '0' : '1') + '" title="' + (activo ? 'Desactivar' : 'Activar') + '">' +
+                            (activo ? '<i class="bi bi-trash"></i>' : '<i class="bi bi-check-lg"></i>') +
+                        '</button>' +
+                    '</td>' +
+                '</tr>';
             }).join("");
         }
 
         async function mostrarMarca() {
             if (!tblBody) return;
-            tblBody.innerHTML = '<tr><td colspan="5" class="text-center">Cargando...</td></tr>';
+
+            tblBody.innerHTML = '<tr><td colspan="7" class="text-center">Cargando...</td></tr>';
             marcaSeleccionada = null;
 
             try {
@@ -106,13 +123,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 var j = await r.json();
                 if (!j.ok) throw new Error(j.msg || "Sin datos");
-                
+
                 marcaCache = j.data || [];
                 pintarMarca(marcaCache);
                 if (txtBuscar) txtBuscar.value = "";
             } catch (e) {
                 console.error("Error al cargar marcas:", e);
-                tblBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">' + esc(e.message) + '</td></tr>';
+                tblBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">' + esc(e.message) + '</td></tr>';
             }
         }
 
@@ -133,17 +150,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (tblBody) {
             tblBody.addEventListener("click", function (e) {
+                var btnEstado = e.target.closest(".btn-cambiar-estado-marca");
+
+                if (btnEstado) {
+                    e.stopPropagation();
+                    cambiarEstadoMarca(btnEstado.dataset.id, btnEstado.dataset.estado === "1");
+                    return;
+                }
+
                 var tr = e.target.closest("tr[data-id]");
                 if (!tr) return;
-                
-                tblBody.querySelectorAll("tr").forEach(function (x) { 
-                    x.classList.remove("sel", "selected", "table-active"); 
+
+                tblBody.querySelectorAll("tr").forEach(function (x) {
+                    x.classList.remove("sel", "selected", "table-active");
                 });
                 tr.classList.add("table-active", "selected");
 
                 var id = tr.getAttribute("data-id");
-                marcaSeleccionada = marcaCache.find(function (item) { 
-                    return String(item.idMarca) === String(id); 
+                marcaSeleccionada = marcaCache.find(function (item) {
+                    return String(item.idMarca) === String(id);
                 });
             });
         }
@@ -152,6 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
             txtBuscar.addEventListener("input", function () {
                 var q = txtBuscar.value.trim().toLowerCase();
                 if (!q) return pintarMarca(marcaCache);
+
                 pintarMarca(marcaCache.filter(function (m) {
                     return (m.nombre || "").toLowerCase().includes(q) ||
                            (m.idUsuarioCrea || "").toLowerCase().includes(q) ||
@@ -167,11 +193,6 @@ document.addEventListener("DOMContentLoaded", function () {
             var txtOrig = document.getElementById("txtIdMarcaOriginal");
             if (txtOrig) txtOrig.value = "";
 
-            var lblPrograma = document.getElementById("lblProgramaEstudioMarca");
-            var txtPrograma = document.getElementById("txtIdProgramaEstudioMarca");
-            if (lblPrograma) lblPrograma.textContent = "2";
-            if (txtPrograma) txtPrograma.value = "2";
-
             var modalTitle = document.getElementById("modalMarcaTitle");
             if (modalTitle) modalTitle.textContent = "Nueva Marca";
 
@@ -181,9 +202,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         function editarMarca() {
-            if (!marcaSeleccionada) { 
-                Alert.advertencia("Selección requerida", "Por favor, seleccione una marca de la lista para editar."); 
-                return; 
+            if (!marcaSeleccionada) {
+                Alert.advertencia("Selección requerida", "Por favor, seleccione una marca de la lista para editar.");
+                return;
+            }
+
+            if (Number(marcaSeleccionada.st_registro) !== 1) {
+                Alert.advertencia("Marca inactiva", "No se puede editar una marca desactivada. Primero debe activarla.");
+                return;
             }
 
             var txtOrig = document.getElementById("txtIdMarcaOriginal");
@@ -194,8 +220,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (txtOrig) txtOrig.value = marcaSeleccionada.idMarca || "";
             if (txtNombre) txtNombre.value = marcaSeleccionada.nombre || "";
-            
-            var prog = marcaSeleccionada.idProgramaEstudio || "2";
+
+            var prog = marcaSeleccionada.idProgramaEstudio || "";
             if (lblPrograma) lblPrograma.textContent = prog;
             if (txtPrograma) txtPrograma.value = prog;
 
@@ -207,9 +233,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         function verDetalle() {
-            if (!marcaSeleccionada) { 
-                Alert.advertencia("Selección requerida", "Por favor, seleccione una marca de la lista para consultar."); 
-                return; 
+            if (!marcaSeleccionada) {
+                Alert.advertencia("Selección requerida", "Por favor, seleccione una marca de la lista para consultar.");
+                return;
             }
 
             var txtOrig = document.getElementById("txtIdMarcaOriginal");
@@ -221,7 +247,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (txtOrig) txtOrig.value = marcaSeleccionada.idMarca || "";
             if (txtNombre) txtNombre.value = marcaSeleccionada.nombre || "";
 
-            var prog = marcaSeleccionada.idProgramaEstudio || "2";
+            var prog = marcaSeleccionada.idProgramaEstudio || "";
             if (lblPrograma) lblPrograma.textContent = prog;
             if (txtPrograma) txtPrograma.value = prog;
 
@@ -234,60 +260,93 @@ document.addEventListener("DOMContentLoaded", function () {
 
         function confirmarEliminar() {
             if (!marcaSeleccionada) {
-                Alert.advertencia("Selección requerida", "Por favor, seleccione una marca de la tabla para eliminar.");
+                Alert.advertencia("Selección requerida", "Por favor, seleccione una marca de la tabla para desactivar.");
+                return;
+            }
+
+            if (Number(marcaSeleccionada.st_registro) !== 1) {
+                Alert.advertencia("Marca inactiva", "La marca seleccionada ya está desactivada.");
                 return;
             }
 
             var nombre = marcaSeleccionada.nombre || marcaSeleccionada.idMarca || "este registro";
 
-            Alert.confirmar("¿Eliminar registro?", '¿Está seguro de eliminar la marca "' + nombre + '"?', async function () {
-                var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
-                            document.querySelector('input[name="_token"]')?.value;
-
-                try {
-                    var response = await fetch("/marca/eliminar", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Accept: "application/json",
-                            "X-CSRF-TOKEN": token
-                        },
-                        body: JSON.stringify({ idMarca: marcaSeleccionada.idMarca })
-                    });
-
-                    var data = await response.json();
-                    if (data.ok || data.success) {
-                        Alert.exito("Eliminado", data.msg || data.message || "Marca eliminada correctamente.", async function () {
-                            await mostrarMarca();
-                        });
-                    } else {
-                        Alert.error("Error al eliminar", data.msg || data.message || "Error al eliminar la marca.");
-                    }
-                } catch (e) {
-                    console.error("Error al eliminar:", e);
-                    Alert.error("Error de conexión", "Error de conexión con el servidor.");
-                }
+            Alert.confirmar("¿Desactivar marca?", '¿Está seguro de desactivar la marca "' + nombre + '"?', async function () {
+                await enviarEstadoMarca(marcaSeleccionada.idMarca, false);
             });
         }
 
-        function exportarExcel() {
-            if (!marcaCache.length) { 
-                Alert.advertencia("Sin datos", "No hay datos para exportar."); 
-                return; 
-            }
-            var csv = "Nombre,Fecha Creacion,Fecha Modificacion,Usuario Crea,Usuario Modifica\n";
-            marcaCache.forEach(function (m) {
-                csv += '"' + (m.nombre || "") + '","' + 
-                            (formatearFecha(m.fechaCreacion) || "") + '","' + 
-                            (formatearFecha(m.fechaModificacion) || "") + '","' + 
-                            (m.idUsuarioCrea || "") + '","' + 
-                            (m.idUsuarioModifica || "") + '"\n';
+        async function cambiarEstadoMarca(idMarca, activar) {
+            var marca = marcaCache.find(function (m) {
+                return String(m.idMarca) === String(idMarca);
             });
+
+            if (!marca) return;
+
+            var nombre = marca.nombre || idMarca;
+            var titulo = activar ? "¿Activar marca?" : "¿Desactivar marca?";
+            var mensaje = activar
+                ? '¿Está seguro de activar la marca "' + nombre + '"?'
+                : '¿Está seguro de desactivar la marca "' + nombre + '"?';
+
+            Alert.confirmar(titulo, mensaje, async function () {
+                await enviarEstadoMarca(idMarca, activar);
+            });
+        }
+
+        async function enviarEstadoMarca(idMarca, activar) {
+            var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ||
+                        document.querySelector('input[name="_token"]')?.value;
+
+            try {
+                var response = await fetch(activar ? "/marca/activar" : "/marca/eliminar", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN": token
+                    },
+                    body: JSON.stringify({ idMarca: idMarca })
+                });
+
+                var data = await response.json();
+
+                if (data.ok || data.success) {
+                    Alert.exito(activar ? "Activada" : "Desactivada", data.msg || data.message || "Estado actualizado correctamente.", async function () {
+                        await mostrarMarca();
+                    });
+                } else {
+                    Alert.error("Error", data.msg || data.message || "No se pudo cambiar el estado de la marca.");
+                }
+            } catch (e) {
+                console.error("Error al cambiar estado:", e);
+                Alert.error("Error de conexión", "Error de conexión con el servidor.");
+            }
+        }
+
+        function exportarExcel() {
+            if (!marcaCache.length) {
+                Alert.advertencia("Sin datos", "No hay datos para exportar.");
+                return;
+            }
+
+            var csv = "Nombre,Fecha Creacion,Fecha Modificacion,Usuario Crea,Usuario Modifica,Estado\n";
+
+            marcaCache.forEach(function (m) {
+                csv += '"' + (m.nombre || "") + '","' +
+                            (formatearFecha(m.fechaCreacion) || "") + '","' +
+                            (formatearFecha(m.fechaModificacion) || "") + '","' +
+                            (m.idUsuarioCrea || "") + '","' +
+                            (m.idUsuarioModifica || "") + '","' +
+                            (Number(m.st_registro) === 1 ? "Activo" : "Inactivo") + '"\n';
+            });
+
             var blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
             var link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
             link.download = "marcas_" + new Date().toISOString().slice(0, 10) + ".csv";
             link.click();
+            URL.revokeObjectURL(link.href);
         }
 
         panelMarca.addEventListener("click", function (e) {
@@ -315,8 +374,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 var nombre = txtNombre ? txtNombre.value.trim() : "";
                 var txtPrograma = document.getElementById("txtIdProgramaEstudioMarca");
                 var idProgramaEstudio = txtPrograma ? txtPrograma.value : "";
-                var cboEstado = document.getElementById("cboEstadoMarca");
-                var stRegistro = cboEstado ? cboEstado.value : 1;
                 var txtOrig = document.getElementById("txtIdMarcaOriginal");
                 var idOriginal = txtOrig ? txtOrig.value : "";
 
@@ -326,7 +383,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 try {
-                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || 
+                    var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") ||
                                 document.querySelector('input[name="_token"]')?.value;
 
                     var response = await fetch("/marca/guardar", {
@@ -339,15 +396,17 @@ document.addEventListener("DOMContentLoaded", function () {
                         body: JSON.stringify({
                             nombre: nombre,
                             idProgramaEstudio: idProgramaEstudio,
-                            st_registro: stRegistro,
+                            st_registro: 1,
                             idOriginal: idOriginal
                         })
                     });
 
                     var data = await response.json();
+
                     if (data.ok || data.success) {
                         var modal = getModalMarca();
                         if (modal) modal.hide();
+
                         Alert.exito("¡Guardado!", data.msg || data.message || "Registro guardado correctamente.", async function () {
                             await mostrarMarca();
                         });
@@ -355,8 +414,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         Alert.error("Error al guardar", data.msg || data.message || "Error al guardar la marca.");
                     }
                 } catch (e) {
-                    var modal = getModalMarca();
-                    if (modal) modal.hide();
+                    console.error("Error al guardar:", e);
                     Alert.error("Error de conexión", "Error de conexión al guardar.");
                 }
             });
