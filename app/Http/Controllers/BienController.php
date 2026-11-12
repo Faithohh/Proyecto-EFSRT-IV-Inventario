@@ -61,6 +61,7 @@ class BienController extends Controller
                     'b.idMarca',
                     'b.idModelo',
                     'b.idEstado',
+                    'b.st_registro',
                     'b.idUsuarioCrea',
                     'b.fechaCreacion',
                     'b.idUsuarioModifica',
@@ -73,7 +74,9 @@ class BienController extends Controller
                     DB::raw("COALESCE(g.nombre, '') as grupo")
                 );
 
-            $this->aplicarFiltroEstado($query, 'b.st_registro');
+            if (!$request->boolean('todos')) {
+                $this->aplicarFiltroEstado($query, 'b.st_registro');
+            }
 
             if (!empty($idProgramaEstudio)) {
                 $query->where('s.idProgramaEstudio', '=', $idProgramaEstudio);
@@ -133,9 +136,11 @@ class BienController extends Controller
     {
         try {
             $bien = DB::table('bien')->where('idBien', $idBien)->first();
+
             if (!$bien) {
                 return response()->json(['ok' => false, 'msg' => 'Bien no encontrado'], 404);
             }
+
             return response()->json(['ok' => true, 'data' => $bien]);
         } catch (\Exception $e) {
             return response()->json(['ok' => false, 'msg' => $e->getMessage()], 500);
@@ -196,15 +201,51 @@ class BienController extends Controller
                 return response()->json(['ok' => false, 'msg' => 'ID de bien no proporcionado'], 400);
             }
 
+            $bien = DB::table('bien')->where('idBien', $idBien)->first();
+
+            if (!$bien) {
+                return response()->json(['ok' => false, 'msg' => 'Bien no encontrado'], 404);
+            }
+
             DB::table('bien')->where('idBien', $idBien)->update([
                 'st_registro' => 0,
                 'idUsuarioModifica' => $idUsuario,
-                'fechaModificacion' => now()
+                'fechaModificacion' => now(),
+                'pcTerminalModifica' => $request->ip()
             ]);
 
-            return response()->json(['ok' => true, 'msg' => 'Bien eliminado correctamente']);
+            return response()->json(['ok' => true, 'msg' => 'Bien desactivado correctamente']);
         } catch (\Exception $e) {
-            return response()->json(['ok' => false, 'msg' => 'Error al eliminar el bien: ' . $e->getMessage()], 500);
+            return response()->json(['ok' => false, 'msg' => 'Error al desactivar el bien: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function activar(Request $request)
+    {
+        try {
+            $idBien = $request->input('idBien');
+            $idUsuario = Session::get('idUsuario', 'ADMIN');
+
+            if (empty($idBien)) {
+                return response()->json(['ok' => false, 'msg' => 'ID de bien no proporcionado'], 400);
+            }
+
+            $bien = DB::table('bien')->where('idBien', $idBien)->first();
+
+            if (!$bien) {
+                return response()->json(['ok' => false, 'msg' => 'Bien no encontrado'], 404);
+            }
+
+            DB::table('bien')->where('idBien', $idBien)->update([
+                'st_registro' => 1,
+                'idUsuarioModifica' => $idUsuario,
+                'fechaModificacion' => now(),
+                'pcTerminalModifica' => $request->ip()
+            ]);
+
+            return response()->json(['ok' => true, 'msg' => 'Bien activado correctamente']);
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'msg' => 'Error al activar el bien: ' . $e->getMessage()], 500);
         }
     }
 }

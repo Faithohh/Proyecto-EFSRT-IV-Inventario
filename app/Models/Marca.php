@@ -74,14 +74,30 @@ class Marca
             ->update([
                 'nombre'             => $nombre,
                 'idProgramaEstudio'  => $idProgramaEstudio ?: null,
-                'st_registro'        => $stRegistro ?? 1,
                 'idUsuarioModifica'  => $idUsuario,
                 'fechaModificacion'  => now(),
             ]);
     }
 
-    public static function eliminar($idMarca)
+    public static function eliminar($idMarca, $idUsuario)
     {
-        return DB::table('marca')->where('idMarca', $idMarca)->delete();
+        return DB::table('marca')
+            ->where('idMarca', $idMarca)
+            ->update([
+                'st_registro'       => 0,
+                'idUsuarioModifica' => $idUsuario,
+                'fechaModificacion' => now(),
+            ]);
+    }
+
+    public static function activar($idMarca, $idUsuario)
+    {
+        return DB::table('marca')
+            ->where('idMarca', $idMarca)
+            ->update([
+                'st_registro'       => 1,
+                'idUsuarioModifica' => $idUsuario,
+                'fechaModificacion' => now(),
+            ]);
     }
 }

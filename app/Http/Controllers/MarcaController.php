@@ -62,14 +62,37 @@ class MarcaController extends Controller
     {
         try {
             $idMarca = $request->input('idMarca');
+
             if (empty($idMarca)) {
                 return response()->json(['ok' => false, 'msg' => 'ID de marca no proporcionado'], 400);
             }
 
-            Marca::eliminar($idMarca);
-            return response()->json(['ok' => true, 'msg' => 'Marca eliminada correctamente']);
+            $idUsuario = Session::get('idUsuario', 'SISTEMA');
+
+            Marca::eliminar($idMarca, $idUsuario);
+
+            return response()->json(['ok' => true, 'msg' => 'Marca desactivada correctamente']);
         } catch (\Exception $e) {
-            return response()->json(['ok' => false, 'msg' => 'Error al eliminar la marca: ' . $e->getMessage()], 500);
+            return response()->json(['ok' => false, 'msg' => 'Error al desactivar la marca: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function activar(Request $request)
+    {
+        try {
+            $idMarca = $request->input('idMarca');
+
+            if (empty($idMarca)) {
+                return response()->json(['ok' => false, 'msg' => 'ID de marca no proporcionado'], 400);
+            }
+
+            $idUsuario = Session::get('idUsuario', 'SISTEMA');
+
+            Marca::activar($idMarca, $idUsuario);
+
+            return response()->json(['ok' => true, 'msg' => 'Marca activada correctamente']);
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'msg' => 'Error al activar la marca: ' . $e->getMessage()], 500);
         }
     }
 }

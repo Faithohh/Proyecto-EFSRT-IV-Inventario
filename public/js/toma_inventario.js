@@ -813,15 +813,16 @@ async function cargarBienesPorSala(idSala) {
             const tdDrelm = document.createElement("td");
             const inputDrelm = document.createElement("input");
 
-            inputDrelm.type = "text";
+             inputDrelm.type = "text";
             inputDrelm.inputMode = "numeric";
+            inputDrelm.maxLength = 6;
             inputDrelm.className = "form-control form-control-sm txtNroDrelm";
             inputDrelm.placeholder = "NRO_DRELM";
             inputDrelm.dataset.idBien = bien.idBien;
             inputDrelm.disabled = inventarioSoloLectura;
 
             inputDrelm.addEventListener("input", function () {
-                this.value = this.value.replace(/[^0-9]/g, "");
+                this.value = this.value.replace(/[^0-9]/g, "").slice(0, 6);
             });
 
             tdDrelm.appendChild(inputDrelm);
@@ -862,7 +863,7 @@ function limpiarBienesInventario() {
 
     if (tbody) {
         tbody.innerHTML =
-            '<tr><td colspan="9" class="text-center text-muted py-4">Seleccione una sala y pulse la lupa para cargar los bienes.</td></tr>';
+            '<tr><td colspan="9" class="text-center text-muted py-4">Seleccione una sala para cargar automaticamente.</td></tr>';
     }
 
     const etiqueta = document.getElementById("lblCantidadBienesInventario");

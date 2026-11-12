@@ -62,14 +62,39 @@ class GrupoController extends Controller
     {
         try {
             $idGrupo = $request->input('idGrupo');
+
             if (empty($idGrupo)) {
                 return response()->json(['ok' => false, 'msg' => 'ID de grupo no proporcionado'], 400);
             }
 
-            Grupo::eliminar($idGrupo);
-            return response()->json(['ok' => true, 'msg' => 'Grupo eliminado correctamente']);
+            $idUsuario = Session::get('idUsuario', 'AZUÑIGA');
+
+            Grupo::eliminar($idGrupo, $idUsuario);
+
+            return response()->json(['ok' => true, 'msg' => 'Grupo desactivado correctamente']);
+
         } catch (\Exception $e) {
-            return response()->json(['ok' => false, 'msg' => 'Error al eliminar el grupo: ' . $e->getMessage()], 500);
+            return response()->json(['ok' => false, 'msg' => 'Error al desactivar el grupo: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function activar(Request $request)
+    {
+        try {
+            $idGrupo = $request->input('idGrupo');
+
+            if (empty($idGrupo)) {
+                return response()->json(['ok' => false, 'msg' => 'ID de grupo no proporcionado'], 400);
+            }
+
+            $idUsuario = Session::get('idUsuario', 'AZUÑIGA');
+
+            Grupo::activar($idGrupo, $idUsuario);
+
+            return response()->json(['ok' => true, 'msg' => 'Grupo activado correctamente']);
+
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'msg' => 'Error al activar el grupo: ' . $e->getMessage()], 500);
         }
     }
 }

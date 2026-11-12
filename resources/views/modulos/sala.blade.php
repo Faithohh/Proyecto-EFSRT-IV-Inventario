@@ -1,3 +1,4 @@
+
 <section class="mp-panel" id="mpSala" hidden>
     <!-- CABECERA DEL MÓDULO (Icono Puerta / Salón) -->
     <div class="mp-panel-header d-flex align-items-center mb-3">
@@ -38,9 +39,15 @@
                     <th>Fecha Modificación</th>
                     <th>Usuario Crea</th>
                     <th>Usuario Modifica</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
                 </tr>
             </thead>
-            <tbody><tr><td colspan="6" class="text-center">Cargando...</td></tr></tbody>
+            <tbody>
+                <tr>
+                    <td colspan="8" class="text-center">Cargando...</td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </section>

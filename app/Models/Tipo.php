@@ -10,7 +10,10 @@ class Tipo
     public static function listar()
     {
         return DB::table('tipo')
-            ->select('NOMBRE')
+            ->select(
+                'NOMBRE',
+                'st_registro'
+            )
             ->orderBy('NOMBRE')
             ->get()
             ->toArray();
@@ -19,7 +22,10 @@ class Tipo
     public static function buscar($nombre)
     {
         return DB::table('tipo')
-            ->select('NOMBRE')
+            ->select(
+                'NOMBRE',
+                'st_registro'
+            )
             ->where('NOMBRE', $nombre)
             ->first();
     }
@@ -36,6 +42,7 @@ class Tipo
 
         return DB::table('tipo')->insert([
             'NOMBRE'        => $nombre,
+            'st_registro'   => 1,
             'idUsuarioCrea' => $idUsuario,
             'fechaCreacion' => now(),
         ]);
@@ -57,6 +64,28 @@ class Tipo
             ->where('NOMBRE', $nombreOriginal)
             ->update([
                 'NOMBRE'            => $nuevoNombre,
+                'idUsuarioModifica' => $idUsuario,
+                'fechaModificacion' => now(),
+            ]);
+    }
+
+    public static function eliminar($nombre, $idUsuario)
+    {
+        return DB::table('tipo')
+            ->where('NOMBRE', $nombre)
+            ->update([
+                'st_registro'       => 0,
+                'idUsuarioModifica' => $idUsuario,
+                'fechaModificacion' => now(),
+            ]);
+    }
+
+    public static function activar($nombre, $idUsuario)
+    {
+        return DB::table('tipo')
+            ->where('NOMBRE', $nombre)
+            ->update([
+                'st_registro'       => 1,
                 'idUsuarioModifica' => $idUsuario,
                 'fechaModificacion' => now(),
             ]);

@@ -80,8 +80,25 @@ class Grupo
             ]);
     }
 
-    public static function eliminar($idGrupo)
+    public static function eliminar($idGrupo, $idUsuario)
     {
-        return DB::table('grupo')->where('idGrupo', $idGrupo)->delete();
+        return DB::table('grupo')
+            ->where('idGrupo', $idGrupo)
+            ->update([
+                'st_registro'       => 0,
+                'idUsuarioModifica' => $idUsuario,
+                'fechaModificacion' => now(),
+            ]);
+    }
+
+    public static function activar($idGrupo, $idUsuario)
+    {
+        return DB::table('grupo')
+            ->where('idGrupo', $idGrupo)
+            ->update([
+                'st_registro'       => 1,
+                'idUsuarioModifica' => $idUsuario,
+                'fechaModificacion' => now(),
+            ]);
     }
 }

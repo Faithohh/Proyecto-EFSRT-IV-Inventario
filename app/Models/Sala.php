@@ -59,6 +59,7 @@ class Sala
 
         $existe = DB::table('sala')
             ->where('nombre', $nombre)
+            ->where('st_registro', 1)
             ->when($idProgramaEstudio, function ($query) use ($idProgramaEstudio) {
                 return $query->where('idProgramaEstudio', $idProgramaEstudio);
             })
@@ -85,6 +86,7 @@ class Sala
         $existe = DB::table('sala')
             ->where('nombre', $nombre)
             ->where('idSala', '!=', $idSala)
+            ->where('st_registro', 1)
             ->when($idProgramaEstudio, function ($query) use ($idProgramaEstudio) {
                 return $query->where('idProgramaEstudio', $idProgramaEstudio);
             })
@@ -102,6 +104,28 @@ class Sala
                 'idProgramaEstudio'  => $idProgramaEstudio ?: null,
                 'st_registro'        => $stRegistro ?? 1,
                 'idUsuarioModifica'  => $idUsuario,
+                'fechaModificacion'  => now(),
+            ]);
+    }
+
+    public static function eliminar($idSala)
+    {
+        return DB::table('sala')
+            ->where('idSala', $idSala)
+            ->update([
+                'st_registro'        => 0,
+                'idUsuarioModifica'  => session('idUsuario', 'SISTEMA'),
+                'fechaModificacion'  => now(),
+            ]);
+    }
+
+    public static function activar($idSala)
+    {
+        return DB::table('sala')
+            ->where('idSala', $idSala)
+            ->update([
+                'st_registro'        => 1,
+                'idUsuarioModifica'  => session('idUsuario', 'SISTEMA'),
                 'fechaModificacion'  => now(),
             ]);
     }

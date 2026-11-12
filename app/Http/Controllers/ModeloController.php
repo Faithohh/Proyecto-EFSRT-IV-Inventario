@@ -63,9 +63,24 @@ class ModeloController extends Controller
             }
 
             Modelo::eliminar($idModelo);
-            return response()->json(['ok' => true, 'msg' => 'Modelo eliminado correctamente']);
+            return response()->json(['ok' => true, 'msg' => 'Modelo desactivado correctamente']);
         } catch (\Exception $e) {
-            return response()->json(['ok' => false, 'msg' => 'Error al eliminar el modelo: ' . $e->getMessage()], 500);
+            return response()->json(['ok' => false, 'msg' => 'Error al desactivar el modelo: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function activar(Request $request)
+    {
+        try {
+            $idModelo = $request->input('idModelo');
+            if (empty($idModelo)) {
+                return response()->json(['ok' => false, 'msg' => 'ID de modelo no proporcionado'], 400);
+            }
+
+            Modelo::activar($idModelo);
+            return response()->json(['ok' => true, 'msg' => 'Modelo activado correctamente']);
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'msg' => 'Error al activar el modelo: ' . $e->getMessage()], 500);
         }
     }
 }

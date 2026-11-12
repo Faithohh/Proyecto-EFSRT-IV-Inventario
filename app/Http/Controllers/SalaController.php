@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\DB;
 use App\Models\Sala;
 use Exception;
 
@@ -61,10 +60,25 @@ class SalaController extends Controller
     {
         try {
             $idSala = $request->input('idSala');
-            DB::table('sala')->where('idSala', $idSala)->delete();
-            return response()->json(['ok' => true, 'msg' => 'Sala eliminada correctamente']);
+
+            Sala::eliminar($idSala);
+
+            return response()->json(['ok' => true, 'msg' => 'Sala desactivada correctamente']);
         } catch (Exception $e) {
-            return response()->json(['ok' => false, 'msg' => 'Error al eliminar la sala: ' . $e->getMessage()]);
+            return response()->json(['ok' => false, 'msg' => 'Error al desactivar la sala: ' . $e->getMessage()]);
+        }
+    }
+
+    public function activar(Request $request)
+    {
+        try {
+            $idSala = $request->input('idSala');
+
+            Sala::activar($idSala);
+
+            return response()->json(['ok' => true, 'msg' => 'Sala activada correctamente']);
+        } catch (Exception $e) {
+            return response()->json(['ok' => false, 'msg' => 'Error al activar la sala: ' . $e->getMessage()]);
         }
     }
 }

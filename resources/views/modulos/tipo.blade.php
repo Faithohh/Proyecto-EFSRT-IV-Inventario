@@ -1,3 +1,4 @@
+
 <section class="mp-panel" id="mpTipo" hidden>
     <!-- CABECERA DEL MÓDULO (Icono Capas / Categoría para Tipo) -->
     <div class="mp-panel-header d-flex align-items-center mb-3">
@@ -30,9 +31,17 @@
     <div class="tb-table-wrap">
         <table class="tb-table" id="tblTipo">
             <thead>
-                <tr><th>Nombre</th></tr>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
             </thead>
-            <tbody><tr><td class="text-center">Cargando...</td></tr></tbody>
+            <tbody>
+                <tr>
+                    <td colspan="3" class="text-center">Cargando...</td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </section>

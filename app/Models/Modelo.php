@@ -12,7 +12,7 @@ class Modelo
         $idProgramaEstudio = session('idProgramaEstudio');
 
         return DB::table('modelo')
-            ->select('idModelo', 'idProgramaEstudio', 'nombre', 'fechaCreacion', 'fechaModificacion', 'idUsuarioCrea', 'idUsuarioModifica')
+            ->select('idModelo', 'idProgramaEstudio', 'nombre', 'fechaCreacion', 'fechaModificacion', 'idUsuarioCrea', 'idUsuarioModifica', 'st_registro')
             ->when($idProgramaEstudio, function ($query) use ($idProgramaEstudio) {
                 return $query->where('idProgramaEstudio', $idProgramaEstudio);
             })
@@ -24,7 +24,7 @@ class Modelo
     public static function buscar($idModelo)
     {
         return DB::table('modelo')
-            ->select('idModelo', 'idProgramaEstudio', 'nombre', 'fechaCreacion', 'fechaModificacion', 'idUsuarioCrea', 'idUsuarioModifica')
+            ->select('idModelo', 'idProgramaEstudio', 'nombre', 'fechaCreacion', 'fechaModificacion', 'idUsuarioCrea', 'idUsuarioModifica', 'st_registro')
             ->where('idModelo', $idModelo)
             ->first();
     }
@@ -48,6 +48,7 @@ class Modelo
         return DB::table('modelo')->insert([
             'nombre'            => $nombre,
             'idProgramaEstudio' => $idProgramaEstudio ?: null,
+            'st_registro'       => 1,
             'idUsuarioCrea'     => $idUsuario,
             'fechaCreacion'     => now(),
         ]);
@@ -81,6 +82,27 @@ class Modelo
 
     public static function eliminar($idModelo)
     {
-        return DB::table('modelo')->where('idModelo', $idModelo)->delete();
+        $idUsuario = session('idUsuario', 'SISTEMA');
+
+        return DB::table('modelo')
+            ->where('idModelo', $idModelo)
+            ->update([
+                'st_registro'       => 0,
+                'idUsuarioModifica' => $idUsuario,
+                'fechaModificacion' => now(),
+            ]);
+    }
+
+    public static function activar($idModelo)
+    {
+        $idUsuario = session('idUsuario', 'SISTEMA');
+
+        return DB::table('modelo')
+            ->where('idModelo', $idModelo)
+            ->update([
+                'st_registro'       => 1,
+                'idUsuarioModifica' => $idUsuario,
+                'fechaModificacion' => now(),
+            ]);
     }
 }

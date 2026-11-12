@@ -1,3 +1,4 @@
+
 <section class="mp-panel" id="mpGrupo" hidden>
     <!-- Cabecera del Módulo -->
     <div class="mp-panel-header d-flex align-items-center mb-3">
@@ -26,7 +27,7 @@
     </div>
 
     <div class="tb-table-wrap">
-        <table class="tb-table" id="tblGrupo">
+        <table class="tb-table" id="tblGrupo" style="width: 100%; table-layout: auto;">
             <thead>
                 <tr>
                     <th>Nombre</th>
@@ -34,9 +35,15 @@
                     <th>fechaCreacion</th>
                     <th>idUsuarioModifica</th>
                     <th>fechaModificacion</th>
+                    <th class="text-center" style="width: 45px; min-width: 45px; padding: 6px 2px; white-space: nowrap;">ESTADO</th>
+                    <th class="text-center" style="width: 45px; min-width: 45px; padding: 6px 2px; white-space: nowrap;">ACCIÓN</th>
                 </tr>
             </thead>
-            <tbody><tr><td colspan="5" class="text-center">Cargando...</td></tr></tbody>
+            <tbody>
+                <tr>
+                    <td colspan="7" class="text-center">Cargando...</td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </section>
