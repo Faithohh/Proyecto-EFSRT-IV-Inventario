@@ -1,3 +1,4 @@
+
 let idInventarioEditando = null;
 let bienesInventario = [];
 let inventarioSoloLectura = false;
@@ -813,7 +814,7 @@ async function cargarBienesPorSala(idSala) {
             const tdDrelm = document.createElement("td");
             const inputDrelm = document.createElement("input");
 
-             inputDrelm.type = "text";
+            inputDrelm.type = "text";
             inputDrelm.inputMode = "numeric";
             inputDrelm.maxLength = 6;
             inputDrelm.className = "form-control form-control-sm txtNroDrelm";
@@ -821,10 +822,25 @@ async function cargarBienesPorSala(idSala) {
             inputDrelm.dataset.idBien = bien.idBien;
             inputDrelm.disabled = inventarioSoloLectura;
 
-            inputDrelm.addEventListener("input", function () {
-                this.value = this.value.replace(/[^0-9]/g, "").slice(0, 6);
-            });
+inputDrelm.addEventListener("input", function () {
+    this.value = this.value.replace(/[^0-9]/g, "").slice(0, 6);
 
+    if (this.value.length === 6) {
+        const filaActual = this.closest("tr");
+        const siguienteFila = filaActual.nextElementSibling;
+
+        if (siguienteFila) {
+            const siguienteInput = siguienteFila.querySelector(
+                ".txtNroDrelm",
+            );
+
+            if (siguienteInput && !siguienteInput.disabled) {
+                siguienteInput.focus();
+                siguienteInput.select();
+            }
+        }
+    }
+});
             tdDrelm.appendChild(inputDrelm);
             tr.appendChild(tdDrelm);
 

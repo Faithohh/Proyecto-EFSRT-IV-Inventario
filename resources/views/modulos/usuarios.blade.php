@@ -74,7 +74,6 @@
                                 <option value="ADMINISTRADOR">ADMINISTRADOR</option>
                                 <option value="COORDINADOR">COORDINADOR</option>
                                 <option value="ASISTENTE">ASISTENTE</option>
-                                <option value="CONSULTA">CONSULTA</option>
                             </select>
                         </div>
                         <div class="col-md-6">

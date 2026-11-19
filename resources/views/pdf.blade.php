@@ -78,6 +78,19 @@
             text-align: left;
         }
 
+        .tabla tr.fila-grupo td {
+            background-color: #dce6f1;
+            color: #1f3b64;
+            font-weight: bold;
+            font-size: 9px;
+            text-align: left;
+            padding: 6px 6px;
+        }
+
+        .tabla tr {
+            page-break-inside: avoid;
+        }
+
         .observacion {
             border: 1px solid #999;
             padding: 8px;
@@ -139,7 +152,6 @@
         <thead>
             <tr>
                 <th>N°</th>
-                <th>GRUPO</th>
                 <th>INV. DRELM</th>
                 <th>CBI</th>
                 <th>DESCRIPCIÓN</th>
@@ -152,10 +164,23 @@
         </thead>
 
         <tbody>
-            @forelse ($informe['bienes'] as $index => $bien)
+            @php
+                $grupoActual = null;
+                $numero = 0;
+            @endphp
+            @forelse ($informe['bienes'] as $bien)
+                @php $grupo = $bien->GRUPO ?? 'SIN GRUPO'; @endphp
+
+                @if ($grupo !== $grupoActual)
+                    <tr class="fila-grupo">
+                        <td colspan="9">GRUPO: {{ $grupo }}</td>
+                    </tr>
+                    @php $grupoActual = $grupo; @endphp
+                @endif
+
+                @php $numero++; @endphp
                 <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $bien->GRUPO }}</td>
+                    <td>{{ $numero }}</td>
                     <td>{{ $bien->INV_DRELM }}</td>
                     <td>{{ $bien->CBI }}</td>
                     <td class="descripcion">{{ $bien->DESCRIPCION }}</td>
@@ -167,7 +192,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="10">No existen bienes registrados en este inventario.</td>
+                    <td colspan="9">No existen bienes registrados en este inventario.</td>
                 </tr>
             @endforelse
         </tbody>
